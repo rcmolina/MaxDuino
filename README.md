@@ -6,5 +6,4 @@ V1.31 Modified ID20,2A to support automatic pausing(@spirax). Also swapped REW-F
 V1.30 max TSX speed 3850 vs  cas speed 3675. Also changed in Menu.
 
 V1.29 3-digits counter can be configured to display m:ss with #define CNTRBASE
-
 V1.28 Better speeed loading tzx files, more than 5000 baudios using PORT instructions
