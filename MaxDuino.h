@@ -203,6 +203,7 @@ byte usedBitsInLastByte=8;
 word loopCount=0;
 byte seqPulses=0;
 word temppause=0;
+byte initialpause0=0;
 unsigned long loopStart=0;
 volatile byte currentChar=0;
 volatile byte currentByte=0;

@@ -769,11 +769,14 @@ void TZXProcess() {
           //process ID20 - Pause Block
           if(r=ReadWord(bytesRead)==2) {
             if(outWord>0) {
+              initialpause0=0;
               temppause = outWord;
-              currentID = IDPAUSE;
+       //       currentID = IDPAUSE;
             } else {
-              currentTask = GETID;
+              initialpause0=1;
+        //      currentTask = GETID;
             }
+            currentID = IDPAUSE;         
           }
         break;
 
@@ -811,7 +814,9 @@ void TZXProcess() {
         case ID2A:
           //Skip//
           bytesRead+=4;
-          currentTask = GETID;
+      //    currentTask = GETID;
+            initialpause0 = 1;
+            currentID = IDPAUSE;        
         break;
 
         case ID2B:
@@ -934,14 +939,16 @@ void TZXProcess() {
                       zeroPulse = TickToUs(486);                    
                       break;
                     case 3850:
-                      /* pilotLength = onePulse = TickToUs(236); //3675
-                      zeroPulse = TickToUs(472);   */  
+                      /* pilotLength = onePulse = TickToUs(238); //3675
+                      zeroPulse = TickToUs(476);   */    
+                      /* pilotLength = onePulse = TickToUs(236); //3700
+                      zeroPulse = TickToUs(472);   */                    
                 //      pilotLength = onePulse = TickToUs(233); //3760
                 //      zeroPulse = TickToUs(466);
+                      pilotLength = onePulse = 65; //3850=1000000/(65*4)
+                      zeroPulse = 130;                  
                       //pilotLength = onePulse = TickToUs(225); //3900
-                      //zeroPulse = TickToUs(450); 
-                      pilotLength = onePulse = 65; //3900
-                      zeroPulse = 130;                                                                                            
+                      //zeroPulse = TickToUs(450);                                                                                           
                       break;
                   }
                
@@ -1126,8 +1133,20 @@ void TZXProcess() {
             }
             bitSet(currentPeriod, 15);
           } else {
-            currentTask = GETID;
-            if(EndOfFile==true) currentID=EOF;  
+              if (initialpause0) {
+                if(!count==0) {
+                  currentPeriod = 32769;
+                  count += -1;
+                } else {
+                  pauseOn=1;
+                  currentTask = GETID;
+                  printtextF(PSTR("ID PAUSED"),0);
+                  initialpause0=0;
+                }
+              } else { 
+                currentTask = GETID;
+                if(EndOfFile==true) currentID=EOF;
+              } 
           } 
         break;
     
