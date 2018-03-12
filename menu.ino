@@ -49,7 +49,7 @@ void menuMode()
         printtextF(PSTR("Motor Ctrl ?"),lineaxy);
         break;
         case 2:
-        printtextF(PSTR("Skip Pauses ?"),lineaxy);
+        printtextF(PSTR("Skip BLK:2A ?"),lineaxy);
         break;       
         case 3:
         printtextF(PSTR("TSXspeedup ?"),lineaxy);
@@ -194,17 +194,17 @@ void menuMode()
           lastbtn=true;
           while(digitalRead(btnStop)==HIGH || lastbtn) {
             if(updateScreen) {
-              printtextF(PSTR("Skip Pauses"),0);
-              if(pskipMask==0) printtextF(PSTR("off *"),lineaxy);
+              printtextF(PSTR("Skip BLK:2A"),0);
+              if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
               else  printtextF(PSTR("ON *"),lineaxy);
           /*    switch(subItem) {
                 case 0:
                   printtextF(PSTR("off"),lineaxy);
-                  if(pskipMask==0) printtextF(PSTR("off *"),lineaxy);
+                  if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
                 break;
                 case 1:
                   printtextF(PSTR("ON"),lineaxy);
-                  if(pskipMask==1) printtextF(PSTR("ON *"),lineaxy);
+                  if(skip2A==1) printtextF(PSTR("ON *"),lineaxy);
                 break;                
               }    */
               updateScreen=false;
@@ -221,19 +221,19 @@ void menuMode()
               updateScreen=true;
             }  */
             if(digitalRead(btnPlay)==LOW && !lastbtn) {
-              pskipMask = !pskipMask;
+              skip2A = !skip2A;
           /*    switch(subItem) {
                 case 0:
-                  pskipMask=0;
+                  skip2A=0;
                 break;
                 case 1:
-                  pskipMask=1;
+                  skip2A=1;
                 break;
               } */
               lastbtn=true;
               updateScreen=true;
               #ifdef OLED1306 
-                OledStatusLine();
+            //    OledStatusLine();
               #endif
             } 
             if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
@@ -318,7 +318,7 @@ void menuMode()
    *  bit 2: 3600
    *  bit 3: 3850
    *  bit 4: n/a
-   *  bit 5: Pause control
+   *  bit 5: BLK_2A control
    *  bit 6: TSXspeedup
    *  bit 7: Motor control
    */
@@ -340,7 +340,7 @@ void menuMode()
   }
   if(mselectMask) settings |=128;
   if(TSXspeedup) settings |=64;
-  if(pskipMask) settings |=32;
+  if(skip2A) settings |=32;
   EEPROM.put(0,settings);
   setBaud();
  }
@@ -362,9 +362,9 @@ void menuMode()
     TSXspeedup=0;
   }
   if(bitRead(settings,5)) {
-    pskipMask=1;
+    skip2A=1;
   } else {
-    pskipMask=0;
+    skip2A=0;
   }   
   if(bitRead(settings,0)) {
     BAUDRATE=1200;

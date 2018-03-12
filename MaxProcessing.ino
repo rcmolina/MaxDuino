@@ -814,9 +814,11 @@ void TZXProcess() {
         case ID2A:
           //Skip//
           bytesRead+=4;
-      //    currentTask = GETID;
+          if (skip2A) currentTask = GETID;
+          else {
             initialpause0 = 1;
-            currentID = IDPAUSE;        
+            currentID = IDPAUSE;
+          }        
         break;
 
         case ID2B:
@@ -1140,7 +1142,7 @@ void TZXProcess() {
                 } else {
                   pauseOn=1;
                   currentTask = GETID;
-                  printtextF(PSTR("ID PAUSED"),0);
+                  printtextF(PSTR("PAUSED*"),0);
                   initialpause0=0;
                 }
               } else { 
@@ -1624,7 +1626,7 @@ void wave2() {
   intError = false;
   if(isStopped==0 && workingPeriod >= 1)
   {
-      if(bitRead(workingPeriod, 15) && !pskipMask)          
+      if bitRead(workingPeriod, 15)          
       {
         //If bit 15 of the current period is set we're about to run a pause
         //Pauses start with a 1.5ms where the output is untouched after which the output is set LOW
