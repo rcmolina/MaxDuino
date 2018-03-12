@@ -1,6 +1,6 @@
 # maxduino
 
-[homepage]: http://www.va-de-retro.com/foros/viewtopic.php?t=5541
+http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
 * V1.32 Deprecated old pskipPause and new block 2A pause control option in Menu.
 * V1.31 Modified ID20,2A to support automatic pausing(@spirax). Also swapped REW-FW for block navigation(@acf76es). 
