@@ -2,6 +2,7 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.33 Blocks for manual REW/FF expanded from 10 upto 20. On Oled screen also prints upto 20 blocks.
 * V1.32 Deprecated old pskipPause and new block 2A pause control option in Menu.
 * V1.31 Modified ID20,2A to support automatic pausing(@spirax). Also swapped REW-FW for block navigation(@acf76es). 
 * V1.30 max TSX speed 3850 vs cas speed 3675. Also changed in Menu.

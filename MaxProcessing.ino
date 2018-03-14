@@ -579,14 +579,18 @@ void TZXProcess() {
               blockID[block] = currentID;
               #ifdef OLED1306
                     #ifdef XY
-                      setXY(8,2);
+                      setXY(7,2);
                       sendChar('1');sendChar('0');
+                      setXY(14,2);
+                  //    if (block == 0) sendChar('0');
+                  //    if (block == 10) sendChar('1');
+                      if ((block%10) == 0) sendChar(48+block/10);  
                       setXY(15,2);
-                      sendChar(48+block);   
+                      sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
                       setXY(10,1);
-                      sendChar(48+block);
+                      sendChar(48+block%10);
                     #endif
               #endif      
               if (block < maxblock-1) block++;               
@@ -628,14 +632,18 @@ void TZXProcess() {
               blockID[block] = currentID;
               #ifdef OLED1306
                     #ifdef XY
-                      setXY(8,2);
-                      sendChar('1');sendChar('1');
+                      setXY(7,2);
+                      sendChar('1');sendChar('0');
+                      setXY(14,2);
+                  //    if (block == 0) sendChar('0');
+                  //    if (block == 10) sendChar('1');
+                      if ((block%10) == 0) sendChar(48+block/10);  
                       setXY(15,2);
-                      sendChar(48+block);   
+                      sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
                       setXY(10,1);
-                      sendChar(48+block);
+                      sendChar(48+block%10);
                     #endif
               #endif   
               if (block < maxblock-1) block++;              
@@ -889,14 +897,18 @@ void TZXProcess() {
               blockID[block] = currentID;
               #ifdef OLED1306
                     #ifdef XY
-                      setXY(8,2);
-                      sendChar('4');sendChar('B');
+                      setXY(7,2);
+                      sendChar('1');sendChar('0');
+                      setXY(14,2);
+                  //    if (block == 0) sendChar('0');
+                  //    if (block == 10) sendChar('1');
+                      if ((block%10) == 0) sendChar(48+block/10);  
                       setXY(15,2);
-                      sendChar(48+block);   
+                      sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
                       setXY(10,1);
-                      sendChar(48+block);
+                      sendChar(48+block%10);
                     #endif
               #endif     
               if (block < maxblock-1) block++;  
@@ -1007,14 +1019,18 @@ void TZXProcess() {
               blockID[block] = currentID;
               #ifdef OLED1306
                     #ifdef XY
-                      setXY(8,2);
-                      sendChar('F');sendChar('E');
+                      setXY(7,2);
+                      sendChar('1');sendChar('0');
+                      setXY(14,2);
+                  //    if (block == 0) sendChar('0');
+                  //    if (block == 10) sendChar('1');
+                      if ((block%10) == 0) sendChar(48+block/10);  
                       setXY(15,2);
-                      sendChar(48+block);   
+                      sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
                       setXY(10,1);
-                      sendChar(48+block);
+                      sendChar(48+block%10);
                     #endif
               #endif     
               if (block < maxblock-1) block++;  

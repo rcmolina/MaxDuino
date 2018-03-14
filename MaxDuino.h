@@ -21,7 +21,7 @@ int period = 208;
 */
 
 int BAUDRATE = 3600;
-int scale = 2;
+byte scale = 2;
 int period = 70;
 
 byte TSXspeedup = 1;
