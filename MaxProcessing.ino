@@ -575,8 +575,8 @@ void TZXProcess() {
           //Process ID10 - Standard Block
           switch (currentBlockTask) {
             case READPARAM:
-              blockOffset[block] = bytesRead;
-              blockID[block] = currentID;
+              blockOffset[block%maxblock] = bytesRead;
+              blockID[block%maxblock] = currentID;
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
@@ -593,7 +593,8 @@ void TZXProcess() {
                       sendChar(48+block%10);
                     #endif
               #endif      
-              if (block < maxblock-1) block++;               
+              if (block < 99) block++;
+              else block = 0;               
               if(r=ReadWord(bytesRead)==2) {
                 pauseLength = outWord;
               }
@@ -628,8 +629,8 @@ void TZXProcess() {
           //Process ID11 - Turbo Tape Block
           switch (currentBlockTask) {
             case READPARAM:
-              blockOffset[block] = bytesRead;
-              blockID[block] = currentID;
+              blockOffset[block%maxblock] = bytesRead;
+              blockID[block%maxblock] = currentID;
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
@@ -646,7 +647,8 @@ void TZXProcess() {
                       sendChar(48+block%10);
                     #endif
               #endif   
-              if (block < maxblock-1) block++;              
+              if (block < 99) block++;
+              else block = 0;             
               if(r=ReadWord(bytesRead)==2) {
                 pilotLength = TickToUs(outWord);
               }
@@ -893,8 +895,8 @@ void TZXProcess() {
           //Process ID4B - Kansas City Block (MSX specific implementation only)
           switch(currentBlockTask) {
             case READPARAM:
-              blockOffset[block] = bytesRead;
-              blockID[block] = currentID;
+              blockOffset[block%maxblock] = bytesRead;
+              blockID[block%maxblock] = currentID;
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
@@ -911,7 +913,8 @@ void TZXProcess() {
                       sendChar(48+block%10);
                     #endif
               #endif     
-              if (block < maxblock-1) block++;  
+              if (block < 99) block++;
+              else block = 0;  
               if(r=ReadDword(bytesRead)==4) {  // Data size to read
                 bytesToRead = outLong - 12;
               }
@@ -1015,8 +1018,8 @@ void TZXProcess() {
           //Pure Tap file block
           switch(currentBlockTask) {
             case READPARAM:
-              blockOffset[block] = bytesRead;
-              blockID[block] = currentID;
+              blockOffset[block%maxblock] = bytesRead;
+              blockID[block%maxblock] = currentID;
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
@@ -1033,7 +1036,8 @@ void TZXProcess() {
                       sendChar(48+block%10);
                     #endif
               #endif     
-              if (block < maxblock-1) block++;  
+              if (block < 99) block++;
+              else block = 0;  
               pauseLength = PAUSELENGTH;
               if(r=ReadWord(bytesRead)==2) {
                     bytesToRead = outWord+1;

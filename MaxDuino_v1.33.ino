@@ -56,7 +56,8 @@
  //               V1.30 max TSX speed 3850 vs  cas speed 3675. Also changed in Menu.
  //               V1.31 Modified ID20,2A to support automatic pausing(@spirax). Also swapped REW-FW for block navigation(@acf76es).
  //               V1.32 Deprecated old pskipPause and new block 2A pause control option in Menu.
- //               V1.33 Blocks for manual REW/FF expanded from 10 upto 20. On Oled screen also prints upto 20 blocks.
+ //               V1.33 Blocks for manual REW/FF expanded from 10 upto 20, used as circular buffer. On Oled screen prints upto 99 blocks,
+ //                     overflowing to 00.  Selecting a block in pause mode traverse last 20 blocks.
 
 #include <SdFat.h>
 #include <TimerOne.h>
@@ -569,10 +570,10 @@ void loop(void) {
        bytesRead=0;                       // for both tap and tzx, no header for tap
        currentTask=GETFILEHEADER;         //First task (default): search for tzx header
 */
-       if (block > 0) block--;
-       else block = maxblock-1; 
-       bytesRead=blockOffset[block];
-       currentID=blockID[block];
+       if (block%maxblock > 0) block--;
+       else block = block- block%maxblock + maxblock-1; 
+       bytesRead=blockOffset[block%maxblock];
+       currentID=blockID[block%maxblock];
        currentTask=PROCESSID; 
        
        SetPlayBlock();       
@@ -608,10 +609,10 @@ void loop(void) {
        bytesRead=0;                       // for both tap and tzx, no header for tap
        currentTask=GETFILEHEADER;         //First task (default): search for tzx header
 */
-       if (block < maxblock-1) block++;
-       else block = 0;
-       bytesRead=blockOffset[block];
-       currentID=blockID[block];
+       if (block%maxblock < maxblock-1) block++;
+       else block = block- block%maxblock;
+       bytesRead=blockOffset[block%maxblock];
+       currentID=blockID[block%maxblock];
        currentTask=PROCESSID;
        
        SetPlayBlock(); 
@@ -1085,9 +1086,9 @@ void SetPlayBlock()
          lcd.setCursor(0,0);
          lcd.print("BLK:");
          lcd.print(block);lcd.print(' ');
-         if (blockID[block] > 0){
-           lcd.print("ID:");lcd.print(blockID[block],HEX); // Block ID en hex
-    //       lcd.print(' ');lcd.print(blockOffset[block],HEX);
+         if (blockID[block%maxblock] > 0){
+           lcd.print("ID:");lcd.print(blockID[block%maxblock],HEX); // Block ID en hex
+    //       lcd.print(' ');lcd.print(blockOffset[block%maxblock],HEX);
          }
        #endif
        #ifdef OLED1306
@@ -1096,10 +1097,10 @@ void SetPlayBlock()
           setXY(0,0);
           sendStr("BLK:");
           utoa(block, input, 10);sendStr(input);sendChar(' ');
-          if (blockID[block] > 0){
+          if (blockID[block%maxblock] > 0){
         //    setXY(11,0);
-            sendStr("ID:");utoa(blockID[block],input,16);sendStr(strupr(input)); // Block ID en hex
-     //       sendChar(' ');utoa(blockOffset[block],input,16);sendStr(strupr(input));            
+            sendStr("ID:");utoa(blockID[block%maxblock],input,16);sendStr(strupr(input)); // Block ID en hex
+     //       sendChar(' ');utoa(blockOffset[block%maxblock],input,16);sendStr(strupr(input));            
           }
        #endif      
        #ifdef P8544
