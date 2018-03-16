@@ -589,7 +589,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
-                      setXY(10,1);
+                      setXY(11,1);
+                      if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);
                       sendChar(48+block%10);
                     #endif
               #endif      
@@ -643,7 +645,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
-                      setXY(10,1);
+                      setXY(11,1);
+                      if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);
                       sendChar(48+block%10);
                     #endif
               #endif   
@@ -909,7 +913,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
-                      setXY(10,1);
+                      setXY(11,1);
+                      if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);
                       sendChar(48+block%10);
                     #endif
               #endif     
@@ -1032,7 +1038,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #ifdef XY2
-                      setXY(10,1);
+                      setXY(11,1);
+                      if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);
                       sendChar(48+block%10);
                     #endif
               #endif     
