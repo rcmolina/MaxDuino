@@ -504,7 +504,16 @@ static void init_OLED(void)
     setXY(0,j);
     for(int i=0;i<128;i++)     // show 128* 32 Logo
     {
-      SendByte(pgm_read_byte(logo+j*128+i));
+   #ifdef LOAD_MEM_LOGO
+     SendByte(pgm_read_byte(logo+j*128+i));
+   #endif
+   #ifdef RECORD_EEPROM_LOGO
+     EEPROM.put(j*128+i, pgm_read_byte(logo+j*128+i));
+   #endif
+   #ifdef LOAD_EEPROM_LOGO
+     EEPROM.get(j*128+i,hdrptr);
+     SendByte(hdrptr);
+   #endif
     }  
   }
 }

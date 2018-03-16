@@ -341,14 +341,14 @@ void menuMode()
   if(mselectMask) settings |=128;
   if(TSXspeedup) settings |=64;
   if(skip2A) settings |=32;
-  EEPROM.put(0,settings);
+  EEPROM.put(1023,settings);
   setBaud();
  }
 
  void loadEEPROM()
  {
   byte settings=0;
-  EEPROM.get(0,settings);
+  EEPROM.get(1023,settings);
   if(!settings) return;
   
   if(bitRead(settings,7)) {

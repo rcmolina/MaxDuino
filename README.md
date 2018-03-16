@@ -2,6 +2,8 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.34 alias "EEPROM version". Now blocks can be directly read/written from EEPROM.Also logo can be copied to eeprom using #define option.
+	After that, you can select option for loading logo directly from EEPROM.. this saves 512 bytes in the sketch.
 * V1.33 Blocks for manual REW/FF expanded from 10 upto 20, used as circular buffer. On Oled screen prints upto 99 blocks, 
 	overflowing to 00. Selecting a block in pause mode traverse last 20 blocks.
 * V1.32 Deprecated old pskipPause. New block2A pause control managed in menu.

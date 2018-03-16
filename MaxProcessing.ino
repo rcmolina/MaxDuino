@@ -575,8 +575,12 @@ void TZXProcess() {
           //Process ID10 - Standard Block
           switch (currentBlockTask) {
             case READPARAM:
-              blockOffset[block%maxblock] = bytesRead;
-              blockID[block%maxblock] = currentID;
+          //    blockOffset[block%maxblock] = bytesRead;
+          //    blockID[block%maxblock] = currentID;
+    
+              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
+         
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
@@ -631,12 +635,16 @@ void TZXProcess() {
           //Process ID11 - Turbo Tape Block
           switch (currentBlockTask) {
             case READPARAM:
-              blockOffset[block%maxblock] = bytesRead;
-              blockID[block%maxblock] = currentID;
+          //    blockOffset[block%maxblock] = bytesRead;
+          //    blockID[block%maxblock] = currentID;
+        
+              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
+              
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
-                      sendChar('1');sendChar('0');
+                      sendChar('1');sendChar('1');
                       setXY(14,2);
                   //    if (block == 0) sendChar('0');
                   //    if (block == 10) sendChar('1');
@@ -899,12 +907,16 @@ void TZXProcess() {
           //Process ID4B - Kansas City Block (MSX specific implementation only)
           switch(currentBlockTask) {
             case READPARAM:
-              blockOffset[block%maxblock] = bytesRead;
-              blockID[block%maxblock] = currentID;
+          //    blockOffset[block%maxblock] = bytesRead;
+          //    blockID[block%maxblock] = currentID;
+    
+              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
+              
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
-                      sendChar('1');sendChar('0');
+                      sendChar('4');sendChar('B');
                       setXY(14,2);
                   //    if (block == 0) sendChar('0');
                   //    if (block == 10) sendChar('1');
@@ -1024,12 +1036,16 @@ void TZXProcess() {
           //Pure Tap file block
           switch(currentBlockTask) {
             case READPARAM:
-              blockOffset[block%maxblock] = bytesRead;
-              blockID[block%maxblock] = currentID;
+          //    blockOffset[block%maxblock] = bytesRead;
+          //    blockID[block%maxblock] = currentID;
+    
+              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
+              
               #ifdef OLED1306
                     #ifdef XY
                       setXY(7,2);
-                      sendChar('1');sendChar('0');
+                      sendChar('F');sendChar('E');
                       setXY(14,2);
                   //    if (block == 0) sendChar('0');
                   //    if (block == 10) sendChar('1');
