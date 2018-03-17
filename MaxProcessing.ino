@@ -2023,9 +2023,9 @@ void UniSetup() {
     WRITE_LOW;    
     isStopped=true;
     pinState=LOW;
-    Timer1.initialize(100000);                //100ms pause prevents anything bad happening before we're ready
-    Timer1.attachInterrupt(wave2);
-    Timer1.stop();                            //Stop the timer until we're ready
+ //   Timer1.initialize(100000);                //100ms pause prevents anything bad happening before we're ready
+ //   Timer1.attachInterrupt(wave2);
+ //   Timer1.stop();                            //Stop the timer until we're ready
 }
 
 void setBaud() 
