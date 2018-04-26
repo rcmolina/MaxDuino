@@ -73,6 +73,14 @@ void checkForEXT (char *filename) {
     hdrptr = HDRSTART;                      // Start reading from position 1 -> 0x13 [0x00]
     //printtextF(PSTR("AY Playing"),0);
   }
+#ifdef Use_UEF
+  if(checkForUEF(filename)) {                 //Check for AY File.  As these have no TAP header we must create it and send AY DATA Block after
+    currentTask=GETUEFHEADER;
+    currentID=UEF;
+    //Serial.println(F("UEF playing"));
+    //printtextF(PSTR("UEF Playing"),0);
+  }
+#endif  
   if(checkForCAS(filename)) {                 //Check for CAS File.  As these have no header we can skip straight to playing data
     //printtextF(PSTR("CAS Playing"),0);
     casduino = 1;
@@ -140,7 +148,7 @@ void checkForEXT (char *filename) {
 void UniPlay(char *filename){
   Timer1.stop();                              //Stop timer interrupt
   if(!entry.open(filename,O_READ)) {
-    printtextF(PSTR("Error Opening File"),0);
+  //  printtextF(PSTR("Error Opening File"),0);
   }
   block=0;                                    // Initial block when starting
 //  currpct = 100;
@@ -245,6 +253,16 @@ bool checkForAY(char *filename) {
   return false;
 }
 
+#ifdef Use_UEF
+bool checkForUEF(char *filename) {
+  //Serial.println(F("checkForUEF"));
+  byte len = strlen(filename);
+  if(strstr_P(strlwr(filename + (len-4)), PSTR(".uef"))) {
+    return true;
+  }
+  return false;
+}
+#endif
 
 void TZXStop() {
   Timer1.stop();                              //Stop timer
@@ -554,6 +572,126 @@ void TZXProcess() {
       //set current task to PROCESSID
       currentTask = PROCESSID;
     }
+
+#ifdef Use_UEF
+
+    if (currentTask == GETUEFHEADER) {
+      //grab 12 byte string
+      ReadUEFHeader();
+      //set current task to GETCHUNKID
+      currentTask = GETCHUNKID;
+    }
+    if(currentTask == GETCHUNKID) {
+      //Serial.println(F("GETCHUNKID"));
+      //Serial.print(F("offset:"));
+      //Serial.println(bytesRead,HEX);
+      //grab 2 byte ID
+      if(r=ReadWord(bytesRead)==2) {
+         chunkID = outWord;
+         if(r=ReadDword(bytesRead)==4) {
+            bytesToRead = outLong;
+            //Serial.print(F("bytesToRead: "));
+            //Serial.println(bytesToRead,DEC);
+         } else {
+             chunkID = IDCHUNKEOF;
+         }
+      } else {
+        chunkID = IDCHUNKEOF;
+      }
+//      if (!(uefTurboMode)) {
+  /*    if ( BAUDRATE == 1200) {
+         zeroPulse = UEFZEROPULSE;
+         onePulse = UEFONEPULSE;
+      } else {
+         zeroPulse = UEFTURBOZEROPULSE;
+         onePulse = UEFTURBOONEPULSE;  
+      } */
+         zeroPulse = 332; // TURBOBAUD1500
+         onePulse = 166;  // TURBOBAUD1500    
+      lastByte=0;
+      
+      //reset data block values
+      currentBit=0;
+      pass=0;
+      //set current task to PROCESSCHUNKID
+      currentTask = PROCESSCHUNKID;
+      currentBlockTask = READPARAM;
+    }
+    if(currentTask == PROCESSCHUNKID) {
+      //CHUNKID Processing
+
+      switch(chunkID) {
+        case ID0000:
+          bytesRead+=bytesToRead;
+          currentTask = GETCHUNKID;
+          break;
+        case ID0100:
+          
+          //bytesRead+=bytesToRead;
+          writeUEFData();
+          break;
+        
+        case ID0110:
+          if(currentBlockTask==READPARAM){
+            if(r=ReadWord(bytesRead)==2) {
+//              if (!(uefTurboMode)) {
+/*              if (BAUDRATE == 1200) {                     
+                 pilotPulses = UEFPILOTPULSES;
+                 pilotLength = UEFPILOTLENGTH;
+              } else {
+                // turbo mode    
+                 pilotPulses = UEFTURBOPILOTPULSES;
+                 pilotLength = UEFTURBOPILOTLENGTH;                
+              } */
+                 pilotPulses = outWord<<2;
+                 pilotLength = 156;                         
+            }
+            currentBlockTask = PILOT;
+          } 
+          else {
+            UEFCarrierToneBlock();
+          }
+       //   UEFCarrierToneBlock();
+          //bytesRead+=bytesToRead;
+          //currentTask = GETCHUNKID;
+          break;
+
+        case ID0112:
+          if(currentBlockTask==READPARAM){
+            if(r=ReadWord(bytesRead)==2) {
+              if (outWord>0) {
+                //Serial.print(F("delay="));
+                //Serial.println(outWord,DEC);
+                temppause = outWord;
+                
+                currentID = IDPAUSE;
+                currentPeriod = temppause;
+                bitSet(currentPeriod, 15);
+                currentTask = GETCHUNKID;
+              } else {
+                currentTask = GETCHUNKID;
+              }     
+            }
+          } 
+          break;
+        case IDCHUNKEOF:
+          //Serial.println(F("IDCHUNKEOF"));
+          bytesRead+=bytesToRead;
+          stopFile();
+          return;
+        default:
+          //Serial.print(F("Skip id "));
+          //Serial.print(chunkID);
+          bytesRead+=bytesToRead;
+          currentTask = GETCHUNKID;
+          break;
+            
+      }
+      //currentTask = GETCHUNKID;
+    }      
+
+#endif
+    
     if(currentTask == GETID) {
       //grab 1 byte ID
       if(ReadByte(bytesRead)==1) {
@@ -1249,7 +1387,11 @@ void TZXProcess() {
             lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
           #endif
   
-          delay(5000);
+          //delay(8000);
+           while(digitalRead(btnStop)==HIGH) {
+             //waits until the button Stop is pressed.
+             //delay(50);
+           }
           stopFile();
         break;
       }
@@ -1308,6 +1450,19 @@ void StandardBlock() {
     break;
   }
 }
+
+#ifdef Use_UEF
+
+void UEFCarrierToneBlock() {
+  //Pure Tone Block - Long string of pulses with the same length
+  currentPeriod = pilotLength;
+  pilotPulses += -1;
+  if(pilotPulses==0) {
+    currentTask = GETCHUNKID;
+  }
+}
+
+#endif
 
 void PureToneBlock() {
   //Pure Tone Block - Long string of pulses with the same length
@@ -1537,6 +1692,96 @@ void ZX80ByteWrite(){
     
 }
 
+#ifdef Use_UEF
+
+//TODO
+void writeUEFData() {
+  #ifdef DEBUG
+  //Serial.println(F("WriteUEFData"));
+  #endif
+  //Convert byte from file into string of pulses.  One pulse per pass
+  byte r;
+  if(currentBit==0) {                         //Check for byte end/first byte
+    #ifdef DEBUG
+    //Serial.println(F("currentBit==0"));
+    #endif
+    if(r=ReadByte(bytesRead)==1) {            //Read in a byte
+      currentByte = outByte;
+      bytesToRead += -1; 
+      #ifdef DEBUG
+      //Serial.print(F("  bytesToRead after decrement: "));
+      //Serial.println(bytesToRead,DEC);
+      #endif
+      //blkchksum = blkchksum ^ currentByte;    // keep calculating checksum
+      if(bytesToRead == 0) {                  //Check for end of data block
+        lastByte = 1;
+        //Serial.println(F("  Rewind bytesRead"));
+        //bytesRead += -1;                      //rewind a byte if we've reached the end
+        if(pauseLength==0) {                  //Search for next ID if there is no pause
+          currentTask = PROCESSCHUNKID;
+        } else {
+          currentBlockTask = PAUSE;           //Otherwise start the pause
+        }
+        //return;                               // exit
+      }
+    } else if(r==0) {                         // If we reached the EOF
+      currentTask = GETCHUNKID;
+    }
+    
+    currentBit = 10;
+    pass=0;
+  } 
+  if (currentBit == 10) {
+    currentPeriod = zeroPulse;
+  } else if (currentBit == 1) {
+    currentPeriod = onePulse;
+    
+  } else {
+    if(currentByte&0x01) {                       //Set next period depending on value of bit 0
+      currentPeriod = onePulse;
+    } else {
+      currentPeriod = zeroPulse;
+    }
+    
+  }
+  pass+=1;      //Data is played as 2 x pulses for a zero, and 4 pulses for a one
+
+  if (currentPeriod == zeroPulse) {
+    if(pass==2) {
+       if ((currentBit>1) && (currentBit<10)) {
+          currentByte >>= 1;                        //Shift along to the next bit
+       }
+       currentBit += -1;
+       pass=0; 
+       if ((lastByte) && (currentBit==0)) {
+         currentTask = GETCHUNKID;
+       } 
+    }
+  } else {
+    // must be a one pulse
+    if(pass==4) {
+      if ((currentBit>1) && (currentBit<10)) {
+        currentByte >>= 1;                        //Shift along to the next bit
+      }
+      
+      currentBit += -1;
+      pass=0; 
+      if ((lastByte) && (currentBit==0)) {
+        currentTask = GETCHUNKID;
+      } 
+    }    
+  }
+  #ifdef DEBUG
+  //Serial.print(F("currentBit = "));
+  //Serial.println(currentBit,DEC);
+  //Serial.print(F("currentPeriod = "));
+  //Serial.println(currentPeriod,DEC);
+  #endif
+  
+}
+
+#endif
+
 void writeData() {
   //Convert byte from file into string of pulses.  One pulse per pass
   byte r;
@@ -1596,7 +1841,6 @@ void writeData() {
     pass=0;  
   }    
 }
-
 
 
 void wave()
@@ -1692,7 +1936,13 @@ void wave2() {
       else  WRITE_HIGH;      
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
-        pinState = LOW;                     //Set next pinstate LOW
+        #ifndef polarity
+          pinState = LOW;                     //Set next pinstate LOW
+        #endif
+        #ifdef polarity
+          pinState = HIGH;                     //Set next pinstate LOW
+        #endif
+        
         //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
         //wbuffer[pos+1][workingBuffer] = lowByte(workingPeriod - 1);
         //wbuffer[pos][workingBuffer] = workingPeriod - 1;  //reduce pause by 1ms as we've already pause for 1.5ms
@@ -2207,4 +2457,26 @@ void ReadAYHeader() {
   }
   bytesRead = 0;
 }
+
+#ifdef Use_UEF
+
+void ReadUEFHeader() {
+  //Read and check first 12 bytes for a UEF header
+  char uefHeader[9];
+  int i=0;
+  
+  if(entry.seekSet(0)) {
+    i = entry.read(uefHeader,9);
+    if(memcmp_P(uefHeader,UEFFile,9)!=0) {
+      printtextF(PSTR("Not UEF File"),1);
+      TZXStop();
+    }
+  } else {
+    printtextF(PSTR("Error Reading File"),0);
+  }
+  bytesRead =12;
+}
+
+#endif
+
 

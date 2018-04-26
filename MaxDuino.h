@@ -1,7 +1,16 @@
 #define outputPin           9
-#define WRITE_LOW           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
-#define WRITE_HIGH          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
-// pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
+
+#ifndef polarity 
+  #define WRITE_LOW           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
+  #define WRITE_HIGH          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
+  // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
+#endif
+
+#ifdef polarity 
+  #define WRITE_HIGH           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
+  #define WRITE_LOW          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
+  // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
+#endif
 
 #define SHORT_SILENCE       122
 #define LONG_SILENCE        SHORT_SILENCE*2
@@ -211,4 +220,53 @@ volatile byte currentByte=0;
 byte block = 0;
 
 
+PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
+#define UEF                 0xFA    //UEF file for ID list
+// UEF chunks
+#define ID0000              0x0000
+#define ID0100              0x0100
+#define ID0110              0x0110
+#define ID0112              0x0112
+#define IDCHUNKEOF          0xffff
+
+//TZX File Tasks for UEF
+#define GETUEFHEADER          4
+#define GETCHUNKID            5
+#define PROCESSCHUNKID        6
+
+// UEF stuff
+// For 1200 baud zero is 416us, one is 208us
+// For 1500 baud zero is 333us, one is 166us
+// For 1550 baud zero is 322us, one is 161us
+// For 1600 baud zero is 313us, one is 156us
+
+#define TURBOBAUD1550
+
+// 1200 baud UEF
+#define UEFPILOTPULSES        outWord<<2;
+#define UEFPILOTLENGTH        208
+#define UEFZEROPULSE             416
+#define UEFONEPULSE              208
+
+
+#ifdef TURBOBAUD1550
+#define UEFTURBOPILOTPULSES     320
+#define UEFTURBOPILOTLENGTH        161
+#define UEFTURBOZEROPULSE             322
+#define UEFTURBOONEPULSE              161
+#endif
+
+#ifdef TURBOBAUD1600
+#define UEFTURBOPILOTPULSES       320
+#define UEFTURBOPILOTLENGTH        156
+#define UEFTURBOZEROPULSE             313
+#define UEFTURBOONEPULSE              156
+#endif
+
+#define DEBUG 0
+unsigned long debugCount=0;
+
+word chunkID = 0;
+// Set uefTurboMode to 0 if the default is 1200 baud. Set to 1 if the default is turbo speed. Holding doown 'ROOT' button on poweron, toggles this
+byte uefTurboMode=0;
 

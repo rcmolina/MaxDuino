@@ -45,20 +45,29 @@ void menuMode()
         case 0:
         printtextF(PSTR("Baud Rate ?"),lineaxy);
         break;
+//        #ifndef Use_UEF
         case 1:
         printtextF(PSTR("Motor Ctrl ?"),lineaxy);
         break;
         case 2:
+        printtextF(PSTR("TSXspeedup ?"),lineaxy);
+        break;
+        case 3:
         printtextF(PSTR("Skip BLK:2A ?"),lineaxy);
         break;       
-        case 3:
-        printtextF(PSTR("TSXspeedup ?"),lineaxy);
-        break;       
+
+//        #endif       
       }
       updateScreen=false;
     }
     if(digitalRead(btnDown)==LOW && !lastbtn){
+      #ifndef Use_UEF
       if(menuItem<3) menuItem+=1;
+      #endif
+      #ifdef Use_UEF
+      if(menuItem<2) menuItem+=1;      
+      #endif
+      
       lastbtn=true;
       updateScreen=true;
     }
@@ -133,6 +142,7 @@ void menuMode()
           lastbtn=true;
           updateScreen=true;
         break;
+
         case 1:
           subItem=0;
           updateScreen=true;
@@ -194,60 +204,6 @@ void menuMode()
           lastbtn=true;
           while(digitalRead(btnStop)==HIGH || lastbtn) {
             if(updateScreen) {
-              printtextF(PSTR("Skip BLK:2A"),0);
-              if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
-              else  printtextF(PSTR("ON *"),lineaxy);
-          /*    switch(subItem) {
-                case 0:
-                  printtextF(PSTR("off"),lineaxy);
-                  if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
-                break;
-                case 1:
-                  printtextF(PSTR("ON"),lineaxy);
-                  if(skip2A==1) printtextF(PSTR("ON *"),lineaxy);
-                break;                
-              }    */
-              updateScreen=false;
-            }
-          /*          
-            if(digitalRead(btnDown)==LOW && !lastbtn){
-              if(subItem<1) subItem+=1;
-              lastbtn=true;
-              updateScreen=true;
-            }
-            if(digitalRead(btnUp)==LOW && !lastbtn) {
-              if(subItem>0) subItem+=-1;
-              lastbtn=true;
-              updateScreen=true;
-            }  */
-            if(digitalRead(btnPlay)==LOW && !lastbtn) {
-              skip2A = !skip2A;
-          /*    switch(subItem) {
-                case 0:
-                  skip2A=0;
-                break;
-                case 1:
-                  skip2A=1;
-                break;
-              } */
-              lastbtn=true;
-              updateScreen=true;
-              #ifdef OLED1306 
-            //    OledStatusLine();
-              #endif
-            } 
-            if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
-          }
-          lastbtn=true;
-          updateScreen=true;
-        break;
-
-        case 3:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(digitalRead(btnStop)==HIGH || lastbtn) {
-            if(updateScreen) {
               printtextF(PSTR("TSXspeedup"),0);
               if(TSXspeedup==0) printtextF(PSTR("off *"),lineaxy);
               else  printtextF(PSTR("ON *"),lineaxy);
@@ -295,7 +251,61 @@ void menuMode()
           lastbtn=true;
           updateScreen=true;
         break;
-        
+   #ifndef Use_UEF
+        case 3:
+          subItem=0;
+          updateScreen=true;
+          lastbtn=true;
+          while(digitalRead(btnStop)==HIGH || lastbtn) {
+            if(updateScreen) {
+              printtextF(PSTR("Skip BLK:2A"),0);
+              if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
+              else  printtextF(PSTR("ON *"),lineaxy);
+          /*    switch(subItem) {
+                case 0:
+                  printtextF(PSTR("off"),lineaxy);
+                  if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
+                break;
+                case 1:
+                  printtextF(PSTR("ON"),lineaxy);
+                  if(skip2A==1) printtextF(PSTR("ON *"),lineaxy);
+                break;                
+              }    */
+              updateScreen=false;
+            }
+          /*          
+            if(digitalRead(btnDown)==LOW && !lastbtn){
+              if(subItem<1) subItem+=1;
+              lastbtn=true;
+              updateScreen=true;
+            }
+            if(digitalRead(btnUp)==LOW && !lastbtn) {
+              if(subItem>0) subItem+=-1;
+              lastbtn=true;
+              updateScreen=true;
+            }  */
+            if(digitalRead(btnPlay)==LOW && !lastbtn) {
+              skip2A = !skip2A;
+          /*    switch(subItem) {
+                case 0:
+                  skip2A=0;
+                break;
+                case 1:
+                  skip2A=1;
+                break;
+              } */
+              lastbtn=true;
+              updateScreen=true;
+              #ifdef OLED1306 
+            //    OledStatusLine();
+              #endif
+            } 
+            if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+          }
+          lastbtn=true;
+          updateScreen=true;
+        break;
+   #endif     
       }
     }
     if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
@@ -338,9 +348,12 @@ void menuMode()
     settings |=8;
     break;
   }
+
   if(mselectMask) settings |=128;
   if(TSXspeedup) settings |=64;
+  #ifndef Use_UEF
   if(skip2A) settings |=32;
+  #endif
   EEPROM.put(1023,settings);
   setBaud();
  }
@@ -350,7 +363,8 @@ void menuMode()
   byte settings=0;
   EEPROM.get(1023,settings);
   if(!settings) return;
-  
+
+
   if(bitRead(settings,7)) {
     mselectMask=1;
   } else {
@@ -361,11 +375,13 @@ void menuMode()
   } else {
     TSXspeedup=0;
   }
+  #ifndef Use_UEF
   if(bitRead(settings,5)) {
     skip2A=1;
   } else {
     skip2A=0;
   }   
+  #endif
   if(bitRead(settings,0)) {
     BAUDRATE=1200;
   }
