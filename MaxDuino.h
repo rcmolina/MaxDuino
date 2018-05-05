@@ -1,16 +1,22 @@
 #define outputPin           9
 
-#ifndef polarity 
+#define WRITE_LOW           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
+#define WRITE_HIGH          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
+// pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
+
+/*
+#ifdef rpolarity 
   #define WRITE_LOW           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
   #define WRITE_HIGH          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
   // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
 #endif
 
-#ifdef polarity 
+#ifndef rpolarity 
   #define WRITE_HIGH           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
   #define WRITE_LOW          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
   // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
 #endif
+*/
 
 #define SHORT_SILENCE       122
 #define LONG_SILENCE        SHORT_SILENCE*2
@@ -240,27 +246,35 @@ PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
 // For 1550 baud zero is 322us, one is 161us
 // For 1600 baud zero is 313us, one is 156us
 
-#define TURBOBAUD1550
+#define TURBOBAUD1500
 
-// 1200 baud UEF
-#define UEFPILOTPULSES        outWord<<2;
-#define UEFPILOTLENGTH        208
-#define UEFZEROPULSE             416
-#define UEFONEPULSE              208
+// STANDARD 1200 baud UEF
+#ifdef STDBAUD1200
+#define UEFPILOTPULSES          outWord<<2;
+#define UEFPILOTLENGTH          208
+#define UEFZEROPULSE            416
+#define UEFONEPULSE             208
+#endif
 
+#ifdef TURBOBAUD1500
+#define UEFPILOTPULSES     outWord<<2;
+#define UEFPILOTLENGTH     156
+#define UEFZEROPULSE       332
+#define UEFONEPULSE        166
+#endif
 
 #ifdef TURBOBAUD1550
-#define UEFTURBOPILOTPULSES     320
-#define UEFTURBOPILOTLENGTH        161
-#define UEFTURBOZEROPULSE             322
-#define UEFTURBOONEPULSE              161
+#define UEFPILOTPULSES     320
+#define UEFPILOTLENGTH     161
+#define UEFZEROPULSE       322
+#define UEFONEPULSE        161
 #endif
 
 #ifdef TURBOBAUD1600
-#define UEFTURBOPILOTPULSES       320
-#define UEFTURBOPILOTLENGTH        156
-#define UEFTURBOZEROPULSE             313
-#define UEFTURBOONEPULSE              156
+#define UEFPILOTPULSES     320
+#define UEFPILOTLENGTH     156
+#define UEFZEROPULSE       313
+#define UEFONEPULSE        156
 #endif
 
 #define DEBUG 0

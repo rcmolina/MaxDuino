@@ -2,7 +2,8 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
-* V1.36 Polarity handling
+* V1.37 Minor optimizations for counter format, acorn standard/turbo speed and simplication in polarity handling.
+* V1.36 Polarity handling with conditional define.
 * V1.35t Acorn speed for loading now 1500 baud, 20% faster (standard is 1200).
 * V1.35 Uncompressed UEF support for Acorn computers.
 * V1.34 alias "EEPROM version". Now blocks can be directly read/written from EEPROM.Also logo can be copied to eeprom using #define option.

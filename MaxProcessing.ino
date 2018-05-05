@@ -599,15 +599,16 @@ void TZXProcess() {
         chunkID = IDCHUNKEOF;
       }
 //      if (!(uefTurboMode)) {
-  /*    if ( BAUDRATE == 1200) {
+   /*   if ( BAUDRATE == 1200) {
          zeroPulse = UEFZEROPULSE;
          onePulse = UEFONEPULSE;
       } else {
          zeroPulse = UEFTURBOZEROPULSE;
          onePulse = UEFTURBOONEPULSE;  
       } */
-         zeroPulse = 332; // TURBOBAUD1500
-         onePulse = 166;  // TURBOBAUD1500    
+      zeroPulse = UEFZEROPULSE;
+      onePulse = UEFONEPULSE;
+       
       lastByte=0;
       
       //reset data block values
@@ -635,7 +636,7 @@ void TZXProcess() {
           if(currentBlockTask==READPARAM){
             if(r=ReadWord(bytesRead)==2) {
 //              if (!(uefTurboMode)) {
-/*              if (BAUDRATE == 1200) {                     
+          /*    if (BAUDRATE == 1200) {                     
                  pilotPulses = UEFPILOTPULSES;
                  pilotLength = UEFPILOTLENGTH;
               } else {
@@ -643,8 +644,9 @@ void TZXProcess() {
                  pilotPulses = UEFTURBOPILOTPULSES;
                  pilotLength = UEFTURBOPILOTLENGTH;                
               } */
-                 pilotPulses = outWord<<2;
-                 pilotLength = 156;                         
+              
+                pilotPulses = UEFPILOTPULSES;
+                pilotLength = UEFPILOTLENGTH;                     
             }
             currentBlockTask = PILOT;
           } 
@@ -1936,11 +1938,11 @@ void wave2() {
       else  WRITE_HIGH;      
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
-        #ifndef polarity
+        #ifdef rpolarity
           pinState = LOW;                     //Set next pinstate LOW
         #endif
-        #ifdef polarity
-          pinState = HIGH;                     //Set next pinstate LOW
+        #ifndef rpolarity
+          pinState = HIGH;                     //Set next pinstate HIGH
         #endif
         
         //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
