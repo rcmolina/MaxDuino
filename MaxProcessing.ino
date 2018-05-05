@@ -1079,7 +1079,7 @@ void TZXProcess() {
               if(r=ReadWord(bytesRead)==2) {  // Pause after block in ms
                 pauseLength = outWord;
               }
-              if (TSXspeedup == 0){
+              if (tsxSPEEDzxPOL == 0){
                   if(r=ReadWord(bytesRead)==2) {  // T-states each pilot pulse
                     pilotLength = TickToUs(outWord);
                   }
@@ -1938,13 +1938,17 @@ void wave2() {
       else  WRITE_HIGH;      
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
-        #ifdef rpolarity
+        
+      /*  #ifdef rpolarity
           pinState = LOW;                     //Set next pinstate LOW
         #endif
         #ifndef rpolarity
           pinState = HIGH;                     //Set next pinstate HIGH
-        #endif
-        
+        #endif */
+
+        if (tsxSPEEDzxPOL) pinState = LOW;         //Set next pinstate LOW
+        else pinState = HIGH;                     //Set next pinstate HIGH
+       
         //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
         //wbuffer[pos+1][workingBuffer] = lowByte(workingPeriod - 1);
         //wbuffer[pos][workingBuffer] = workingPeriod - 1;  //reduce pause by 1ms as we've already pause for 1.5ms

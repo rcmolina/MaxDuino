@@ -39,7 +39,7 @@ int BAUDRATE = 3600;
 byte scale = 2;
 int period = 70;
 
-byte TSXspeedup = 1;
+byte tsxSPEEDzxPOL = 1;
 
 /* Header Definitions */
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
