@@ -70,7 +70,7 @@
  //               V1.36 Polarity handling
  //               V1.37 Minor optimizations for counter format, acorn standard/turbo speed, simplication in polarity handling and 
  //                     now controlled from menu using the same option for tsx acceleration: tsxSPEEDzxPOL.
- //               V1.38 Code reformatted, cas is optional with new #def Use_CAS
+ //               V1.38 Code reformatted, cas is optional with new #def Use_CAS.Solved a bug when back with stop button in 4th subdir.
  //
 #include <SdFat.h>
 #include <TimerOne.h>
