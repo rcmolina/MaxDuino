@@ -585,12 +585,12 @@ void loop(void) {
            subdir = 2;
            sd.chdir(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),true);
            break;
-       case 3:
+    /*   case 3:
        //default:
            //sprintf(fileName,"%s%s/%s/%s",prevSubDir[0],prevSubDir[1],prevSubDir[2],prevSubDir[3]);
            //subdir = 3;
            sd.chdir(strcat(strcat(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),"/"),prevSubDir[2]),true); 
-           break;          
+           break; */         
        }
        //Return to prev Dir of the SD card.
        //sd.chdir(fileName,true);
