@@ -571,22 +571,26 @@ void loop(void) {
        subdir--;
        prevSubDir[subdir][0]='\0';     
        switch(subdir){
+        case 0:
+           //sprintf(fileName,"%s",prevSubDir[0]);
+           sd.chdir("/",true);
+           break;
         case 1:
            //sprintf(fileName,"%s%s",prevSubDir[0],prevSubDir[1]);
            sd.chdir(strcat(strcat(fileName,"/"),prevSubDir[0]),true);
            break;
         case 2:
+        default:
            //sprintf(fileName,"%s%s/%s",prevSubDir[0],prevSubDir[1],prevSubDir[2]);
+           subdir = 2;
            sd.chdir(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),true);
            break;
        case 3:
+       //default:
            //sprintf(fileName,"%s%s/%s/%s",prevSubDir[0],prevSubDir[1],prevSubDir[2],prevSubDir[3]);
-          sd.chdir(strcat(strcat(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),"/"),prevSubDir[2]),true); 
+           //subdir = 3;
+           sd.chdir(strcat(strcat(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),"/"),prevSubDir[2]),true); 
            break;          
-        default: 
-           //sprintf(fileName,"%s",prevSubDir[0]);
-           subdir = 0;
-           sd.chdir("/",true);
        }
        //Return to prev Dir of the SD card.
        //sd.chdir(fileName,true);
