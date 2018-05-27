@@ -1,4 +1,4 @@
-
+#ifdef Use_CAS
 void casPause()
 {
   noInterrupts();
@@ -23,6 +23,7 @@ void casStop()
   Timer1.attachInterrupt(wave2);
   Timer1.stop();     */                       //Stop the timer until we're ready   
 }
+#endif
 
 word TickToUs(word ticks) {
   return (word) ((((float) ticks)/3.5)+0.5);
@@ -80,7 +81,9 @@ void checkForEXT (char *filename) {
     //Serial.println(F("UEF playing"));
     //printtextF(PSTR("UEF Playing"),0);
   }
-#endif  
+#endif 
+
+//#ifdef Use_CAS 
   if(checkForCAS(filename)) {                 //Check for CAS File.  As these have no header we can skip straight to playing data
     //printtextF(PSTR("CAS Playing"),0);
     casduino = 1;
@@ -114,7 +117,7 @@ void checkForEXT (char *filename) {
     Timer1.restart();
 */
   }
-    
+//#endif     
 }
 
 /*
@@ -179,10 +182,12 @@ void UniPlay(char *filename){
 
 //    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
   }
+#ifdef Use_CAS
   else {
     Timer1.initialize(period);
     Timer1.attachInterrupt(wave);    
   }
+#endif
 }
 
 /*
@@ -207,6 +212,7 @@ void UniPlay(char *filename) {
 }
 */
 
+//#ifdef Use_CAS
 bool checkForCAS(char *filename) {
   //Check for CAS file extensions as these have no header
   byte len = strlen(filename);
@@ -215,7 +221,7 @@ bool checkForCAS(char *filename) {
   }
   return false;
 }
-
+//#endif
 
 bool checkForTap(char *filename) {
   //Check for TAP file extensions as these have no header
@@ -1844,7 +1850,7 @@ void writeData() {
   }    
 }
 
-
+#ifdef Use_CAS
 void wave()
 {
   if(isStopped==0)
@@ -1904,6 +1910,7 @@ void wave()
       WRITE_LOW;
 
 }
+#endif Use_CAS
 
 void wave2() {
   //ISR Output routine
@@ -1946,8 +1953,10 @@ void wave2() {
           pinState = HIGH;                     //Set next pinstate HIGH
         #endif */
 
-        if (tsxSPEEDzxPOL) pinState = LOW;         //Set next pinstate LOW
-        else pinState = HIGH;                     //Set next pinstate HIGH
+ //       if (tsxSPEEDzxPOL) pinState = LOW;         //Set next pinstate LOW
+ //       else pinState = HIGH;                     //Set next pinstate HIGH
+
+        pinState = !tsxSPEEDzxPOL;
        
         //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
         //wbuffer[pos+1][workingBuffer] = lowByte(workingPeriod - 1);
@@ -1992,7 +2001,7 @@ void wave2() {
 }
 
 
-
+#ifdef Use_CAS
 void writeByte(byte b)
 {
 if(dragonMode==1) {
@@ -2037,6 +2046,7 @@ void writeHeader()
     bits[i]=1;
   }
 }
+#endif Use_CAS
 
 void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
@@ -2079,6 +2089,7 @@ void writeHeader2() {
   }    
 }  // End writeHeader2()
 
+#ifdef Use_CAS
 void process()
 {
   byte r=0;
@@ -2231,6 +2242,7 @@ void processDragon()
     }
   }
 }
+#endif 
 
 int readfile(byte bytes, unsigned long p)
 {
@@ -2243,6 +2255,7 @@ int readfile(byte bytes, unsigned long p)
   return i;
 }
 
+//#ifdef Use_CAS
 void clearBuffer()
 {
   for(int i=0;i<buffsize+1;i++)
@@ -2251,6 +2264,7 @@ void clearBuffer()
     wbuffer[i][1]=2;
   }
 }
+//#endif
 
 void clearBuffer2()
 {
@@ -2315,14 +2329,26 @@ void setBaud()
 
 
 void uniLoop() {
- 
+
+/*
  if (casduino) {                 //Check for CAS File.  As these have no header we can skip straight to playing data
     casduinoLoop();
  }  else {
     TZXLoop();
  }  
-} 
+*/
+ if (!casduino) {                 
+    TZXLoop();
+ }  
 
+ #ifdef Use_CAS
+ else {                      //Check for CAS File.  As these have no header we can skip straight to playing data
+    casduinoLoop();
+ }  
+ #endif
+}
+ 
+#ifdef Use_CAS
 void casduinoLoop()
 {
   noInterrupts();
@@ -2370,6 +2396,7 @@ void casduinoLoop()
          }
     } 
 }
+#endif
 
 int ReadByte(unsigned long pos) {
   //Read a byte from the file, and move file position on one if successful

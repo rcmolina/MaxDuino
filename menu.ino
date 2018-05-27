@@ -50,7 +50,7 @@ void menuMode()
         printtextF(PSTR("Motor Ctrl ?"),lineaxy);
         break;
         case 2:
-        printtextF(PSTR("tsxSPEED/zxPOL ?"),lineaxy);
+        printtextF(PSTR("tsxSPEED_zxPOL ?"),lineaxy);
         break;
         case 3:
         printtextF(PSTR("Skip BLK:2A ?"),lineaxy);
@@ -329,7 +329,7 @@ void menuMode()
    *  bit 3: 3850
    *  bit 4: n/a
    *  bit 5: BLK_2A control
-   *  bit 6: TSXspeedup
+   *  bit 6: TSXspeedup_ZXpolarity
    *  bit 7: Motor control
    */
   byte settings=0;
