@@ -2,6 +2,7 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.39 Optional hq.uef support for Acorn using define (implemented chunks 111 and 116). New userconfig.h with help for easier configuration.
 * V1.38	Code reformatted, cas is optional with new #def Use_CAS. Solved a bug when back with stop button from 4th subdir.
 * V1.37 Minor optimizations for counter format, acorn standard/turbo speed, simplication in polarity handling and now controlled from menu using the same option for tsx acceleration: tsxSPEEDzxPOL.
 * V1.36 Polarity handling with conditional define.
