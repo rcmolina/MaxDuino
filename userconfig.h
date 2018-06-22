@@ -1,35 +1,34 @@
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                    Add // at the beginning of lines to comment and remove selected option                    */
-//*********************************  OPTIONAL USE TO SAVE SPACE  ***********************************************//
-#define Use_MENU 1                  // removing menu saves space
-#define Use_CAS 1                   // .cas files playback on MSX / Dragon / CoCo Tandy computers
-#define Use_UEF 1                   // .uef files playback on BBC Micro / Electron / Atom computers
-    //#define Use_c112 1            // integer gap chunk for .uef
-    #define Use_hqUEF 1             // .hq.uef files playback on BBC Micro / Electron / Atom computers
-        //#define Use_c116 1        // floating point gap chunk for .hq.uef
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,       //
-/*         for that you have to decompress these files manually.                                               */
-/*         linux / mac os: gunzip -c game.uef> game.uef.tmp && mv game.uef.tmp game.uef                        */
-/*         windows os: add .gz to file name, then click to extract with winrar                                 */
-//*************************************************************************************************************//
-//                                       Set Acorn UEF default speed                                           //
-//#define STDBAUD1200               // Standard acorn speed
-#define TURBOBAUD1500               // default setting
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                          Add // at the beginning of lines to comment and remove selected option                        */
+//*******************************************  OPTIONAL USE TO SAVE SPACE  ***********************************************//
+#define Use_MENU 1                         // removing menu saves space
+#define Use_CAS 1                         // .cas files playback on MSX / Dragon / CoCo Tandy computers
+#define Use_UEF 1                         // .uef files playback on BBC Micro / Electron / Atom computers
+    //#define Use_c112 1                  // integer gap chunk for .uef
+    #define Use_hqUEF 1                   // .hq.uef files playback on BBC Micro / Electron / Atom computers
+        //#define Use_c116 1              // floating point gap chunk for .hq.uef
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
+/*         for that you have to decompress these files manually.                                                         */
+/*         linux / mac os: gunzip -c game.uef> game.uef.tmp && mv game.uef.tmp game.uef                                  */
+/*         windows os: add .gz to file name, then click to extract with winrar                                           */
+//***********************************************************************************************************************//
+//                                       Set Acorn UEF default speed                                                     //
+#define TURBOBAUD1500                 // default setting, 25% faster than 1200 baudios standard speed
 //#define TURBOBAUD1550
 //#define TURBOBAUD1600
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
-byte scale = 2;                     // 1 for BAUDRATE 1200
-int period = 70;                    // 208 for BAUDRATE=1200
-byte mselectMask = 0;               // Motor control state 1=on 0=off
-byte tsxSPEEDzxPOL = 1;             // Dual flag: rpolarity needed for zx games: Basil the Great Mouse Detective, Mask, 
-                                    //            .. and SpeedControl for .tsx
-byte skip2A = 0;                    // Pause on for BLK:2A
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                                   Configure your screen settings here                                       */
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+byte scale = 2;                         // 1 for BAUDRATE 1200
+int period = 70;                        // 208 for BAUDRATE=1200
+byte mselectMask = 0;                   // Motor control state 1=on 0=off
+byte TSXCONTROLzxpolarityUEFTURBO = 1;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+                                        //            Mask // SpeedControl for .tsx // UEF turbo mode
+byte skip2A = 0;                        // Pause on for BLK:2A
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                                   Configure your screen settings here                                                  */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set defines for various types of screen, currently only 16x2 I2C LCD is supported
 //#define SERIALSCREEN  1           // For testing and debugging
 
@@ -51,11 +50,11 @@ byte lineaxy=1;
 byte lineaxy=2;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM LOGO. How to move to EEPROM, saving memory:
 // Phase 1: Uncomment RECORD_EEPROM_LOGO define , this copies logo from memory to EEPROM. Compile the sketh.
 // Phase 2:  Comment RECORD_EEPROM define, uncomment LOAD_EEPROM define. Complile the sketch again 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //#define LOAD_MEM_LOGO 1  // legacy, logo is not in EEPROM then wasting memory.
 #define BLOCK_EEPROM_START 512

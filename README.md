@@ -2,6 +2,7 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.40 LCD sketch savings, polary/tsx control/UEF turbo mode can be change while paused with menu button. Reworked acorn chunk 116 floating point conversion to integer.
 * V1.39 Optional hq.uef support for Acorn using define (implemented chunks 111 and 116). New userconfig.h with help for easier configuration.
 * V1.38	Code reformatted, cas is optional with new #def Use_CAS. Solved a bug when back with stop button from 4th subdir.
 * V1.37 Minor optimizations for counter format, acorn standard/turbo speed, simplication in polarity handling and now controlled from menu using the same option for tsx acceleration: tsxSPEEDzxPOL.

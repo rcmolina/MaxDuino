@@ -239,32 +239,30 @@ PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
 // For 1600 baud zero is 313us, one is 156us
 
 // STANDARD 1200 baud UEF
-#ifdef STDBAUD1200
-#define UEFPILOTPULSES          outWord<<2;
-#define UEFPILOTLENGTH          208
-#define UEFZEROPULSE            416
-#define UEFONEPULSE             208
-#endif
+#define UEFPILOTPULSES           outWord<<2;
+#define UEFPILOTLENGTH           208
+#define UEFZEROPULSE             416
+#define UEFONEPULSE              208
 
 #ifdef TURBOBAUD1500
-#define UEFPILOTPULSES     outWord<<2;
-#define UEFPILOTLENGTH     156
-#define UEFZEROPULSE       332
-#define UEFONEPULSE        166
+#define UEFTURBOPILOTPULSES       outWord<<2;
+#define UEFTURBOPILOTLENGTH       156
+#define UEFTURBOZEROPULSE         332
+#define UEFTURBOONEPULSE          166
 #endif
 
 #ifdef TURBOBAUD1550
-#define UEFPILOTPULSES     320
-#define UEFPILOTLENGTH     161
-#define UEFZEROPULSE       322
-#define UEFONEPULSE        161
+#define UEFTURBOPILOTPULSES       320
+#define UEFTURBOPILOTLENGTH       161
+#define UEFTURBOZEROPULSE         322
+#define UEFTURBOONEPULSE          161
 #endif
 
 #ifdef TURBOBAUD1600
-#define UEFPILOTPULSES     320
-#define UEFPILOTLENGTH     156
-#define UEFZEROPULSE       313
-#define UEFONEPULSE        156
+#define UEFTURBOPILOTPULSES       320
+#define UEFTURBOPILOTLENGTH       156
+#define UEFTURBOZEROPULSE         313
+#define UEFTURBOONEPULSE          156
 #endif
 
 #define DEBUG 0

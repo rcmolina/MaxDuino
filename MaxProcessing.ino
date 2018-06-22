@@ -162,16 +162,16 @@ void TZXProcess() {
       } else {
         chunkID = IDCHUNKEOF;
       }
-//      if (!(uefTurboMode)) {
-   /*   if ( BAUDRATE == 1200) {
+      if (!(TSXCONTROLzxpolarityUEFTURBO)) {
+      //if ( BAUDRATE == 1200) {
          zeroPulse = UEFZEROPULSE;
          onePulse = UEFONEPULSE;
       } else {
          zeroPulse = UEFTURBOZEROPULSE;
          onePulse = UEFTURBOONEPULSE;  
-      } */
-      zeroPulse = UEFZEROPULSE;
-      onePulse = UEFONEPULSE;
+      } 
+      //zeroPulse = UEFZEROPULSE;
+      //onePulse = UEFONEPULSE;
        
       lastByte=0;
       
@@ -201,18 +201,18 @@ void TZXProcess() {
         case ID0110:
           if(currentBlockTask==READPARAM){
             if(r=ReadWord(bytesRead)==2) {
-//              if (!(uefTurboMode)) {
-          /*    if (BAUDRATE == 1200) {                     
+              if (!(TSXCONTROLzxpolarityUEFTURBO)) {
+              //if (BAUDRATE == 1200) {                     
                  pilotPulses = UEFPILOTPULSES;
                  pilotLength = UEFPILOTLENGTH;
               } else {
                 // turbo mode    
                  pilotPulses = UEFTURBOPILOTPULSES;
                  pilotLength = UEFTURBOPILOTLENGTH;                
-              } */
+              } 
               
-                pilotPulses = UEFPILOTPULSES;
-                pilotLength = UEFPILOTLENGTH;                     
+                //pilotPulses = UEFPILOTPULSES;
+                //pilotLength = UEFPILOTLENGTH;                     
             }
             currentBlockTask = PILOT;
           } 
@@ -289,9 +289,18 @@ void TZXProcess() {
         case ID0116:
           if(currentBlockTask==READPARAM){
             if(r=ReadDword(bytesRead)==4) {
-              memcpy(&outFloat,&outLong,4);
+              byte * FloatB = (byte *) &outLong;
+              //memcpy(&outFloat,&outLong,4);
               //outWord = (int)(outFloat+.9)*1000;
-              outWord = int(outFloat+.9) <<10;
+              //outWord = int(outFloat+.9) <<10;
+            //outWord = *((float *)&outLong);
+              //outWord = (((*(&outLong+2)&0x80) >> 7) | (*(&outLong+3)&0x7f) << 1) + 10;
+              //outWord = *(&outLong) | (*(&outLong+1))<<8  | ((outWord&1)<<7)<<16 | (outWord>>1)<<24  ;
+              outWord = (((*(FloatB+2)&0x80) >> 7) | (*(FloatB+3)&0x7f) << 1) + 10;
+              outWord = *FloatB | (*(FloatB+1))<<8  | ((outWord&1)<<7)<<16 | (outWord>>1)<<24  ;
+              outFloat = *((float *) &outWord);
+              outWord= (int) outFloat;
+              
               if (outWord>0) {
                 //Serial.print(F("delay="));
                 //Serial.println(outWord,DEC);
@@ -712,7 +721,7 @@ void TZXProcess() {
               if(r=ReadWord(bytesRead)==2) {  // Pause after block in ms
                 pauseLength = outWord;
               }
-              if (tsxSPEEDzxPOL == 0){
+              if (TSXCONTROLzxpolarityUEFTURBO == 0){
                   if(r=ReadWord(bytesRead)==2) {  // T-states each pilot pulse
                     pilotLength = TickToUs(outWord);
                   }
@@ -990,9 +999,11 @@ void TZXProcess() {
             lcd.setCursor(0,0);
             lcd.print("ID? ");
             lcd.setCursor(4,0);
-            lcd.print(String(currentID, HEX));
+            //lcd.print(String(currentID, HEX));
+            lcd.print(currentID);
             lcd.setCursor(0,1);
-            lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
+            //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
+            lcd.print(bytesRead) ; // lcd.print(" - L: "); lcd.print(loopCount);
           #endif
 
           #ifdef OLED1306
@@ -1520,10 +1531,10 @@ void wave2() {
           pinState = HIGH;                     //Set next pinstate HIGH
         #endif */
 
- //       if (tsxSPEEDzxPOL) pinState = LOW;         //Set next pinstate LOW
+ //       if (TSXCONTROLzxpolarityUEFTURBO) pinState = LOW;         //Set next pinstate LOW
  //       else pinState = HIGH;                     //Set next pinstate HIGH
 
-        pinState = !tsxSPEEDzxPOL;
+        pinState = !TSXCONTROLzxpolarityUEFTURBO;
        
         //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
         //wbuffer[pos+1][workingBuffer] = lowByte(workingPeriod - 1);
