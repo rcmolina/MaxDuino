@@ -73,7 +73,7 @@
  //               V1.38 Code reformatted, cas is optional with new #def Use_CAS.Solved a bug when back with stop button from 4th subdir.
  //               V1.39 Optional hq.uef support for Acorn using define (implemented chunks 111 and 116).
  //                     Code better organized, and new userconfig.h with help for easier configuration -Alfredo Crespo
- //               V1.40 LCD sketch savings, polary/tsx control/UEF turbo mode can be change while paused with menu button 
+ //               V1.40 LCD sketch savings, tsx control/polarity/UEF turbo mode can be changed while paused with menu button. 
  //                     Reworked acorn chunk 116 floating point conversion to integer.
  //
 #include <SdFat.h>
