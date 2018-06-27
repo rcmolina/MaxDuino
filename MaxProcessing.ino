@@ -769,7 +769,7 @@ void TZXProcess() {
                       break;
                   }
                
-              } //TSX_SPEEDUP
+              } //End of TSX_SPEEDUP
 
               if(r=ReadByte(bytesRead)==1) {  // BitCfg
                 oneBitPulses =  outByte & 0x0f;       //(default:4)
@@ -780,11 +780,11 @@ void TZXProcess() {
               if(r=ReadByte(bytesRead)==1) {  // ByteCfg
                 //Start Bits Cfg
                 startBitValue = (outByte >> 5) & 1;   //(default:0)
-                startBitPulses = (outByte >> 6) & 3;  //(default:1)
+                /*startBits = */startBitPulses = (outByte >> 6) & 3;  //(default:1)
                 startBitPulses *= startBitValue ? oneBitPulses : zeroBitPulses;
                 //Stop Bits Cfg
                 stopBitValue = (outByte >> 2) & 1;    //(default:1)
-                stopBitPulses = (outByte >> 3) & 3;   //(default:2)
+                /*stopBits = */stopBitPulses = (outByte >> 3) & 3;   //(default:2)
                 stopBitPulses *= stopBitValue ? oneBitPulses : zeroBitPulses;
                 //Endianness
                 endianness = outByte & 1;             //0:LSb 1:MSb (default:0)
@@ -1028,9 +1028,11 @@ void TZXProcess() {
             lcd.setCursor(0,0);
             lcd.print("ID? ");
             lcd.setCursor(4,0);
-            lcd.print(String(currentID, HEX));
+            //lcd.print(String(currentID, HEX));
+            lcd.print(currentID);
             lcd.setCursor(0,1);
-            lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
+            //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
+            lcd.print(bytesRead) ; // lcd.print(" - L: "); lcd.print(loopCount);
           #endif
   
           //delay(8000);
@@ -1183,25 +1185,26 @@ void writeData4B() {
   if (currentBit>0) {
 
     //Start bits
-    if (currentBit==10) {
-      currentPeriod = startBitValue ? onePulse : zeroPulse;
-      pass+=1;
-      if (pass==startBitPulses) {
-        currentBit += -1;
-        pass = 0;
-      }
+    if (currentBit==10 && startBitPulses) {
+          currentPeriod = startBitValue ? onePulse : zeroPulse;
+          pass+=1;
+          if ( pass==startBitPulses) {
+            currentBit += -1;
+            pass = 0;
+          }
     } else
     //Stop bits
-    if (currentBit==1) {
+    if (currentBit==1 && stopBitPulses) {
       currentPeriod = stopBitValue ? onePulse : zeroPulse;
       pass+=1;
-      if (pass==stopBitPulses) {
+      if ( pass==stopBitPulses )  {
         currentBit += -1;
         pass = 0;
       }
     } else
     //Data bits
     {
+      if (currentBit==10 && !startBitPulses) currentBit = 9;
       dataBit = (currentByte >> (endianness ? (currentBit - 2) : (9 - currentBit))) & 1;
       currentPeriod = dataBit ? onePulse : zeroPulse;
       pass+=1;
@@ -1209,6 +1212,7 @@ void writeData4B() {
         currentBit += -1;
         pass = 0;
       }
+      if (currentBit==1 && !stopBitPulses) currentBit = 0;
     }
   }
   else

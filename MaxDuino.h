@@ -197,8 +197,10 @@ word onePulse=0;
 
 byte oneBitPulses = 4;
 byte zeroBitPulses = 2;
+//byte startBits = 1;
 byte startBitPulses = 2;
 byte startBitValue = 0;
+//byte stopBits = 2;
 byte stopBitPulses = 8;
 byte stopBitValue = 1;
 byte endianness = 0;    //0:LSb 1:MSb (default:0)
