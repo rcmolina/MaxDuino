@@ -735,7 +735,7 @@ void TZXProcess() {
                     onePulse = TickToUs(outWord);
                   }
               } else {
-                  //Fixed speedup baudrate, reduced pilot duration
+                  //Begin of TSX_SPEEDUP: Fixed speedup baudrate, reduced pilot duration
                   pilotPulses = BAUDRATE/1200*5000;
                   bytesRead += 8;
                   switch(BAUDRATE){
@@ -1000,10 +1000,12 @@ void TZXProcess() {
             lcd.print("ID? ");
             lcd.setCursor(4,0);
             //lcd.print(String(currentID, HEX));
-            lcd.print(currentID);
+            utoa(currentID,PlayBytes,16);
+            lcd.print(PlayBytes);
             lcd.setCursor(0,1);
             //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-            lcd.print(bytesRead) ; // lcd.print(" - L: "); lcd.print(loopCount);
+            ltoa(bytesRead,PlayBytes,16);
+            lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
           #endif
 
           #ifdef OLED1306
@@ -1017,9 +1019,9 @@ void TZXProcess() {
                   u8g.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
               } while( u8g.nextPage() ); */
               printtextF(PSTR("ID? "),0);
-              itoa(currentID,PlayBytes,16);sendStrXY(PlayBytes,4,0);
-              itoa(bytesRead,PlayBytes,16);strcat_P(PlayBytes,PSTR(" - L: "));printtext(PlayBytes,lineaxy);
-              itoa(loopCount,PlayBytes,10);sendStrXY(PlayBytes,10,lineaxy);
+              utoa(currentID,PlayBytes,16);sendStrXY(PlayBytes,4,0);
+              ltoa(bytesRead,PlayBytes,16);strcat_P(PlayBytes,PSTR(" - L: "));printtext(PlayBytes,lineaxy);
+              utoa(loopCount,PlayBytes,10);sendStrXY(PlayBytes,10,lineaxy);
 
           #endif 
           
@@ -1029,10 +1031,12 @@ void TZXProcess() {
             lcd.print("ID? ");
             lcd.setCursor(4,0);
             //lcd.print(String(currentID, HEX));
-            lcd.print(currentID);
+            utoa(currentID,PlayBytes,16);
+            lcd.print(PlayBytes);
             lcd.setCursor(0,1);
             //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-            lcd.print(bytesRead) ; // lcd.print(" - L: "); lcd.print(loopCount);
+            ltoa(bytesRead,PlayBytes,16);
+            lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
           #endif
   
           //delay(8000);

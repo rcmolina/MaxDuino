@@ -368,7 +368,13 @@ const unsigned char myFont[][8] PROGMEM = {
     static void setXY(unsigned char col,unsigned char row)
     {
     sendcommand(0xb0+row); //set page address
+    
+    #ifdef OLED1106_1.3
+    sendcommand(0x02+(8*col&0x0f)); //set low col address
+    #else
     sendcommand(0x00+(8*col&0x0f)); //set low col address
+    #endif
+
     sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
     }
     //==========================================================//
@@ -521,7 +527,13 @@ static void init_OLED(void)
     sendcommand(0xD5);            //SETDISPLAYCLOCKDIV
     sendcommand(0x80);            // the suggested ratio 0x80
     sendcommand(0xA8);            //SSD1306_SETMULTIPLEX
-    sendcommand(0x1f); //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x32 OLED 0x03f
+
+    #ifdef OLED1106_1.3
+      sendcommand(0x1f); //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f
+    #else
+      sendcommand(0x1f); //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f
+    #endif
+    
     sendcommand(0xD3);            //SETDISPLAYOFFSET
     sendcommand(0x0);             //no offset
     sendcommand(0x40 | 0x0);      //SETSTARTLINE
