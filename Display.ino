@@ -560,8 +560,13 @@ static void init_OLED(void)
     
     sendcommand(0xDA);            //0xDA
     sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */
-    sendcommand(0x81);           //SETCONTRAS
-    sendcommand(0xcf);           //
+    #ifdef OLED1106_1.3
+      sendcommand(0x81);           //SETCONTRAS
+      sendcommand(0x4f);           // default 0x80
+    #else
+      sendcommand(0x81);           //SETCONTRAS
+      sendcommand(0xcf);           //
+    #endif
     sendcommand(0xD9);          //SETPRECHARGE /* [2] pre-charge period 0x022/f1*/
     sendcommand(0xf1); 
     sendcommand(0xDB);        //SETVCOMDETECT                
