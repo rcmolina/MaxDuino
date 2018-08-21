@@ -368,7 +368,13 @@ const unsigned char myFont[][8] PROGMEM = {
     static void setXY(unsigned char col,unsigned char row)
     {
     sendcommand(0xb0+row); //set page address
-    sendcommand(0x00+(8*col&0x0f)); //set low col address
+    
+    #ifdef OLED1106_1.3
+      sendcommand(0x02+(8*col&0x0f)); //set low col address
+    #else
+      sendcommand(0x00+(8*col&0x0f)); //set low col address
+    #endif
+    
     sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
     }
     //==========================================================//
