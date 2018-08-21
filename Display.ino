@@ -205,7 +205,6 @@ const byte logo [] PROGMEM = {
 #ifdef LOGOMAXDUINO
 // 'Maxduino_128x32'
 const byte logo [] PROGMEM = {
-
 0x00, 0x00, 0x00, 0x00, 0x60, 0xB8, 0x44, 0x5A, 0x2D, 0x2E, 0x95, 0x93, 0x16, 0x96, 0x94, 0x10,
 0x10, 0x20, 0x20, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x00, 0x00,
@@ -244,7 +243,6 @@ const byte logo [] PROGMEM = {
 #ifdef LOGOARDUITAPE
  // 'Arduitape_128x32'
 const byte logo [] PROGMEM = {
-
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -524,23 +522,24 @@ static void init_OLED(void)
     sendcommand(0xd0 | ((1)&0x0f)); */    
         
     sendcommand(0xAE);             //DISPLAYOFF
-    sendcommand(0xD5);            //SETDISPLAYCLOCKDIV
-    sendcommand(0x80);            // the suggested ratio 0x80
-    sendcommand(0xA8);            //SSD1306_SETMULTIPLEX
-
-    #ifdef OLED1106_1.3
+    //sendcommand(0xD5);            //SETDISPLAYCLOCKDIV
+    //sendcommand(0x80);            // the suggested ratio 0x80
+    #ifdef OLED1106_1.3   
+      sendcommand(0xA8);            //SSD1306_SETMULTIPLEX
+      //sendcommand(0x3f); //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f
       sendcommand(0x1f); //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f
     #else
+      sendcommand(0xA8);            //SSD1306_SETMULTIPLEX
       sendcommand(0x1f); //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f
     #endif
     
-    sendcommand(0xD3);            //SETDISPLAYOFFSET
-    sendcommand(0x0);             //no offset
-    sendcommand(0x40 | 0x0);      //SETSTARTLINE
-    sendcommand(0x8D);            //CHARGEPUMP
-    sendcommand(0x14);
-    sendcommand(0x20);             //MEMORYMODE
-    sendcommand(0x02);             //com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5), Feb 23, 2013: 128x32 OLED: 0x002,  128x32 OLED 0x012
+    //sendcommand(0xD3);            //SETDISPLAYOFFSET
+    //sendcommand(0x0);             //no offset
+    //sendcommand(0x40 | 0x0);      //SETSTARTLINE
+    //sendcommand(0x8D);            //CHARGEPUMP
+    //sendcommand(0x14);
+    //sendcommand(0x20);             //MEMORYMODE
+    //sendcommand(0x02);             //com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5), Feb 23, 2013: 128x32 OLED: 0x002,  128x32 OLED 0x012
 
 #ifdef ROTATE180    
     sendcommand(0xA0 | 0x1);      //SEGREMAP   //Rotate screen 180 deg 0xA1
@@ -557,9 +556,15 @@ static void init_OLED(void)
     //sendcommand(0xC8);            //COMSCANDEC  Rotate screen 180 Deg /* c0: scan dir normal, c8: reverse */
     sendcommand(0xC0);
 #endif
+
+    #ifdef OLED1106_1.3             
+      sendcommand(0xDA);
+      sendcommand(0x02);            //0x12 for 128x64 mode, default value                           
+    #else                           //0x02 for 128x32 mode
+      sendcommand(0xDA);            //0xDA
+      sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */
+    #endif
     
-    sendcommand(0xDA);            //0xDA
-    sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */
     #ifdef OLED1106_1.3
       sendcommand(0x81);           //SETCONTRAS
       sendcommand(0x4f);           // default 0x80
@@ -567,13 +572,13 @@ static void init_OLED(void)
       sendcommand(0x81);           //SETCONTRAS
       sendcommand(0xcf);           //
     #endif
-    sendcommand(0xD9);          //SETPRECHARGE /* [2] pre-charge period 0x022/f1*/
-    sendcommand(0xf1); 
-    sendcommand(0xDB);        //SETVCOMDETECT                
-    sendcommand(0x40);
-    sendcommand(0x2E);            // stop scroll
-    sendcommand(0xA4);        //DISPLAYALLON_RESUME        
-    sendcommand(0xA6);        //NORMALDISPLAY             
+    //sendcommand(0xD9);          //SETPRECHARGE /* [2] pre-charge period 0x022/f1*/
+    //sendcommand(0xf1); 
+    //sendcommand(0xDB);        //SETVCOMDETECT                
+    //sendcommand(0x40);
+    //sendcommand(0x2E);            // stop scroll
+    //sendcommand(0xA4);        //DISPLAYALLON_RESUME        
+    //sendcommand(0xA6);        //NORMALDISPLAY             
     sendcommand(0xAF);    //display on
 
 /*    sendcommand(0xFF); // U8G_ESC_CS(0) disable chip
