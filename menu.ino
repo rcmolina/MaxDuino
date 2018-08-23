@@ -88,19 +88,43 @@ void menuMode()
               switch(subItem) {
                 case 0:                                  
                   printtextF(PSTR("1200"),lineaxy);
-                  if(BAUDRATE==1200) printtextF(PSTR("1200 *"),lineaxy);
+                  if(BAUDRATE==1200) {
+                    #ifndef OLED1306
+                      printtextF(PSTR("1200 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
+                  }
                 break;
                 case 1:        
                   printtextF(PSTR("2400"),lineaxy);
-                  if(BAUDRATE==2400) printtextF(PSTR("2400 *"),lineaxy);
+                  if(BAUDRATE==2400) {
+                    #ifndef OLED1306
+                      printtextF(PSTR("2400 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
+                  }
                 break;
                 case 2:                  
                   printtextF(PSTR("3600"),lineaxy);
-                  if(BAUDRATE==3600) printtextF(PSTR("3600 *"),lineaxy);
+                  if(BAUDRATE==3600) {
+                    #ifndef OLED1306
+                      printtextF(PSTR("3600 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
+                  }
                 break;                  
                 case 3:                  
                   printtextF(PSTR("3850"),lineaxy);
-                  if(BAUDRATE==3850) printtextF(PSTR("3850 *"),lineaxy);
+                  if(BAUDRATE==3850) {
+                    #ifndef OLED1306
+                      printtextF(PSTR("3850 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
+                  }
                 break;                
               }
               updateScreen=false;
