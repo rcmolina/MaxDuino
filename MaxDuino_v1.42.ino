@@ -1185,7 +1185,8 @@ void printtext(char* text, int l) {  //Print text to screen.
  //   setXY(11,2);
  //   sendStr("BLK:");
     setXY(0,3);
-    sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
+    //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
+    itoa(BAUDRATE,input,10);sendStr(input);
     setXY(5,3);
     if(mselectMask==1) sendStr(" M:ON");
     else sendStr("m:off");    
