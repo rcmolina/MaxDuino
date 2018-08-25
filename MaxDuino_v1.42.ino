@@ -1107,9 +1107,28 @@ void printtextF(const char* text, int l) {  //Print text to screen.
   #endif
 
  #ifdef OLED1306
-      strncpy_P(fline, text, 16);
+   /*   strncpy_P(fline, text, 16);
       for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
-      sendStrXY(fline,0,l);
+      sendStrXY(fline,0,l); */
+      setXY(0,l);
+      
+      char x = 0;
+      while (char i=pgm_read_byte(text+x)) {
+        sendChar(i);
+        x++;
+      }
+      for(x; x<16; x++) sendChar(' ');
+
+/*
+      for(int i=0;i<16;i++)
+      {
+        int j;
+        if(i<strlen(text))  j=pgm_read_byte(text);
+        else  j=0x20;
+        sendChar(j);
+      }  
+*/       
+   
   /*    u8g.firstPage();
       do {  
          u8g.drawStr( 0, 15, line0);   
@@ -1151,12 +1170,25 @@ void printtext(char* text, int l) {  //Print text to screen.
   #endif
 
    #ifdef OLED1306
+/*
       for(int i=0;i<16;i++)
       {
         if(i<strlen(text))  fline[i]=text[i];
         else  fline[i]=0x20;
       }    
       sendStrXY(fline,0,l);
+*/
+
+      setXY(0,l); 
+
+      char j;
+       for(int i=0;i<16;i++)
+      {
+        if(i<strlen(text))  j=text[i];
+        else  j=0x20;
+        sendChar(j);
+      }       
+      
       //setXY(0,l);
       //sendStr("                    ");
       //setXY(0,l);
