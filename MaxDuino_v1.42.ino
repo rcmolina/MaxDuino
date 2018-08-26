@@ -1169,7 +1169,7 @@ void printtext(char* text, int l) {  //Print text to screen.
     lcd.print(fline);
   #endif
 
-   #ifdef OLED1306
+  #ifdef OLED1306
 /*
       for(int i=0;i<16;i++)
       {
@@ -1181,14 +1181,25 @@ void printtext(char* text, int l) {  //Print text to screen.
 
       setXY(0,l); 
 
-      char j;
-       for(int i=0;i<16;i++)
+      char i;
+      const char len = strlen(text);
+       for(char x=0;x<16;x++)
       {
-        if(i<strlen(text))  j=text[i];
-        else  j=0x20;
-        sendChar(j);
+        if(x<len)  i=text[x];
+        else  i=0x20;
+        sendChar(i);
       }       
-      
+
+/*
+      char x = 0;
+       while ((*text) && (x<16)) 
+      {
+        sendChar(*text);
+        *text++;
+        x++;
+      }
+      for(x; x<16; x++) sendChar(' ');      
+*/              
       //setXY(0,l);
       //sendStr("                    ");
       //setXY(0,l);

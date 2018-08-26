@@ -570,7 +570,7 @@ static void init_OLED(void)
     
     #ifdef OLED1106_1.3
       sendcommand(0x81);           //SETCONTRAS
-      sendcommand(0x4f);           // default 0x80
+      sendcommand(0x1f);           // default 0x80
     #else
       sendcommand(0x81);           //SETCONTRAS
       sendcommand(0xcf);           //
