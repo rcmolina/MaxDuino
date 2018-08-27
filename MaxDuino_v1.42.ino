@@ -1102,13 +1102,21 @@ void printtextF(const char* text, int l) {  //Print text to screen.
   #endif
   
   #ifdef LCDSCREEN16x2
-    strncpy_P(fline, text, 16);
+  /*  strncpy_P(fline, text, 16);
     for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
     //lcd.setCursor(0,l);
     //lcd.print(F("                    "));
     lcd.setCursor(0,l);
-    lcd.print(fline);
+    lcd.print(fline); */
     //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
+    lcd.setCursor(0,l);
+
+    char x = 0;
+    while (char ch=pgm_read_byte(text+x)) {
+      lcd.print(ch);
+      x++;
+    }
+    for(x; x<16; x++) lcd.print(' ');  
     
   #endif
 
@@ -1163,16 +1171,26 @@ void printtext(char* text, int l) {  //Print text to screen.
   #endif
   
   #ifdef LCDSCREEN16x2
-    for(int i=0;i<16;i++)
+/*    for(int i=0;i<16;i++)
     {
       if(i<strlen(text))  fline[i]=text[i];
       else  fline[i]=0x20;
-    }   
+    }    
 
     //lcd.setCursor(0,l);
     //lcd.print(F("                    "));
     lcd.setCursor(0,l);
-    lcd.print(fline);
+    lcd.print(fline); */
+    lcd.setCursor(0,l);
+        
+    char ch;
+    const char len = strlen(text);
+    for(char x=0;x<16;x++) {
+        if(x<len)  ch=text[x];
+        else  ch=0x20;
+        lcd.print(ch); 
+    }
+    
   #endif
 
   #ifdef OLED1306
