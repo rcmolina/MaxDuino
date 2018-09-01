@@ -29,10 +29,10 @@ void menuMode()
  *  
  *  Save settings to eeprom on exit. 
  */
-
+ byte lastbtn=true;
+ 
  void menuMode()
  { 
-  byte lastbtn=true;
   byte menuItem=0;
   byte subItem=0;
   byte updateScreen=true;
@@ -161,7 +161,7 @@ void menuMode()
               #endif
               lastbtn=true;
             }
-            if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+            checkLastButton();
           }
           lastbtn=true;
           updateScreen=true;
@@ -216,7 +216,7 @@ void menuMode()
                 OledStatusLine();
               #endif              
             }
-            if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+            checkLastButton();
           }
           lastbtn=true;
           updateScreen=true;
@@ -270,7 +270,7 @@ void menuMode()
                 OledStatusLine();
               #endif
             }
-            if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+            checkLastButton();
           }
           lastbtn=true;
           updateScreen=true;
@@ -324,7 +324,7 @@ void menuMode()
             //    OledStatusLine();
               #endif
             } 
-            if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+            checkLastButton();
           }
           lastbtn=true;
           updateScreen=true;
@@ -332,7 +332,7 @@ void menuMode()
    #endif     
       }
     }
-    if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+    checkLastButton();
   }
   updateEEPROM();
 
@@ -422,4 +422,9 @@ void menuMode()
   //UniSetup();
  
  }
+
+void checkLastButton()
+{
+  if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false; 
+}
 
