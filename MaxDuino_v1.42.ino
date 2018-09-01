@@ -551,7 +551,8 @@ void loop(void) {
         #ifdef Use_MENU
            menuMode();
            //setBaud();
-           printtextF(PSTR(VERSION),0);
+           //printtextF(PSTR(VERSION),0);
+           printtext(PlayBytes,0);           
            //lcd_clearline(1);
           #ifdef LCDSCREEN16x2
             printtextF(PSTR(""),1);
@@ -1127,8 +1128,8 @@ void printtextF(const char* text, int l) {  //Print text to screen.
       setXY(0,l);
       
       char x = 0;
-      while (char i=pgm_read_byte(text+x)) {
-        sendChar(i);
+      while (char ch=pgm_read_byte(text+x)) {
+        sendChar(ch);
         x++;
       }
       for(x; x<16; x++) sendChar(' ');
@@ -1205,13 +1206,13 @@ void printtext(char* text, int l) {  //Print text to screen.
 
       setXY(0,l); 
 
-      char i;
+      char ch;
       const char len = strlen(text);
        for(char x=0;x<16;x++)
       {
-        if(x<len)  i=text[x];
-        else  i=0x20;
-        sendChar(i);
+        if(x<len)  ch=text[x];
+        else  ch=0x20;
+        sendChar(ch);
       }       
 
 /*
