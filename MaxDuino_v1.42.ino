@@ -947,7 +947,7 @@ void getMaxFile() {
     entry.close();
     maxFile++;
   }
-  entry.cwd()->rewind();
+  //entry.cwd()->rewind();
 }
 
 
