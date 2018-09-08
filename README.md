@@ -2,6 +2,8 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.43 aka "Mar Menor" version. Implemented half-interval (logarithmic) search for dirs and block selection. Now ROOT button used as pivot.
+Menu functions now activated with ROOT + STOP, new half-interval search with ROOT + UP/DOWN.
 * V1.42 Bugs solved: Rewinding block not showing first digit correctly (@acf76es). LCD printing when block ID not recognized again in hex.
 First support of 1,3" oled SH1106 but using 128x32 and not 128x64. Backported optimizations from V1.43.
 * V1.41 New logos from zx-uno companion Sugarless (@spark2k06/@yoxxxoy). New SPLASH_SCREEN configuration (@spark2k06).  Better .tsx start/stopbits support: Now working with SVI-3x8 machines!
