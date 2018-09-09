@@ -1128,7 +1128,9 @@ void seekFile(int pos) {
   entry.getName(fileName,filenameLength);
   entry.getSFN(sfileName);
   filesize = entry.fileSize();
+  #ifdef AYPLAY
   ayblklen = filesize + 3;  // add 3 file header, data byte and chksum byte to file length
+  #endif
   if(entry.isDir() || !strcmp(sfileName, "ROOT")) { isDir=1; } else { isDir=0; }
   entry.close();
 
