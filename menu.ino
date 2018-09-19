@@ -428,5 +428,6 @@ void checkLastButton()
   if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false; 
         //    setXY(0,0);
         //  sendChar(lastbtn+'0');
+  delay(50);
 }
 
