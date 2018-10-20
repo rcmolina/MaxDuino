@@ -561,11 +561,13 @@ void loop(void) {
 
      }
 
-     checkLastButton();
-     #ifdef SHOW_DIRPOS
-       if(digitalRead(btnRoot)==LOW && start==0 && !lastbtn) {                                          // show min-max dir
+     //checkLastButton();
+     //if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
+     lastbtn=false;
+     if(digitalRead(btnRoot)==LOW && start==0 && !lastbtn) {                                          // show min-max dir
        //if(digitalRead(btnRoot)==LOW && start==0 && digitalRead(btnStop)==LOW ){ 
-         //printtextF(PSTR(VERSION),0);
+       //printtextF(PSTR(VERSION),0);
+       #ifdef SHOW_DIRPOS
         #if defined(LCDSCREEN16x2) && !defined(SHOW_STATUS_LCD) && !defined(SHOW_DIRNAMES)
            char len=0;
            lcd.setCursor(0,0); 
@@ -630,16 +632,16 @@ void loop(void) {
           sendStr(input);sendChar('<');sendChar(' ');
           sendStr(oldMaxFileName);
            
-        #endif        
-         while(digitalRead(btnRoot)==LOW && !lastbtn) {
+        #endif
+      #endif        
+        while(digitalRead(btnRoot)==LOW && !lastbtn) {
            //prevent button repeats by waiting until the button is released.
            //delay(50);
            lastbtn = 1;
            checkLastButton();           
-         }        
-         printtext(PlayBytes,0);
-       }
-     #endif
+        }        
+        printtext(PlayBytes,0);
+     }
      
      #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
        if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block

@@ -14,7 +14,7 @@ void casStop()
   start=0;
   //interrupts();
   entry.close();
-  REWIND=1;   
+  //REWIND=1;   
   seekFile(currentFile);
   bytesRead=0;
   dragonMode=0;
