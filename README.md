@@ -2,6 +2,7 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.44 New define btnRoot_AS_PIVOT in userconfig.h so it can be deactivated by user. New #define in Maxduino.h to support Antonio Villena's MINIDUINO new design with amplifier and new define OLED_SETCONTRAS in userconfig.h for contrast value override. New Miniduino logo. It's posible to select RECORD_EEPROM and LOAD_EEPROM both for better testing when selecting new logos in userconfig.h, pressing MENU simulates a reset to show logo again.
 * V1.43 aka "Mar Menor" version. Implemented half-interval (logarithmic) search for dirs and block selection. Now ROOT button used as pivot.
 Menu functions now activated with ROOT + STOP, new half-interval search with ROOT + UP/DOWN.
 * V1.42 Bugs solved: Rewinding block not showing first digit correctly (@acf76es). LCD printing when block ID not recognized again in hex.
