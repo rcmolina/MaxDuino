@@ -2,13 +2,13 @@
 #define outputPin           9
 
 #ifdef MINIDUINO_AMPLI
-  #define INIT_OUTPORT        DDRB |= B00000011;       // pin8+ pin9 es el bit0-bit1 del PORTB 
-  #define WRITE_LOW           PORTB &= B11111100       // pin8+ pin9 , bit0- bit1 del PORTB
-  #define WRITE_HIGH          PORTB |= B00000011       // pin8+ pin9 , bit0- bit1 del PORTB
+  #define INIT_OUTPORT         DDRB |= B00000011       // pin8+ pin9 es el bit0-bit1 del PORTB 
+  #define WRITE_LOW           PORTB = (PORTB & B11111101) | B00000001       // pin8+ pin9 , bit0- bit1 del PORTB
+  #define WRITE_HIGH          PORTB = (PORTB | B00000010) & B11111110       // pin8+ pin9 , bit0- bit1 del PORTB
 #else
-  #define INIT_OUTPORT        DDRB |= _BV(1);         // El pin9 es el bit1 del PORTB
-  #define WRITE_LOW           PORTB &= ~_BV(1)        // El pin9 es el bit1 del PORTB
-  #define WRITE_HIGH          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
+  #define INIT_OUTPORT         DDRB |=  _BV(1)         // El pin9 es el bit1 del PORTB
+  #define WRITE_LOW           PORTB &= ~_BV(1)         // El pin9 es el bit1 del PORTB
+  #define WRITE_HIGH          PORTB |=  _BV(1)         // El pin9 es el bit1 del PORTB
 #endif
 
 // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
