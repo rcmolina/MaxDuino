@@ -1521,17 +1521,18 @@ void wave2() {
         //Pause block periods are stored in milliseconds not microseconds
         isPauseBlock = true;
         bitClear(workingPeriod,15);         //Clear pause block flag
-        pinState = !pinState;
+        //pinState = !pinState;
         pauseFlipBit = true;
         wasPauseBlock = true;
       } else {
         if(workingPeriod >= 1 && wasPauseBlock==false) {
-          pinState = !pinState;
+          //pinState = !pinState;
         } else if (wasPauseBlock==true && isPauseBlock==false) {
           wasPauseBlock=false;
         }
       }
       //digitalWrite(outputPin, pinState);
+      pinState = !pinState;
       if (pinState == LOW)     WRITE_LOW;    
       else  WRITE_HIGH;      
       if(pauseFlipBit==true) {
