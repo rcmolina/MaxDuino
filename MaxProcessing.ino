@@ -1525,11 +1525,14 @@ void wave2() {
         pauseFlipBit = true;
         wasPauseBlock = true;
       } else {
+        /*
         if(workingPeriod >= 1 && wasPauseBlock==false) {
           //pinState = !pinState;
         } else if (wasPauseBlock==true && isPauseBlock==false) {
           wasPauseBlock=false;
         }
+        */
+            if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;
       }
       //digitalWrite(outputPin, pinState);
       pinState = !pinState;
