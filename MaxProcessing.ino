@@ -1576,7 +1576,8 @@ void wave2() {
           morebuff = HIGH;                  //Request more data to fill inactive page
         } 
      }
-  } else if(workingPeriod <= 1 && isStopped==0) {
+  //} else if(workingPeriod <= 1 && isStopped==0) {
+  } else if (isStopped==0) {    
     newTime = 1000;                         //Just in case we have a 0 in the buffer
     //pos += 1;
     pos += 2;
