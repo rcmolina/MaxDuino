@@ -6,9 +6,9 @@ void checkForEXT (char *filename) {
   if(strstr_P(strlwr(filename + x), PSTR(".tap"))) {casduino =0; currentTask=PROCESSID; currentID=TAP;}
   else if(strstr_P(strlwr(filename + x), PSTR(".p"))) {casduino =0; currentTask=PROCESSID; currentID=ZXP;}
   else if(strstr_P(strlwr(filename + x), PSTR(".o"))) {casduino =0; currentTask=PROCESSID; currentID=ZXO;}
- 
+ #ifdef AYPLAY  
   else if(strstr_P(strlwr(filename + x), PSTR(".ay"))) {casduino =0; currentTask=GETAYHEADER; currentID=AYO; AYPASS = 0; hdrptr = HDRSTART;}
-
+ #endif
  #ifdef Use_UEF
   else if(strstr_P(strlwr(filename + x), PSTR(".uef"))) {casduino =0; currentTask=GETUEFHEADER; currentID=UEF;}
  #endif
