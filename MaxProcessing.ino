@@ -1778,7 +1778,7 @@ int ReadLong(unsigned long pos) {
     i = entry.read(out,3);
     if(i==3) bytesRead += 3;
   }
-  outLong = (word(out[2],out[1]) << 8) | out[0];
+  outLong = ((unsigned long)word(out[2],out[1]) << 8) | out[0];
   //blkchksum = blkchksum ^ out[0] ^ out[1] ^ out[2];
   return i;
 }
