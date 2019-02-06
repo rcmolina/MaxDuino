@@ -1792,7 +1792,7 @@ int ReadDword(unsigned long pos) {
     i = entry.read(out,4);
     if(i==4) bytesRead += 4;
   }
-  outLong = (word(out[3],out[2]) << 16) | word(out[1],out[0]);
+  outLong = ((unsigned long)word(out[3],out[2]) << 16) | word(out[1],out[0]);
   //blkchksum = blkchksum ^ out[0] ^ out[1] ^ out[2] ^ out[3];
   return i;
 }
