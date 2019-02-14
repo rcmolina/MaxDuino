@@ -1,4 +1,4 @@
-#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
+//#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
 #define outputPin           9
 
 #ifdef MINIDUINO_AMPLI

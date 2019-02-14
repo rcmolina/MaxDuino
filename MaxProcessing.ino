@@ -1602,7 +1602,7 @@ void wave2() {
         if (bitRead(workingPeriod, 13) == 0)     WRITE_LOW;    
         else  {WRITE_HIGH; bitClear(workingPeriod,13);}     
         bitClear(workingPeriod,14);         //Clear ID15 flag
-        workingPeriod = SampleLength +5;
+        workingPeriod = SampleLength +6;
         //workingPeriod += 5;              
       }
       #endif
@@ -1619,7 +1619,7 @@ void wave2() {
  //       if (TSXCONTROLzxpolarityUEFTURBO) pinState = LOW;         //Set next pinstate LOW
  //       else pinState = HIGH;                     //Set next pinstate HIGH
 
-       // pinState = !TSXCONTROLzxpolarityUEFTURBO;
+        pinState = !TSXCONTROLzxpolarityUEFTURBO;
        
         //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
         //wbuffer[pos+1][workingBuffer] = lowByte(workingPeriod - 1);
