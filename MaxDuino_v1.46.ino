@@ -89,7 +89,7 @@
  //                     when selecting new logos in userconfig.h, pressing MENU simulates a reset to show logo again.
  //               V1.45 New ID15 testing code, can be deactivated from userconfig.h to save space. Amstrad bugs solved: 
  //                     Deflektor and other cdts now loading.
- //               V1.46 OLED 128x64 mode with 8 lines, logo can also be loaded with full resolution (@geloalex, @merlinkv, @acf76es)
+ //               V1.46 OLED 128x64 mode with 8 rows, logo can also be loaded with full resolution (@geloalex, @merlinkv, @acf76es)
  //           
 #include <SdFat.h>
 #include <TimerOne.h>
