@@ -1478,9 +1478,13 @@ void printtextF(const char* text, int l) {  //Print text to screen.
   #endif
 
  #ifdef OLED1306
-   /*   strncpy_P(fline, text, 16);
+     #ifdef XY2
+      strncpy_P(fline, text, 16);
       for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
-      sendStrXY(fline,0,l); */
+      sendStrXY(fline,0,l);
+     #endif
+     
+     #ifdef XY 
       setXY(0,l);
       
       char x = 0;
@@ -1489,7 +1493,7 @@ void printtextF(const char* text, int l) {  //Print text to screen.
         x++;
       }
       for(x; x<16; x++) sendChar(' ');
-
+     #endif
 /*
       for(int i=0;i<16;i++)
       {
@@ -1551,15 +1555,16 @@ void printtext(char* text, int l) {  //Print text to screen.
   #endif
 
   #ifdef OLED1306
-/*
+    #ifdef XY2
       for(int i=0;i<16;i++)
       {
         if(i<strlen(text))  fline[i]=text[i];
         else  fline[i]=0x20;
       }    
       sendStrXY(fline,0,l);
-*/
-
+    #endif
+    
+    #ifdef XY
       setXY(0,l); 
 
       char ch;
@@ -1570,7 +1575,7 @@ void printtext(char* text, int l) {  //Print text to screen.
         else  ch=0x20;
         sendChar(ch);
       }       
-
+    #endif
 /*
       char x = 0;
        while ((*text) && (x<16)) 
@@ -1601,9 +1606,8 @@ void printtext(char* text, int l) {  //Print text to screen.
    
 }
 
-#ifdef OLED1306
-  void OledStatusLine() {
-    #ifdef XY
+void OledStatusLine() {
+  #ifdef XY
     setXY(4,2);
     sendStr("ID:   BLK:");
  //   setXY(11,2);
@@ -1629,10 +1633,16 @@ void printtext(char* text, int l) {  //Print text to screen.
       if (TSXCONTROLzxpolarityUEFTURBO == 1) sendStr(" %^ON");
       else sendStr("%^off");
     #endif
-  }
-#endif
+  #endif
+  #ifdef XY2
+    #ifdef OLED1306_128_64
+          
+    #else
+    
+    #endif      
+  #endif  
+}
 
-#endif
 void SetPlayBlock()
 {
 
