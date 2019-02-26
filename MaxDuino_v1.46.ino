@@ -1634,9 +1634,18 @@ void OledStatusLine() {
       else sendStr("%^off");
     #endif
   #endif
-  #ifdef XY2
-    #ifdef OLED1306_128_64
+  #ifdef XY2                        // Y with double value
+    #ifdef OLED1306_128_64          // 8 rows supported
+        sendStrXY("ID:   BLK:",4,4);
+         
+        //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
+        itoa(BAUDRATE,input,10);sendStrXY(input,0,6);
+        
+        if(mselectMask==1) sendStrXY(" M:ON",5,6);
+        else sendStrXY("m:off",5,6);  
           
+        if (TSXCONTROLzxpolarityUEFTURBO == 1) sendStrXY(" %^ON",11,6);
+        else sendStrXY("%^off",11,6);           
     #else
     
     #endif      
