@@ -420,7 +420,8 @@ void loop(void) {
           //If no file is play, start playback
           playFile();
           if (mselectMask == 1){  
-            oldMotorState = !motorState;  //Start in pause if Motor Control is selected
+            //oldMotorState = !motorState;  //Start in pause if Motor Control is selected
+            oldMotorState = 0;
           }
           delay(200);
           
@@ -1068,7 +1069,13 @@ void loop(void) {
               lcd.print("PAUSED ");    
          #endif 
          #ifdef OLED1306
-              sendStrXY("PAUSED ",0,0);
+              #ifdef XY
+                setXY(0,0);
+                sendStr("PAUSED ");
+              #endif
+              #ifdef XY2
+                sendStrXY("PAUSED ",0,0);
+              #endif
          #endif 
          #ifdef P8544
               lcd.setCursor(0,0);
@@ -1087,7 +1094,13 @@ void loop(void) {
               lcd.print("PLAYing");    
          #endif 
          #ifdef OLED1306
-              sendStrXY("PLAYing",0,0);
+              #ifdef XY
+                setXY(0,0);
+                sendStr("PLAYing");
+              #endif
+              #ifdef XY2
+                sendStrXY("PLAYing",0,0);
+              #endif
          #endif 
          #ifdef P8544
               lcd.setCursor(0,0);
