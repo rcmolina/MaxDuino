@@ -474,7 +474,12 @@ void loop(void) {
             //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000); sendStrXY(PlayBytes,0,0);
             if (currpct <100) {                         
               itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));setXY (8,0);sendStr(PlayBytes);
-            }              
+            } else {                          // Block number must me printed after REW
+                setXY(14,2);
+                sendChar(48+(block)/10);
+              //setXY(15,2);
+                sendChar(48+(block)%10);                            
+            }           
             //sprintf(PlayBytes,"%03d",lcdsegs%1000);sendStrXY(PlayBytes,13,0);
             //strcpy(PlayBytes,PSTR("000"));
             PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
@@ -502,10 +507,12 @@ void loop(void) {
             setXY(13,0);
             sendStr(PlayBytes);
             
-            setXY(14,2);
-            sendChar(48+(block-1)/10);
+        //    if (currpct==100){
+        //      setXY(14,2);
+        //      sendChar(48+(block)/10);
             //setXY(15,2);
-            sendChar(48+(block-1)%10);   
+        //      sendChar(48+(block)%10);
+        //    }    
           #endif
 
          #ifdef P8544                                      
