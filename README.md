@@ -2,6 +2,7 @@
 
 http://www.va-de-retro.com/foros/viewtopic.php?t=5541
 
+* V1.48 Testing new chunks for Acorn computers.
 * V1.47 Optional BLOCKID_INTO_MEM if loading many turbo short blocks. BLOCK_EEPROM_PUT must be disabled when loading Amstrad cpc Breaking Baud demo. Bug fixed: block counter should not be incremented when pausing. 
 * V1.46 OLED 128x64 mode with 8 rows, logo can also be loaded with full resolution (@geloalex, @merlinkv, @acf76es)
 * V1.45 New ID15 testing code, can be deactivated from userconfig.h to save space. Amstrad bugs solved: Deflektor and other cdts now loading.
