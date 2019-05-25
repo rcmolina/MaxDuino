@@ -92,7 +92,7 @@
  //               V1.46 OLED 128x64 mode with 8 rows, logo can also be loaded with full resolution (@geloalex, @merlinkv, @acf76es)
  //               V1.47 Optional BLOCKID_INTO_MEM if loading many turbo short blocks. BLOCK_EEPROM_PUT must be disabled when loading 
  //                     Amstrad cpc Breaking Baud demo. Bug fixed: block counter should not be incremented when pausing.
- //               V1.48 New chunks for Acorn computers: Implemented parity handling for loading protected games (@acf76es).
+ //               V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es).
  //           
 #include <SdFat.h>
 #include <TimerOne.h>
