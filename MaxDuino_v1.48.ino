@@ -93,6 +93,7 @@
  //               V1.47 Optional BLOCKID_INTO_MEM if loading many turbo short blocks. BLOCK_EEPROM_PUT must be disabled when loading 
  //                     Amstrad cpc Breaking Baud demo. Bug fixed: block counter should not be incremented when pausing.
  //               V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es).
+ //                     Remove warnings from IDE compilation (@llopis).
  //           
 #include <SdFat.h>
 #include <TimerOne.h>
@@ -474,7 +475,7 @@ void loop(void) {
           #ifdef OLED1306
             //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000); sendStrXY(PlayBytes,0,0);
             if (currpct <100) {                         
-              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));setXY (8,0);sendStr(PlayBytes);
+              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));setXY (8,0);sendStr((unsigned char *)(PlayBytes));
             } else {                          // Block number must me printed after REW
                 setXY(14,2);
                 sendChar(48+(block)/10);
@@ -506,7 +507,7 @@ void loop(void) {
             #endif                 
                               
             setXY(13,0);
-            sendStr(PlayBytes);
+            sendStr((unsigned char *)(PlayBytes));
 
         //    if (currpct==100){
         //      setXY(14,2);
@@ -1101,7 +1102,7 @@ void loop(void) {
          #ifdef OLED1306
               #ifdef XY
                 setXY(0,0);
-                sendStr("PAUSED ");
+                sendStr((unsigned char *)"PAUSED ");
               #endif
               #ifdef XY2
                 sendStrXY("PAUSED ",0,0);
@@ -1126,7 +1127,7 @@ void loop(void) {
          #ifdef OLED1306
               #ifdef XY
                 setXY(0,0);
-                sendStr("PLAYing");
+                sendStr((unsigned char *)"PLAYing");
               #endif
               #ifdef XY2
                 sendStrXY("PLAYing",0,0);
@@ -1652,7 +1653,7 @@ void printtext(char* text, int l) {  //Print text to screen.
 void OledStatusLine() {
   #ifdef XY
     setXY(4,2);
-    sendStr("ID:   BLK:");
+    sendStr((unsigned char*)"ID:   BLK:");
  //   setXY(11,2);
  //   sendStr("BLK:");
     #ifdef OLED1306_128_64
@@ -1668,13 +1669,13 @@ void OledStatusLine() {
     #else
       setXY(0,3);
       //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
-      itoa(BAUDRATE,input,10);sendStr(input);
+      itoa(BAUDRATE,(char *)input,10);sendStr(input);
       setXY(5,3);
-      if(mselectMask==1) sendStr(" M:ON");
-      else sendStr("m:off");    
+      if(mselectMask==1) sendStr((unsigned char *)" M:ON");
+      else sendStr((unsigned char *)"m:off");    
       setXY(11,3); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
-      else sendStr("%^off");
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr((unsigned char *)" %^ON");
+      else sendStr((unsigned char *)"%^off");
     #endif
   #endif
   #ifdef XY2                        // Y with double value
@@ -1716,11 +1717,11 @@ void SetPlayBlock()
     //      setXY(11,0);sendStr(" <<>>");
     //      setXY(11,0);sendStr(" Paus"); 
           setXY(0,0);
-          sendStr("BLK:");
-          utoa(block, input, 10);sendStr(input);sendChar(' ');
+          sendStr((unsigned char *)"BLK:");
+          utoa(block, (char *)input, 10);sendStr(input);sendChar(' ');
           if (bytesRead > 0){
         //    setXY(11,0);
-            sendStr("ID:");utoa(currentID,input,16);sendStr(strupr(input)); // Block ID en hex
+            sendStr((unsigned char *)"ID:");utoa(currentID,(char *)input,16);sendStr((unsigned char *)strupr((char *)input)); // Block ID en hex
      //       sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));            
           }
        #endif      

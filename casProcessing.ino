@@ -86,7 +86,7 @@ void wave()
       WRITE_LOW;
 
 }
-#endif Use_CAS
+#endif
 
 
 #ifdef Use_CAS
@@ -134,7 +134,7 @@ void writeHeader()
     bits[i]=1;
   }
 }
-#endif Use_CAS
+#endif
 
 
 #ifdef Use_CAS

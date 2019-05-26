@@ -547,7 +547,7 @@ const unsigned char myFont[][8] PROGMEM = {
     {
     sendcommand(0xb0+row); //set page address
     
-    #ifdef OLED1106_1.3
+    #ifdef OLED1106_1_3
       sendcommand(0x02+(8*col&0x0f)); //set low col address
     #else
       sendcommand(0x00+(8*col&0x0f)); //set low col address
@@ -757,7 +757,7 @@ static void init_OLED(void)
           sendcommand(0x81);                    //SETCONTRAS
           sendcommand(OLED_SETCONTRAS);         // value inside userconfig.h
     #else
-        #ifdef OLED1106_1.3
+        #ifdef OLED1106_1_3
           sendcommand(0x81);                    //SETCONTRAS
           sendcommand(0x27);                    // default 0x80 : (SMALL 0x00, LARGE 0xFF)
         #else
