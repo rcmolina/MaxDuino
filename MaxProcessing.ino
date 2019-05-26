@@ -158,7 +158,9 @@ void TZXProcess() {
             bytesToRead = outLong;
             //Serial.print(F("bytesToRead: "));
             //Serial.println(bytesToRead,DEC);
-            parity = 0;            
+            parity = 0;  
+            
+ #if defined(Use_UEF) && defined(Use_hqUEF) && defined(Use_c104)          
             if (chunkID == ID0104) {
               //bytesRead+= 3;
               bytesToRead+= -3;
@@ -171,6 +173,7 @@ void TZXProcess() {
               }
               bytesRead+= 1;                                         
             }
+ #endif
          } else {
              chunkID = IDCHUNKEOF;
          }
@@ -217,14 +220,14 @@ void TZXProcess() {
           /* stopBits = */ //stopBitPulses = 1;
           writeUEFData();
           break;
-          
+ #if defined(Use_UEF) && defined(Use_hqUEF) && defined(Use_c104)         
         case ID0104:          
           //parity = 1; // ParityOdd i.e complete with value to get Odd number of ones
           /* stopBits = */ //stopBitPulses = 1;
           writeUEFData();
           //bytesRead+=bytesToRead;
           break; 
-                
+ #endif               
         case ID0110:
           if(currentBlockTask==READPARAM){
             if(r=ReadWord(bytesRead)==2) {
