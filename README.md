@@ -1,6 +1,6 @@
 # maxduino
 
-http://www.va-de-retro.com/foros/viewtopic.php?t=5541
+https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
 * V1.49 ID15 adjustment for slow Amstrad musical loaders.
 * V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es). Remove warnings when compilation from IDE (@llopis).
