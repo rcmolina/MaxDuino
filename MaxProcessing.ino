@@ -603,7 +603,8 @@ void TZXProcess() {
           if(currentBlockTask==READPARAM) {
             if(r=ReadWord(bytesRead)==2) {     
               //Number of T-states per sample (bit of data) 79 or 158 - 22.6757uS for 44.1KHz
-              SampleLength = TickToUs(outWord) + TickToUs(outWord)/9; 
+              //SampleLength = TickToUs(outWord) + TickToUs(outWord)/9;
+               SampleLength = TickToUs(outWord + (outWord /8));
             }
             if(r=ReadWord(bytesRead)==2) {      
               //Pause after this block in milliseconds
