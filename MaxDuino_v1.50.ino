@@ -96,7 +96,7 @@
  //               V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es).
  //                     Remove warnings when compilation fron IDE (@llopis).
  //               V1.49 ID15 adjustment for slow Amstrad musical loaders.
- //               V1.50 aka "Maria". Auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
+ //               V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
  //           
 #include <SdFat.h>
 #include <TimerOne.h>
