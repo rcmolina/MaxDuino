@@ -2,13 +2,14 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
+* V1.50 aka "Maria". Auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
 * V1.49 ID15 adjustment for slow Amstrad musical loaders.
 * V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es). Remove warnings when compilation from IDE (@llopis).
 * V1.47 Optional BLOCKID_INTO_MEM if loading many turbo short blocks. BLOCK_EEPROM_PUT must be disabled when loading Amstrad cpc Breaking Baud demo. Bug fixed: block counter should not be incremented when pausing. 
 * V1.46 OLED 128x64 mode with 8 rows, logo can also be loaded with full resolution (@geloalex, @merlinkv, @acf76es)
 * V1.45 New ID15 testing code, can be deactivated from userconfig.h to save space. Amstrad bugs solved: Deflektor and other cdts now loading.
 * V1.44 New define btnRoot_AS_PIVOT in userconfig.h so it can be deactivated by user. New #define in Maxduino.h to support Antonio Villena's MINIDUINO new design with amplifier and new define OLED_SETCONTRAS in userconfig.h for contrast value override. New Miniduino logo. It's posible to select RECORD_EEPROM and LOAD_EEPROM both for better testing when selecting new logos in userconfig.h, pressing MENU simulates a reset to show logo again.
-* V1.43 aka "Mar Menor" version. Implemented half-interval (logarithmic) search for dirs and block selection. Now ROOT button used as pivot.
+* V1.43 aka "Mar Menor". Implemented half-interval (logarithmic) search for dirs and block selection. Now ROOT button used as pivot.
 Menu functions now activated with ROOT + STOP, new half-interval search with ROOT + UP/DOWN.
 * V1.42 Bugs solved: Rewinding block not showing first digit correctly (@acf76es). LCD printing when block ID not recognized again in hex.
 First support of 1,3" oled SH1106 but using 128x32 and not 128x64. Backported optimizations from V1.43.
