@@ -950,15 +950,15 @@ void loop(void) {
        //Move up a file in the directory
        scrollTime=millis()+scrollWait;
        scrollPos=0;
-       upFile();   
-       
+       upFile();
+       debouncemax(btnUp);   
+/*       
        timeDiff2 = millis();           // get current millisecond count  
        while ((digitalRead(btnUp)==LOW) && (millis() - timeDiff2 < 200)) {
          //prevent button repeats by waiting until the button is released.
          delay(50); 
        }        
-
-       
+*/       
        //debounce(btnUp);       
 /*       while(digitalRead(btnUp)==LOW) {
          //prevent button repeats by waiting until the button is released.
@@ -1072,12 +1072,14 @@ void loop(void) {
        scrollTime=millis()+scrollWait;
        scrollPos=0;
        downFile();
-
+       debouncemax(btnDown);
+/*
        timeDiff2 = millis();           // get current millisecond count  
        while ((digitalRead(btnDown)==LOW) && (millis() - timeDiff2 < 200)) {
          //prevent button repeats by waiting until the button is released.
          delay(50); 
-       } 
+       }
+*/ 
        //debounce(btnDown);      
 /*       while(digitalRead(btnDown)==LOW) {
          //prevent button repeats by waiting until the button is released.
@@ -1166,6 +1168,14 @@ void loop(void) {
 
 void debounce(int boton){
   while(digitalRead(boton)==LOW){
+    //prevent button repeats by waiting until the button is released.
+    delay(50);
+  }
+}
+
+void debouncemax(int boton){
+  timeDiff2 = millis();
+  while ((digitalRead(boton)==LOW) && (millis() - timeDiff2 < 200)) {
     //prevent button repeats by waiting until the button is released.
     delay(50);
   }
