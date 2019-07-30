@@ -81,9 +81,8 @@
  //               V1.42 Bugs solved: Rewinding block not showing first digit correctly (@acf76es). 
  //                     LCD printing when block ID not recognized again in hex. First support of 1,3" oled SH1106 but using 128x32 
  //                     and not 128x64
- //               V1.43 aka "Mar Menor". Implemented half-interval (logarithmic) search for dirs and block selection. 
- //                     Now root button used as pivot. Menu funcions now activated with ROOT + STOP, new half-interval search with 
- //                     ROOT + UP/DOWN. (Frank Schröder)
+ //               V1.43 Implemented half-interval (logarithmic) search for dirs and block selection. Now root button used as pivot.
+ //                     Menu funcions now activated with ROOT + STOP, new half-interval search with ROOT + UP/DOWN. (Frank Schröder)
  //               V1.44 New define btnRoot_AS_PIVOT in userconfig.h so it can be deactivated by user. New #define in Maxduino.h to support 
  //                     Antonio Villena's MINIDUINO new design with amplifier and new define OLED_SETCONTRAS in userconfig.h for contrast 
  //                     value override. New Miniduino logo. It's posible to select RECORD_EEPROM and LOAD_EEPROM both for better testing 
@@ -96,7 +95,7 @@
  //               V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es).
  //                     Remove warnings when compilation fron IDE (@llopis).
  //               V1.49 ID15 adjustment for slow Amstrad musical loaders.
- //               V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
+ //               V1.50 Auto-scrolling when holding down UP or DOWN (Frank Schröder).
  //           
 #include <SdFat.h>
 #include <TimerOne.h>
@@ -950,15 +949,15 @@ void loop(void) {
        //Move up a file in the directory
        scrollTime=millis()+scrollWait;
        scrollPos=0;
-       upFile();
-       debouncemax(btnUp);   
-/*       
+       upFile();   
+       
        timeDiff2 = millis();           // get current millisecond count  
        while ((digitalRead(btnUp)==LOW) && (millis() - timeDiff2 < 200)) {
          //prevent button repeats by waiting until the button is released.
          delay(50); 
        }        
-*/       
+
+       
        //debounce(btnUp);       
 /*       while(digitalRead(btnUp)==LOW) {
          //prevent button repeats by waiting until the button is released.
@@ -1072,14 +1071,12 @@ void loop(void) {
        scrollTime=millis()+scrollWait;
        scrollPos=0;
        downFile();
-       debouncemax(btnDown);
-/*
+
        timeDiff2 = millis();           // get current millisecond count  
        while ((digitalRead(btnDown)==LOW) && (millis() - timeDiff2 < 200)) {
          //prevent button repeats by waiting until the button is released.
          delay(50); 
-       }
-*/ 
+       } 
        //debounce(btnDown);      
 /*       while(digitalRead(btnDown)==LOW) {
          //prevent button repeats by waiting until the button is released.
@@ -1168,14 +1165,6 @@ void loop(void) {
 
 void debounce(int boton){
   while(digitalRead(boton)==LOW){
-    //prevent button repeats by waiting until the button is released.
-    delay(50);
-  }
-}
-
-void debouncemax(int boton){
-  timeDiff2 = millis();
-  while ((digitalRead(boton)==LOW) && (millis() - timeDiff2 < 200)) {
     //prevent button repeats by waiting until the button is released.
     delay(50);
   }
