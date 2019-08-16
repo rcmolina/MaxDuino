@@ -2,6 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
+* V1.51 Dragon TOSEC files with short leader loading now.
 * V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
 * V1.49 ID15 adjustment for slow Amstrad musical loaders.
 * V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es). Remove warnings when compilation from IDE (@llopis).
