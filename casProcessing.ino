@@ -283,7 +283,7 @@ void processDragon()
       }
         
     } else if(currentTask==wHeader) {      
-        if(!count==0) {
+        if(count>=0) {
           writeByte(0x55);
           count--;
         } else {
@@ -331,7 +331,7 @@ void processDragon()
           }
 
     } else if(currentTask==wNewLeader) {      
-        if(!count==0) {
+        if(count>=0) {
           writeByte(0x55);
           count--;
         } else {   
