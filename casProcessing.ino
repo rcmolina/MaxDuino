@@ -304,7 +304,7 @@ void processDragon()
                 currentTask=wNameFileBlk;
                 count=input[0]++;                   
                 //currentTask==lookLeader;             
-                //count=256;                 
+                //count=255;                 
           }
  
  
@@ -317,7 +317,7 @@ void processDragon()
             writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
             bytesRead+=1;            
             currentTask=lookLeader;
-            count=256;                 
+            count=255;                 
           }
 
           
