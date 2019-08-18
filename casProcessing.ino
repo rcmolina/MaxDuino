@@ -301,10 +301,10 @@ void processDragon()
           } else {
             writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
             bytesRead+=1;
-                currentTask=wNameFileBlk;
-                count=input[0]++;                   
-                //currentTask==lookLeader;             
-                //count=255;                 
+            currentTask=wNameFileBlk;
+            count=input[0]++;                   
+            //currentTask==lookLeader;             
+            //count=255;                 
           }
  
  
@@ -323,11 +323,11 @@ void processDragon()
           
     } else if(currentTask==lookLeader) { 
           if(input[0] == 0x55) {
-           writeByte(0x55); 
-           bytesRead+=1;
-           count--;
+            writeByte(0x55); 
+            bytesRead+=1;
+            count--;
           } else {
-           currentTask=wNewLeader; 
+            currentTask=wNewLeader; 
           }
 
     } else if(currentTask==wNewLeader) {      

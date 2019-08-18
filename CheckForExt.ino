@@ -17,9 +17,10 @@ void checkForEXT (char *filename) {
     casduino =1; 
     byte r=0;
     out=LOW;
-    if((r=readfile(2,bytesRead))==2) {
+    if((r=readfile(1,bytesRead))==1) {
       #if defined(Use_CAS) && defined(Use_DRAGON)
-        if(!memcmp_P(input,DRAGON,2)) {
+        //if(!memcmp_P(input,DRAGON,1)) {
+        if (input[0] == 0x55) {
           out=HIGH;
           dragonMode=1;
           period=249;
