@@ -371,6 +371,8 @@ void processDragon()
   }
 }
 #endif
+
+#endif 
 int readfile(byte bytes, unsigned long p)
 {
   
@@ -381,8 +383,6 @@ int readfile(byte bytes, unsigned long p)
   } 
   return i;
 }
-#endif 
-
 
 //#ifdef Use_CAS
 void clearBuffer()

@@ -17,8 +17,9 @@ void checkForEXT (char *filename) {
     casduino =1; 
     byte r=0;
     out=LOW;
-    if((r=readfile(1,bytesRead))==1) {
-      #if defined(Use_CAS) && defined(Use_DRAGON)
+ 
+  #if defined(Use_CAS) && defined(Use_DRAGON)
+    if((r=readfile(1,bytesRead))==1) {     
         //if(!memcmp_P(input,DRAGON,1)) {
         if (input[0] == 0x55) {
           out=HIGH;
@@ -26,8 +27,8 @@ void checkForEXT (char *filename) {
           period=249;
           count=255;
         }
-      #endif
     }
+  #endif    
     bytesRead=0;
     currentType=typeNothing;
     currentTask=lookHeader;
