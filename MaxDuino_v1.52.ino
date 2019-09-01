@@ -98,7 +98,7 @@
  //               V1.49 ID15 adjustment for slow Amstrad musical loaders.
  //               V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
  //               V1.51 Dragon TOSEC files with short leader loading now.
- //               V1.52 Arduino nano EVERY micro supported. Need work for turbo loading.
+ //               V1.52 New arduino nano EVERY micro supported. Need work for turbo loading.
 //
 
 #ifdef __AVR_ATmega4809__
