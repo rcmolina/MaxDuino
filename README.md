@@ -2,7 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
-* V1.52 First support for arduino nano EVERY. Need work for turbo loading.
+* V1.52 Arduino nano EVERY micro supported. Need work for turbo loading.
 * V1.51 Dragon TOSEC files with short leader loading now.
 * V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
 * V1.49 ID15 adjustment for slow Amstrad musical loaders.
