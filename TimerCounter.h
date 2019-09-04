@@ -24,7 +24,7 @@ class TimerCounter
     //  Configuration
     //****************************
     void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
-    TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_NORMAL_gc;        // set mode as NORMAL, stop the timer
+    TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_DSBOTTOM_gc;        // set mode as DSBOTTOM, stop the timer
     TCA0.SINGLE.CTRLA |= (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
     TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
     /* disable event counting */
@@ -32,8 +32,10 @@ class TimerCounter
     setPeriod(microseconds);
     }
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
-  //const unsigned long cycles = (F_CPU / 2000000) * microseconds;
-  const unsigned long cycles =16 * microseconds;
+      //const unsigned long cycles = 16 * microseconds;  //WGMODE_NORMAL
+   //DSBOTTOM: the counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2
+  const unsigned long cycles = (F_CPU / 2000000) * microseconds;
+  
    if (cycles < TIMER1_RESOLUTION * 64) {
     //clockSelectBits = _BV(CS11) | _BV(CS10);
     clockSelectBits = TCA_SINGLE_CLKSEL_DIV64_gc;    
