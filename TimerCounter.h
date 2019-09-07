@@ -25,17 +25,18 @@ class TimerCounter
     //****************************
     void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
     TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_DSBOTTOM_gc;        // set mode as DSBOTTOM, stop the timer
-    TCA0.SINGLE.CTRLA |= (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
-    TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
+    //TCA0.SINGLE.CTRLA |= (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
+    //TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
     /* disable event counting */
-    TCA0.SINGLE.EVCTRL &= ~(TCA_SINGLE_CNTEI_bm);
+    //TCA0.SINGLE.EVCTRL &= ~(TCA_SINGLE_CNTEI_bm);
     setPeriod(microseconds);
     }
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
       //const unsigned long cycles = 16 * microseconds;  //WGMODE_NORMAL
    //DSBOTTOM: the counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2
   const unsigned long cycles = (F_CPU / 2000000) * microseconds;
-  
+
+
    if (cycles < TIMER1_RESOLUTION * 64) {
     //clockSelectBits = _BV(CS11) | _BV(CS10);
     clockSelectBits = TCA_SINGLE_CLKSEL_DIV64_gc;    
@@ -94,13 +95,10 @@ class TimerCounter
  */ 
   //ICR1 = pwmPeriod;
     TCA0.SINGLE.PER = pwmPeriod;
-  //TCCR1B = _BV(WGM13) | clockSelectBits;
-    TCA0.SINGLE.CTRLA = clockSelectBits                     /* set clock source (sys_clk/256) */
-                      | TCA_SINGLE_ENABLE_bm;                /* start timer */
-      //TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV64_gc| TCA_SINGLE_ENABLE_bm;
-//TCA0.SINGLE.CTRLA |= (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
-  //TCA0.SINGLE.INTCTRL |= (TCA_SINGLE_OVF_bm); // Enable timer interrupts on overflow on timer A
-    
+    //TCA0.SINGLE.PER = cycles / 64;
+                                          // set clock source and start timer
+    TCA0.SINGLE.CTRLA = clockSelectBits | TCA_SINGLE_ENABLE_bm;
+  //TCA0.SINGLE.INTCTRL |= (TCA_SINGLE_OVF_bm); // Enable timer interrupts on overflow on timer A   
     }
 
     //****************************

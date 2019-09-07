@@ -378,14 +378,14 @@ void menuMode()
   #ifndef Use_UEF
   if(skip2A) settings |=32;
   #endif
-  EEPROM.put(1023,settings);
+  EEPROM.put(EEPROM_CONFIG_BYTEPOS,settings);
   setBaud();
  }
 
  void loadEEPROM()
  {
   byte settings=0;
-  EEPROM.get(1023,settings);
+  EEPROM.get(EEPROM_CONFIG_BYTEPOS,settings);
   if(!settings) return;
 
 
