@@ -36,7 +36,6 @@ class TimerCounter
    //DSBOTTOM: the counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2
   const unsigned long cycles = (F_CPU / 2000000) * microseconds;
 
-
    if (cycles < TIMER1_RESOLUTION * 64) {
     //clockSelectBits = _BV(CS11) | _BV(CS10);
     clockSelectBits = TCA_SINGLE_CLKSEL_DIV64_gc;    

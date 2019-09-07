@@ -1866,7 +1866,7 @@ void setBaud()
   }
 //  scale=BAUDRATE/1200;
 //  period=208/scale;
-  Timer1.setPeriod(period);
+  //Timer1.setPeriod(period);
   Timer1.stop();
 }
 
