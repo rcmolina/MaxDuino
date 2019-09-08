@@ -1052,17 +1052,10 @@ void TZXProcess() {
               currentTask = GETID; 
               bitSet(currentPeriod, 15);       */             
           if(temppause>0) {
-           #ifdef __AVR_ATmega4809__ 
-            if(temppause > 520) {
+            if(temppause > MAXPAUSE_PERIOD) {
               //Serial.println(temppause, DEC);
-              currentPeriod = 520;
-              temppause += -520; 
-           #else
-            if(temppause > 8300) {
-              //Serial.println(temppause, DEC);
-              currentPeriod = 8300;
-              temppause += -8300; 
-           #endif     
+              currentPeriod = MAXPAUSE_PERIOD;
+              temppause += -MAXPAUSE_PERIOD;    
             } else {
               currentPeriod = temppause;
               temppause = 0;

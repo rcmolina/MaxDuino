@@ -51,6 +51,7 @@ byte skip2A = 0;                        // Pause on for BLK:2A
       //#define OLED1306_128_64         // 128x64 resolution with 8 rows
       //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
   #define EEPROM_CONFIG_BYTEPOS  255     // Byte position to save configuration
+  #define MAXPAUSE_PERIOD   520         // millis  
 #else  //__AVR_ATmega328P__
   //#define SERIALSCREEN              // For testing and debugging
   
@@ -64,6 +65,7 @@ byte skip2A = 0;                        // Pause on for BLK:2A
       //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
   //#define P8544                       // Set if you are Display Nokia 5110 display 
   #define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
+  #define MAXPAUSE_PERIOD   8300         // millis  
 #endif
 
 //#define btnRoot_AS_PIVOT
