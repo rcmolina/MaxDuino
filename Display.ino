@@ -675,7 +675,7 @@ static void clear_display(void)
       for(i=0;i<128;i++)     //was 128
       {
         SendByte(0);         //clear all COL
-        //mydelay(10);
+        //delay(10);
       }
     }
   }
@@ -784,7 +784,7 @@ static void init_OLED(void)
   //  sendcommand(0xa0);    //seg re-map 0->127(default)
   //  sendcommand(0xa1);    //seg re-map 127->0
   //  sendcommand(0xc8);
-  //  mydelay(1000);
+  //  delay(1000);
   //----------------------------REVERSE comments----------------------------//
   // sendcommand(0xa7);  //Set Inverse Display  
   // sendcommand(0xae);   //display off
@@ -1287,7 +1287,7 @@ const unsigned char logo [] PROGMEM = {
   lcd.bitmap(logo2, 3,84); */
   bitmap2(logo, 6,84);
   
-  mydelay(2000); 
+  delay(2000); 
   lcd.clear();
   
 }
