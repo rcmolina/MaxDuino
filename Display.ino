@@ -675,7 +675,7 @@ static void clear_display(void)
       for(i=0;i<128;i++)     //was 128
       {
         SendByte(0);         //clear all COL
-        //delay(10);
+        //mydelay(10);
       }
     }
   }
@@ -784,7 +784,7 @@ static void init_OLED(void)
   //  sendcommand(0xa0);    //seg re-map 0->127(default)
   //  sendcommand(0xa1);    //seg re-map 127->0
   //  sendcommand(0xc8);
-  //  delay(1000);
+  //  mydelay(1000);
   //----------------------------REVERSE comments----------------------------//
   // sendcommand(0xa7);  //Set Inverse Display  
   // sendcommand(0xae);   //display off
@@ -805,13 +805,27 @@ static void init_OLED(void)
    #ifdef LOAD_MEM_LOGO
      SendByte(pgm_read_byte(logo+j*128+i));
    #endif
-   #ifdef RECORD_EEPROM_LOGO
+   #if defined(RECORD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
      EEPROM.put(j*128+i, pgm_read_byte(logo+j*128+i));
    #endif
-   #ifdef LOAD_EEPROM_LOGO
+   #if defined(RECORD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
+     if (i%2 == 0){   
+        EEPROM.put(j*64+i/2, pgm_read_byte(logo+j*128+i));
+     }
+   #endif   
+   #if defined(LOAD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
      EEPROM.get(j*128+i,hdrptr);
      SendByte(hdrptr);
    #endif
+   #if defined(LOAD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
+     if (i%2 == 0){
+      EEPROM.get(j*64+i/2,hdrptr);
+      SendByte(hdrptr);
+     } else {
+      SendByte(hdrptr);
+     }
+   #endif   
+   
     }  
   }
 }
@@ -1273,7 +1287,7 @@ const unsigned char logo [] PROGMEM = {
   lcd.bitmap(logo2, 3,84); */
   bitmap2(logo, 6,84);
   
-  delay(2000); 
+  mydelay(2000); 
   lcd.clear();
   
 }

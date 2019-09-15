@@ -99,8 +99,9 @@
  //               V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
  //               V1.51 Dragon TOSEC files with short leader loading now.
  //               V1.52 New arduino nano EVERY micro supported. Need work for turbo loading.
-//
-
+ //                     Different config files for new high capacity chips (Riccardo Repetto).
+ //                     Compressed logo where only even columns are used for load/save with EEPROM.
+ //
 #ifdef __AVR_ATmega4809__
   #define SDFat           // Needs 2 patches, check your version:
                           //
@@ -164,7 +165,11 @@
 #endif
 
 #include <EEPROM.h>
-#include "userconfig.h"
+#if defined(__AVR_ATmega4809__) || defined(__AVR_ATmega2560__)
+  #include "userMAXconfig.h"
+#else //__AVR_ATmega328P__
+  #include "userconfig.h"
+#endif
 #include "MaxDuino.h"
 
 #ifdef LCDSCREEN16x2
@@ -174,7 +179,6 @@
   char indicators[] = {'|', '/', '-',0};
   uint8_t SpecialChar [8]= { 0x00, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00, 0x00 };
   #define SCREENSIZE 16
-  #define maxblock 19
 #endif
 
 #ifdef OLED1306 
@@ -186,7 +190,6 @@
   //char line1[17];
   char indicators[] = {'|', '/', '-',92};
   #define SCREENSIZE 16
-  #define maxblock 19
 #endif
 
 #ifdef P8544
@@ -214,7 +217,6 @@
     0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e
   };
   #define SCREENSIZE 14
-  #define maxblock 19
 #endif
 
 char fline[17];

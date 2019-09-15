@@ -1,4 +1,4 @@
-////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
+////////////////                CONFIG FOR NEW ARDUINO NANO EVERY OR MEGA2560                  ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
@@ -23,11 +23,11 @@
 //#define TURBOBAUD1550
 //#define TURBOBAUD1600
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//#define AYPLAY
+#define AYPLAY
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
 #define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
-#define maxblock 19                   // maxblock if not using EEPROM  
+#define maxblock 99                   // maxblock if not using EEPROM 
 #define DIRECT_RECORDING
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
@@ -42,17 +42,15 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set defines for various types of screen
 
-//#define SERIALSCREEN              // For testing and debugging
+//#define SERIALSCREEN              // For testing and debugging 
 
-//#define LCD_I2C_ADDR    0x27        // Set the i2c address of your 1602LCD usually 0x27
-//#define LCD_I2C_ADDR    0x3f        // Set the i2c address of your 1602LCD usually 0x3f
-//#define LCDSCREEN16x2             // Set if you are using a 1602 LCD screen
+#define LCD_I2C_ADDR    0x27        // Set the i2c address of your 1602LCD usually 0x27
+#define LCDSCREEN16x2               // Set if you are using a 1602 LCD screen
 
 //#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
-#define OLED1306                      // Set if you are using OLED 1306 display
+//#define OLED1306                      // Set if you are using OLED 1306 display
     //#define OLED1306_128_64         // 128x64 resolution with 8 rows
     //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
-//#define P8544                       // Set if you are Display Nokia 5110 display
 
 //#define btnRoot_AS_PIVOT
   #define SHOW_DIRPOS
@@ -73,6 +71,7 @@ byte lineaxy=2;
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss
 //#define  cntrMSS                  // if not defined use sss format, if defined m:ss
 #define MAXPAUSE_PERIOD   8300         // millis
+//#define MAXPAUSE_PERIOD   520         // millis  
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
@@ -86,8 +85,8 @@ byte lineaxy=2;
 // Also it's posible to select record and load both for better testing new logo activation, pressing MENU simulates a reset.
 // And both can be deactivated also showing a black screen.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
-//#define EEPROM_LOGO_COMPRESS
+#define EEPROM_CONFIG_BYTEPOS  255     // Byte position to save configuration
+#define EEPROM_LOGO_COMPRESS
 //#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 #define BLOCK_EEPROM_START 512
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
