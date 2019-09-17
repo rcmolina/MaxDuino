@@ -86,6 +86,7 @@ byte lineaxy=2;
 // And both can be deactivated also showing a black screen.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define EEPROM_CONFIG_BYTEPOS  255     // Byte position to save configuration
+#define COMPRESS_REPEAT_ROW
 #define EEPROM_LOGO_COMPRESS
 //#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 #define BLOCK_EEPROM_START 512

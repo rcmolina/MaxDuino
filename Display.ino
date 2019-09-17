@@ -853,7 +853,9 @@ static void init_OLED(void)
               for(ib=0;ib<4;ib++) {
                 if (bitRead (ril,ib)) {
                   il |= (1 << ib*2);
-                  il |= (1 << (ib*2)+1);
+                  #ifdef COMPRESS_REPEAT_ROW
+                    il |= (1 << (ib*2)+1);
+                  #endif
                 }
               }
               hdrptr = il;
@@ -865,7 +867,9 @@ static void init_OLED(void)
               for(ic=4;ic<8;ic++) {
                 if (bitRead (rih,ic)) {
                   ih |= (1 << (ic-4)*2);
-                  ih |= (1 << ((ic-4)*2)+1);
+                  #ifdef COMPRESS_REPEAT_ROW
+                    ih |= (1 << ((ic-4)*2)+1);
+                  #endif
                 }
               }
               hdrptr = ih;                           
