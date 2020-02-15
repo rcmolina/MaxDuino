@@ -17,6 +17,7 @@ void checkForEXT (char *filename) {
     casduino =1; 
     byte r=0;
     out=LOW;
+    dragonMode=0;
     if((r=readfile(1,bytesRead))==1) {
       #if defined(Use_CAS) && defined(Use_DRAGON)
         //if(!memcmp_P(input,DRAGON,1)) {
