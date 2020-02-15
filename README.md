@@ -2,6 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
+* V1.54 Maintenance release. Final byte patched again for Dragon and Coco, got switched when testing in v1.51.
 * V1.53 Some rework for Arduino nano every and timers TCA / TCB0 and using last SDFat for better speed.
 * V1.52 New arduino nano EVERY micro supported. Need work for turbo loading. Compressed logo where only even columns are used for load/save with EEPROM. Different config files for new high capacity chips (Riccardo Repetto).
 * V1.51 Dragon TOSEC files with short leader loading now.
