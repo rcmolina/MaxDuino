@@ -170,8 +170,10 @@
 #endif
 
 #include <EEPROM.h>
-#if defined(__AVR_ATmega4809__) || defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega2560__)
   #include "userMAXconfig.h"
+#elif defined(__AVR_ATmega4809__)
+  #include "userEVERYconfig.h"
 #else //__AVR_ATmega328P__
   #include "userconfig.h"
 #endif
