@@ -85,11 +85,11 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 // Also it's posible to select record and load both for better testing new logo activation, pressing MENU simulates a reset.
 // And both can be deactivated also showing a black screen.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define EEPROM_CONFIG_BYTEPOS  255     // Byte position to save configuration
+#define EEPROM_CONFIG_BYTEPOS  511     // Byte position to save configuration
 //#define COMPRESS_REPEAT_ROW
 //#define EEPROM_LOGO_COMPRESS
 #define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
-#define BLOCK_EEPROM_START 1024
+#define BLOCK_EEPROM_START 512
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
 //#define LOAD_EEPROM_LOGO 
 
