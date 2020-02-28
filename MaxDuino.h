@@ -1,7 +1,17 @@
-//#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
-#define outputPin           9
+#ifdef __AVR_ATmega2560__
+  #define outputPin           23
+#else
+  //#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
+  #define outputPin           9
+#endif
 
-#ifdef __AVR_ATmega4809__
+#ifdef __AVR_ATmega2560__
+
+  #define INIT_OUTPORT         DDRA |=  _BV(1)         // El pin23 es el bit1 del PORTA
+  #define WRITE_LOW           PORTA &= ~_BV(1)         // El pin23 es el bit1 del PORTA
+  #define WRITE_HIGH          PORTA |=  _BV(1)         // El pin23 es el bit1 del PORTA
+
+#elif __AVR_ATmega4809__
   //#define INIT_OUTPORT         DDRB |=  _BV(1)         // El pin9 es el bit1 del PORTB
   //#define INIT_OUTPORT          pinMode(outputPin,OUTPUT)  
   #define INIT_OUTPORT         VPORTB.DIR |=  _BV(0)         // El pin9 es PB0
@@ -23,7 +33,6 @@
     #define WRITE_LOW           PORTB &= ~_BV(1)         // El pin9 es el bit1 del PORTB
     #define WRITE_HIGH          PORTB |=  _BV(1)         // El pin9 es el bit1 del PORTB
   #endif
-#endif 
 
 // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
 
@@ -40,6 +49,8 @@
   // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
 #endif
 */
+
+#endif 
 
 #define SHORT_SILENCE       122
 #define LONG_SILENCE        SHORT_SILENCE*2
