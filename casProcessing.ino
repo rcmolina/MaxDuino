@@ -65,7 +65,9 @@ void wave()
 
     case 2:
     //  digitalWrite(outputPin, LOW);
-      WRITE_LOW; 
+      //WRITE_LOW;
+      if (out == LOW)     WRITE_LOW;    
+      else  WRITE_HIGH;
       break;
     }
   
