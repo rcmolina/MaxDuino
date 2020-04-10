@@ -252,6 +252,7 @@ word loopCount=0;
 byte seqPulses=0;
 word temppause=0;
 byte forcePause0=0;
+byte firstBlockPause = false;
 unsigned long loopStart=0;
 volatile byte currentChar=0;
 volatile byte currentByte=0;

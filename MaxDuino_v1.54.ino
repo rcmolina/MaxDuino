@@ -598,8 +598,13 @@ void loop(void) {
           
         } else {
           //If a file is playing, pause or unpause the file                  
-          if (pauseOn == 0) printtextF(PSTR("Paused"),0); 
-          else printtextF(PSTR("Playing"),0);      
+          if (pauseOn == 0) {
+            printtextF(PSTR("Paused"),0); 
+            firstBlockPause = true;
+          } else  {
+            printtextF(PSTR("Playing"),0);
+            firstBlockPause = false;      
+          }
                          
           #ifdef LCDSCREEN16x2            
    /*         //lcd_clearline(0);
@@ -1167,12 +1172,22 @@ void loop(void) {
        #ifdef BLOCKID_INTO_MEM
          oldMinBlock = 0;
          oldMaxBlock = maxblock;
+         if (firstBlockPause) {
+            block = block -2;
+            if (block < 0) block = 0;        
+            firstBlockPause = false;
+         }         
          if (block < maxblock) block++;
          else block = 0;       
        #endif
        #ifdef BLOCK_EEPROM_PUT
          oldMinBlock = 0;
          oldMaxBlock = 99;
+         if (firstBlockPause) {
+            block = block -2;
+            if (block < 0) block = 0;         
+            firstBlockPause = false;
+         }          
          if (block < 99) block++;
          else block = 0;
        #endif
