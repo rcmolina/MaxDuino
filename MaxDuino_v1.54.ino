@@ -1181,8 +1181,9 @@ void loop(void) {
          if (block < maxblock) block++;
          else block = 0;   */
          if (firstBlockPause) {
+            firstBlockPause = false;
             if (block > 0) block--;
-            else block = maxblock;  
+            else block = maxblock;
          } else {
             if (block < maxblock) block++;
             else block = 0;       
@@ -1200,8 +1201,9 @@ void loop(void) {
          if (block < 99) block++;
          else block = 0; */
          if (firstBlockPause) {
+            firstBlockPause = false;
             if (block > 0) block--;
-            else block = 99;  
+            else block = 99;
          } else {
             if (block < 99) block++;
             else block = 0;       
