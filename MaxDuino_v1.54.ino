@@ -1172,26 +1172,40 @@ void loop(void) {
        #ifdef BLOCKID_INTO_MEM
          oldMinBlock = 0;
          oldMaxBlock = maxblock;
-         if (firstBlockPause) {           
+       /*  if (firstBlockPause) {           
             if (block > 1) block = block -2;
             else if (block == 1) block = maxblock;
             else block = maxblock -1;  // block == 0
             firstBlockPause = false;
          }           
          if (block < maxblock) block++;
-         else block = 0;       
+         else block = 0;   */
+         if (firstBlockPause) {
+            if (block > 0) block--;
+            else block = maxblock;  
+         } else {
+            if (block < maxblock) block++;
+            else block = 0;       
+         }             
        #endif
        #ifdef BLOCK_EEPROM_PUT
          oldMinBlock = 0;
          oldMaxBlock = 99;
-         if (firstBlockPause) {
+         /* if (firstBlockPause) {
             if (block > 1) block = block -2;
             else if (block == 1) block = 99;
             else block = 98;  // block == 0
             firstBlockPause = false;
          }          
          if (block < 99) block++;
-         else block = 0;
+         else block = 0; */
+         if (firstBlockPause) {
+            if (block > 0) block--;
+            else block = 99;  
+         } else {
+            if (block < 99) block++;
+            else block = 0;       
+         }         
        #endif
 /*
        EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
