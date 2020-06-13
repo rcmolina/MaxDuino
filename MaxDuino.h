@@ -232,8 +232,8 @@ word sync1Length=0;
 word sync2Length=0;
 word zeroPulse=0;
 word onePulse=0;
-word passforZero=2;
-word passforOne=4;
+byte passforZero=2;
+byte passforOne=4;
 
 byte oneBitPulses = 4;
 byte zeroBitPulses = 2;

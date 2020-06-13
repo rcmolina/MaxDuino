@@ -34,6 +34,8 @@ void UniPlay(char *filename){
     isStopped=false;
     count = 255;                                //End of file buffer flush
     EndOfFile=false;
+    passforZero=2;
+    passforOne=4;
    // pinState=LOW;                               //Always Start on a LOW output for simplicity
    // digitalWrite(outputPin, pinState);
 //    digitalWrite(outputPin, LOW);
