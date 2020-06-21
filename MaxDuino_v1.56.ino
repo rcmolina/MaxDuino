@@ -104,7 +104,7 @@
  //               V1.53 Some rework for Arduino nano every and timers TCA / TCB0 and using last SDFat for better speed.
  //               V1.54 Maintenance release. Final byte patched again for Dragon and Coco, got switched when testing in v1.51. 
  //               V1.55 support for BBC chunk 0x117 (@vanekp)
- //               V1.56 ID19 short implementation to load zx81 tzx files
+ //               V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files
  //        
 #ifdef __AVR_ATmega4809__
                           // In C:\Users\Rafael\AppData\Local\Arduino15\packages\arduino\hardware\megaavr\1.8.4
@@ -959,7 +959,7 @@ void loop(void) {
 */       
      }
 
-     if(digitalRead(btnStop)==LOW && start==0 && subdir >0) {                                         // back subdir
+     if(digitalRead(btnStop)==LOW && start==0 && subdir >0) {               // back subdir
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif     
@@ -1037,7 +1037,7 @@ void loop(void) {
      }     
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot) ) {             //  up block sequential search
+     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot) ) {    //  up block sequential search
 #else
      if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 ) {             //  up block sequential search
 #endif
@@ -1049,6 +1049,7 @@ void loop(void) {
        bytesRead=0;                       // for both tap and tzx, no header for tap
        currentTask=GETFILEHEADER;         //First task (default): search for tzx header
 */
+       firstBlockPause = false;
        #ifdef BLOCKID_INTO_MEM
          oldMinBlock = 0;
          oldMaxBlock = maxblock;
@@ -1078,7 +1079,7 @@ void loop(void) {
  */      
      }
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {         // up block half-interval search
+     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {  // up block half-interval search
 
 /*
        bytesRead=11;                     // for tzx skip header(10) + GETID(11)
@@ -1111,7 +1112,7 @@ void loop(void) {
 #endif
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==0 && digitalRead(btnRoot) ) {                         // up dir sequential search
+     if(digitalRead(btnUp)==LOW && start==0 && digitalRead(btnRoot) ) {   
 #else
      if(digitalRead(btnUp)==LOW && start==0 ) {                         // up dir sequential search
 #endif
@@ -1139,7 +1140,7 @@ void loop(void) {
      }
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==0 && digitalRead(btnRoot)==LOW) {                     // up dir half-interval search
+     if(digitalRead(btnUp)==LOW && start==0 && digitalRead(btnRoot)==LOW) {      // up dir half-interval search
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif
@@ -1158,7 +1159,7 @@ void loop(void) {
 #endif
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)) {            // down block sequential search
+     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)) {           
 #else
      if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 ) {            // down block sequential search
 #endif
