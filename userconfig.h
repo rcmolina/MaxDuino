@@ -31,6 +31,7 @@
 #define maxblock 19                   // maxblock if not using EEPROM  
 #define DIRECT_RECORDING
 //#define ID19REW                       // trace id19 block for zx81 .tzx to be rewinded
+#define ZX81SPEEDUP
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200
@@ -102,11 +103,11 @@ byte lineaxy=2;
 #else
 //#define LOGOARDUITAPE            // original arduitape logo
 //#define LOGOMAXDUINO             // new logo created by Spirax
- //#define LOGOMAXDUINO2              // new logo2 created by rcmolina
+#define LOGOMAXDUINO2              // new logo2 created by rcmolina
 //#define LOGOMAXDUINO3            // new logo3 created by rcmolina
 //#define LOGOMAXDUINO4            // new logo4 created by rcmolina
 //#define SUGARLESS_1              // new logo cretaed bt YoxxxoY
 //#define SUGARLESS_2              // new logo created by YoxxxoY
-#define LOGOMINIDUINO            // new logo for A.Villena's Miniduino by rcmolina
+//#define LOGOMINIDUINO            // new logo for A.Villena's Miniduino by rcmolina
 #endif
 

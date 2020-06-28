@@ -2,7 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
-* V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files.
+* V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files. Now you can use TSXControl to speedup loadings.
 * V1.55 support for BBC chunk 0x117 (@vanekp)
 * V1.54 Maintenance release. Final byte patched again for Dragon and Coco, got switched when testing in v1.51.
 * V1.53 Some rework for Arduino nano every and timers TCA / TCB0 and using last SDFat for better speed.

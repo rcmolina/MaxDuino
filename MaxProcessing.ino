@@ -1539,8 +1539,14 @@ void ZX8081DataBlock() {
 
 void ZX80ByteWrite(){
   currentPeriod = ZX80PULSE;
+#ifdef ZX81SPEEDUP
+  if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) currentPeriod = ZX80TURBOPULSE;
+#endif
   if(pass==1) {
     currentPeriod=ZX80BITGAP;
+  #ifdef ZX81SPEEDUP
+    if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) currentPeriod = ZX80TURBOBITGAP;
+  #endif   
   }
   if(pass==0) {
     if(currentByte&0x80) {                       //Set next period depending on value of bit 0

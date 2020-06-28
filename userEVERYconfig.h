@@ -31,6 +31,7 @@
 #define maxblock 99                   // maxblock if not using EEPROM 
 #define DIRECT_RECORDING
 //#define ID19REW                       // trace id19 block for zx81 .tzx to be rewinded
+#define ZX81SPEEDUP
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200

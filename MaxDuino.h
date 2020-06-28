@@ -195,9 +195,13 @@ word currentPeriod=1;
 
 //ZX81 Standards
 #define ZX80PULSE                 160
-//#define ZX80PULSE                 150
+//#define ZX80TURBOPULSE            150
+#define ZX80TURBOPULSE            120
+
 #define ZX80BITGAP                1442
-//#define ZX80BITGAP                1340
+//#define ZX80TURBOBITGAP           1340
+#define ZX80TURBOBITGAP           500
+
 //ZX81 Pulse Patterns - Zero Bit  - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
 //                    - One Bit   - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
 

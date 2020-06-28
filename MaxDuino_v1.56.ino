@@ -104,7 +104,8 @@
  //               V1.53 Some rework for Arduino nano every and timers TCA / TCB0 and using last SDFat for better speed.
  //               V1.54 Maintenance release. Final byte patched again for Dragon and Coco, got switched when testing in v1.51. 
  //               V1.55 support for BBC chunk 0x117 (@vanekp)
- //               V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files
+ //               V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files. 
+ //                     Now you can use TSXControl to speedup loadings
  //        
 #ifdef __AVR_ATmega4809__
                           // In C:\Users\Rafael\AppData\Local\Arduino15\packages\arduino\hardware\megaavr\1.8.4
@@ -1037,7 +1038,7 @@ void loop(void) {
      }     
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot) ) {    //  up block sequential search
+     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot) ) {    
 #else
      if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 ) {             //  up block sequential search
 #endif
@@ -1161,7 +1162,7 @@ void loop(void) {
 #ifdef btnRoot_AS_PIVOT
      if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)) {           
 #else
-     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 ) {            // down block sequential search
+     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 ) {      // down block sequential search
 #endif
 
 /*
