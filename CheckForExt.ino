@@ -6,9 +6,11 @@ void checkForEXT (char *filename) {
   while (*(filename+x) && (*(filename+x) != '.')) x++;
   if(strstr_P(strlwr(filename + x), PSTR(".tap"))) {
     casduino =0; currentTask=PROCESSID; currentID=TAP;
-    if((r=readfile(1,bytesRead))==1) {
-       if (input[0] == 0x16) currentID=ORIC;
-    }
+    #ifdef tapORIC
+      if((r=readfile(1,bytesRead))==1) {
+         if (input[0] == 0x16) currentID=ORIC;
+      }
+    #endif
   }
   else if(strstr_P(strlwr(filename + x), PSTR(".p"))) {casduino =0; currentTask=PROCESSID; currentID=ZXP;}
   else if(strstr_P(strlwr(filename + x), PSTR(".o"))) {casduino =0; currentTask=PROCESSID; currentID=ZXO;}

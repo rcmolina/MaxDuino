@@ -1165,24 +1165,26 @@ void TZXProcess() {
           }  
         break;
       #endif
-       
-      case ORIC:
-        switch(currentBlockTask) {
-          case READPARAM:
-            pauseLength = PAUSELENGTH;
-            currentChar=0;
-            currentBlockTask=PILOT;
-          break;
-          
-          case PILOT:
 
-          break;
-          
-          case DATA:
-
-          break;
-        }
-                 
+      #ifdef tapORIC
+        case ORIC:
+          switch(currentBlockTask) {
+            case READPARAM:
+              pauseLength = PAUSELENGTH;
+              currentChar=0;
+              currentBlockTask=PILOT;
+            break;
+            
+            case PILOT:
+  
+            break;
+            
+            case DATA:
+  
+            break;
+          }
+        #endif  
+               
         case IDPAUSE:
          /*     currentPeriod = temppause;
               temppause = 0;

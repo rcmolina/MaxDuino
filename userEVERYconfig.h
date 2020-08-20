@@ -13,6 +13,7 @@
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef
         //#define Use_c117                // data encoding format change for 300 bauds
+//#define Use_tapORIC        
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
