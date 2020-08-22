@@ -3,21 +3,21 @@
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
-//#define AYPLAY
+#define AYPLAY
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
 //#define Use_tapORIC
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
-        //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
+        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
         #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef
-        //#define Use_c117                // data encoding format change for 300 bauds
+        #define Use_c117                // data encoding format change for 300 bauds
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
@@ -36,8 +36,8 @@
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200
 int period = 70;                        // 208 for BAUDRATE=1200
-byte mselectMask = 1;                   // Motor control state 1=on 0=off
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 1;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+byte mselectMask = 0;                   // Motor control state 1=on 0=off
+byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
 byte skip2A = 1;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
 #define OLED1306                      // Set if you are using OLED 1306 display
 //#define OLED1306_128_64         // 128x64 resolution with 8 rows
-//#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
+#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
 
 //#define btnRoot_AS_PIVOT
   #define SHOW_DIRPOS
