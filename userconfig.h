@@ -3,9 +3,14 @@
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
+//#define AYPLAY
+#define DIRECT_RECORDING
+#define ZX81SPEEDUP
+#define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
+//#define Use_tapORIC
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
-        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
+        //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
@@ -13,7 +18,6 @@
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef
         #define Use_c117                // data encoding format change for 300 bauds
-//#define Use_tapORIC
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
@@ -25,14 +29,9 @@
 //#define TURBOBAUD1550
 //#define TURBOBAUD1600
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//#define AYPLAY
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
 #define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
 #define maxblock 19                   // maxblock if not using EEPROM  
-#define DIRECT_RECORDING
-//#define ID19REW                       // trace id19 block for zx81 .tzx to be rewinded
-#define ZX81SPEEDUP
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200

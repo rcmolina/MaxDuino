@@ -725,13 +725,12 @@ void TZXProcess() {
               currentBlockTask = DATA;             
             break;
         */ 
-        
             case PAUSE:
               currentPeriod = PAUSELENGTH;
               bitSet(currentPeriod, 15);
               currentBlockTask=DATA;
             break; 
-                      
+                         
             case DATA:
               //if (block <= 10) {
                 //bytesRead += bytesToRead;
@@ -1090,7 +1089,7 @@ void TZXProcess() {
               bitSet(currentPeriod, 15);
               currentBlockTask=PILOT;
             break; 
-                       
+                        
             case PILOT:
               ZX81FilenameBlock();
             break;
@@ -1104,17 +1103,16 @@ void TZXProcess() {
         case ZXO:
           switch(currentBlockTask) {
             case READPARAM:
-               //pauseLength = PAUSELENGTH*5;
-              pauseLength = PAUSELENGTH;
+              pauseLength = PAUSELENGTH*5;
               currentBlockTask=PAUSE;
             break;
-
+                        
             case PAUSE:
               currentPeriod = PAUSELENGTH;
               bitSet(currentPeriod, 15);
-              currentBlockTask=DATA;
+              currentBlockTask=PILOT;
             break; 
-                              
+            
             case DATA:
               ZX8081DataBlock();
             break; 
@@ -1183,8 +1181,8 @@ void TZXProcess() {
   
             break;
           }
-        #endif  
-               
+        #endif 
+                
         case IDPAUSE:
          /*     currentPeriod = temppause;
               temppause = 0;
@@ -1523,52 +1521,24 @@ void ZX8081DataBlock() {
       currentByte = outByte;
     #ifdef ID19REW        
         bytesToRead += -1;
-        if((bytesToRead == 0) && (currentID == ID19)) {    
-/*          //currentTask = GETID;
-          temppause = pauseLength;
-          currentID = IDPAUSE;          
-*/          //return;
-           if(ReadByte(bytesRead)==1) {
-            currentID = outByte;
-            } else {      // EOF
-                //count = 255;
-                if(!count==0) {
-                  currentPeriod = 32769;
-                  count += -1;
-                } else {
-                  stopFile();
-                  return;
-                }  
-            }                    
-        }
-     #endif 
+        if((bytesToRead == -1) && (currentID == ID19)) {    
+          bytesRead += -1;                      //rewind a byte if we've reached the end
+          temppause = PAUSELENGTH;
+          currentID = IDPAUSE;
+          //return;
+        }                   
+    #endif 
           
     } else if(r==0) {
-      //EndOfFile=true;
-      //temppause = 3000;
+      EndOfFile=true;
       temppause = pauseLength;
-      currentID = IDPAUSE;
-      //return;
+    currentID = IDPAUSE;
+      return;
     }
     currentBit=9;
     pass=0;
   }
   
-  /*currentPeriod = ZX80PULSE;
-  if(pass==1) {
-    currentPeriod=ZX80BITGAP;
-  }
-  if(pass==0) {
-    if(currentByte&0x80) {                       //Set next period depending on value of bit 0
-      pass=19;
-    } else {
-      pass=9;
-    }
-    currentByte <<= 1;                        //Shift along to the next bit
-    currentBit += -1;
-    currentPeriod=0;
-  }
-  pass+=-1;*/
   ZX80ByteWrite();
 }
 

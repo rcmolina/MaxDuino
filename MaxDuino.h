@@ -167,7 +167,7 @@ word currentPeriod=1;
 #define AYO                 0xFB    //AY file
 #define ZXO                 0xFC    //ZX80 O file
 #define ZXP                 0xFD    //ZX81 P File
-#define TAP                 0xFE    //zx Tap File Mode
+#define TAP                 0xFE    //Tap File Mode
 #define IDEOF               0xFF    //End of file
 
 //TZX File Tasks
