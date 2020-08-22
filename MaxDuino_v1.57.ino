@@ -106,7 +106,10 @@
  //               V1.55 support for BBC chunk 0x117 (@vanekp)
  //               V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files. 
  //                     Now you can use TSXControl to speedup loadings
- //        
+ //               V1.57 Changed zx81 TSXControl to Speed to avoid polarity problems. 
+ //                     Better zx81 file loading. Removed Amstrad tweaking to slower ID15, 
+ //                     Oricium game now can load in 4 minutes in Oric Atmos (file attached to test).
+ //       
 #ifdef __AVR_ATmega4809__
                           // In C:\Users\Rafael\AppData\Local\Arduino15\packages\arduino\hardware\megaavr\1.8.4
                           // change .\variants\nona4809\timers.h , .\variants\nona4809\variant.c , .\cores\arduino\wiring.c
