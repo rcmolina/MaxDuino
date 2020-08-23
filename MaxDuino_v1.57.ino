@@ -107,8 +107,8 @@
  //               V1.56 aka "baby Fran". ID19 short implementation to load zx81 tzx files. 
  //                     Now you can use TSXControl to speedup loadings
  //               V1.57 Changed zx81 TSXControl to Speed to avoid polarity problems. 
- //                     Better zx81 file loading. Removed Amstrad tweaking to slower ID15, 
- //                     Oricium game now can load in 4 minutes in Oric Atmos (file attached to test).
+ //                     Better zx81 file loading (@El Viejoven FX). Removed Amstrad tweaking to slower ID15, 
+ //                     Oricium game now can load in 4 minutes in Oric Atmos, file attached for testing.
  //       
 #ifdef __AVR_ATmega4809__
                           // In C:\Users\Rafael\AppData\Local\Arduino15\packages\arduino\hardware\megaavr\1.8.4
