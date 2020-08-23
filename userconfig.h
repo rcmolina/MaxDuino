@@ -12,12 +12,12 @@
     #define Use_DRAGON
         #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
-    #define Use_c112                      // integer gap chunk for .uef
+    //#define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
         #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef
-        #define Use_c117                // data encoding format change for 300 bauds
+        //#define Use_c117                // data encoding format change for 300 bauds
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
@@ -28,15 +28,13 @@
 #define TURBOBAUD1500                 // default setting, 25% faster than 1200 baudios standard speed
 //#define TURBOBAUD1550
 //#define TURBOBAUD1600
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
-#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
-#define maxblock 19                   // maxblock if not using EEPROM  
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200
 int period = 70;                        // 208 for BAUDRATE=1200
-byte mselectMask = 0;                   // Motor control state 1=on 0=off
+byte mselectMask = 1;                   // Motor control state 1=on 0=off
 byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 1;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
 byte skip2A = 0;                        // Pause on for BLK:2A
@@ -80,6 +78,12 @@ byte lineaxy=2;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
+//#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
+#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
+#define maxblock 19                   // maxblock if not using EEPROM  
+#define BLOCK_EEPROM_START 512
+#define LOAD_EEPROM_SETTINGS
+#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM LOGO. How to move to EEPROM, saving memory:
@@ -89,11 +93,10 @@ byte lineaxy=2;
 // Also it's posible to select record and load both for better testing new logo activation, pressing MENU simulates a reset.
 // And both can be deactivated also showing a black screen.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
+
 //#define COMPRESS_REPEAT_ROW
 //#define EEPROM_LOGO_COMPRESS
 //#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
-#define BLOCK_EEPROM_START 512
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
 //#define LOAD_EEPROM_LOGO 
 

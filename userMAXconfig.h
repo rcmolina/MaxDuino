@@ -28,10 +28,8 @@
 #define TURBOBAUD1500                 // default setting, 25% faster than 1200 baudios standard speed
 //#define TURBOBAUD1550
 //#define TURBOBAUD1600
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
-#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
-#define maxblock 99                   // maxblock if not using EEPROM 
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200
@@ -79,6 +77,12 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
+//#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
+#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
+#define maxblock 99                   // maxblock if not using EEPROM 
+#define BLOCK_EEPROM_START 512
+#define LOAD_EEPROM_SETTINGS
+#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM LOGO. How to move to EEPROM, saving memory:
@@ -88,13 +92,12 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 // Also it's posible to select record and load both for better testing new logo activation, pressing MENU simulates a reset.
 // And both can be deactivated also showing a black screen.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
+
 //#define COMPRESS_REPEAT_ROW
 //#define EEPROM_LOGO_COMPRESS
-#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
-#define BLOCK_EEPROM_START 512
+//#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-//#define LOAD_EEPROM_LOGO 
+#define LOAD_EEPROM_LOGO 
 
 #ifdef OLED1306_128_64
   //#define Maxduino2Alf              // new Maxduino2 logo 128x64 by Alfredo Retrocant
