@@ -73,6 +73,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 //#define  cntrMSS                  // if not defined use sss format, if defined m:ss
 #define MAXPAUSE_PERIOD   8300         // millis
 //#define MAXPAUSE_PERIOD   520         // millis  
+#define OnPausePOLChg
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.

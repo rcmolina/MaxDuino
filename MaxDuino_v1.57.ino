@@ -746,6 +746,7 @@ void loop(void) {
 */
      }
 
+#ifdef OnPausePOLChg
 #ifdef btnRoot_AS_PIVOT
      if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && digitalRead(btnStop)==LOW ){             // change polarity
 #else
@@ -763,6 +764,7 @@ void loop(void) {
 //       }
 
      }
+#endif
 
 #ifdef btnRoot_AS_PIVOT
      //checkLastButton();

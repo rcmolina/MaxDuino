@@ -74,6 +74,7 @@ byte lineaxy=2;
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss
 //#define  cntrMSS                  // if not defined use sss format, if defined m:ss
 #define MAXPAUSE_PERIOD   8300         // millis
+//#define OnPausePOLChg
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
@@ -98,7 +99,7 @@ byte lineaxy=2;
 //#define EEPROM_LOGO_COMPRESS
 //#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-//#define LOAD_EEPROM_LOGO 
+#define LOAD_EEPROM_LOGO 
 
 #ifdef OLED1306_128_64
   //#define Maxduino2Alf              // new Maxduino2 logo 128x64 by Alfredo Retrocant

@@ -73,6 +73,7 @@ byte lineaxy=2;
 //#define  cntrMSS                  // if not defined use sss format, if defined m:ss
 #define MAXPAUSE_PERIOD   8300         // millis
 //#define MAXPAUSE_PERIOD   520         // millis  
+#define OnPausePOLChg
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
