@@ -605,19 +605,47 @@ void loop(void) {
         } else {
           //If a file is playing, pause or unpause the file                  
           if (pauseOn == 0) {
-            printtextF(PSTR("Paused"),0); 
+            //printtextF(PSTR("Paused"),0);
+            #ifdef LCDSCREEN16x2
+              lcd.setCursor(0,0); lcd.print(F("Paused "));
+            #endif
+            #ifdef OLED1306
+              setXY(0,0); 
+              //sendStr((unsigned char *)("Paused "));
+              char x = 0;
+              while (char ch=pgm_read_byte(PSTR("Paused ")+x)) {
+                sendChar(ch);
+                x++;
+              }              
+            #endif
+            #ifdef P8544
+            #endif 
             firstBlockPause = true;
           } else  {
-            printtextF(PSTR("Playing"),0);
+            //printtextF(PSTR("Playing"),0);
+            #ifdef LCDSCREEN16x2
+              lcd.setCursor(0,0); lcd.print(F("Playing"));            
+            #endif
+            #ifdef OLED1306
+              setXY(0,0); 
+              //sendStr2((unsigned char *)("Playing"));
+              char x = 0;
+              while (char ch=pgm_read_byte(PSTR("Playing")+x)) {
+                sendChar(ch);
+                x++;
+              }                           
+            #endif
+            #ifdef P8544
+            #endif             
             firstBlockPause = false;      
           }
-                         
+/*                         
           #ifdef LCDSCREEN16x2            
-   /*         //lcd_clearline(0);
-            lcd.setCursor(0,0);
-            lcd.print(F("Paused "));
+            //lcd_clearline(0);
+            //lcd.setCursor(0,0);
+            //lcd.print(F("Paused "));
             //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000);lcd.setCursor(0,0);lcd.print(PlayBytes);               
-            //lcd.print(entry.curPosition()); */
+            //lcd.print(entry.curPosition()); 
 
             //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000); sendStrXY(PlayBytes,0,0);
             if (currpct <100) {              
@@ -625,12 +653,18 @@ void loop(void) {
             }
             //sprintf(PlayBytes,"%03d",lcdsegs%1000);lcd.setCursor(13,0);lcd.print(PlayBytes);
             //strcpy(PlayBytes,PSTR("000"));
+            
+            //PlayBytes[0]= 48+ (lcdsegs/CNTRBASE)%10;
+            //PlayBytes[1]= 48+ (lcdsegs%CNTRBASE)/10;
+            //PlayBytes[2]= 48+ (lcdsegs%CNTRBASE)%10;
+            //PlayBytes[3]= '\0'
+            
             PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
-    /*        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-            else 
-               if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
-               else
-                  itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); */
+    //        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
+    //        else 
+    //           if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
+    //           else
+    //              itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); 
 
             #ifndef cntrMSS
               if ((lcdsegs %1000) <10) itoa(lcdsegs%10,PlayBytes+2,10);
@@ -662,12 +696,18 @@ void loop(void) {
             }
             //sprintf(PlayBytes,"%03d",lcdsegs%1000);sendStrXY(PlayBytes,13,0);
             //strcpy(PlayBytes,PSTR("000"));
+            
+            //PlayBytes[0]= 48+ (lcdsegs/CNTRBASE)%10;
+            //PlayBytes[1]= 48+ (lcdsegs%CNTRBASE)/10;
+            //PlayBytes[2]= 48+ (lcdsegs%CNTRBASE)%10;
+            //PlayBytes[3]= '\0'
+                        
             PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
-    /*        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-            else 
-               if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
-               else
-                  itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); */
+    //        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
+    //        else 
+    //           if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
+    //           else
+    //              itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); 
 
             #ifndef cntrMSS
               if ((lcdsegs %1000) <10) itoa(lcdsegs%10,PlayBytes+2,10);
@@ -696,10 +736,10 @@ void loop(void) {
           #endif
 
          #ifdef P8544                                      
-/*            itoa(newpct,PlayBytes,10);
-            strcat_P(PlayBytes,PSTR("%"));
-            lcd.setCursor(0,3);
-            lcd.print(PlayBytes); */
+       //     itoa(newpct,PlayBytes,10);
+       //     strcat_P(PlayBytes,PSTR("%"));
+       //     lcd.setCursor(0,3);
+       //     lcd.print(PlayBytes); 
             //sprintf(PlayBytes,"%03d",lcdsegs%1000);lcd.setCursor(13,0);lcd.print(PlayBytes);strcpy(PlayBytes,"000");
             if (currpct <100) {              
               itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));lcd.setCursor(0,3);lcd.print(PlayBytes);
@@ -707,11 +747,11 @@ void loop(void) {
             //sprintf(PlayBytes,"%03d",lcdsegs%1000);lcd.setCursor(13,0);lcd.print(PlayBytes);
             //strcpy(PlayBytes,PSTR("000"));
             PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
-    /*        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-            else 
-               if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
-               else
-                  itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); */
+    //        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
+    //        else 
+    //           if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
+    //           else
+    //              itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10);
 
             #ifndef cntrMSS
               if ((lcdsegs %1000) <10) itoa(lcdsegs%10,PlayBytes+2,10);
@@ -734,7 +774,8 @@ void loop(void) {
           #endif
             
           //scrollPos=0;
-          //scrollText(fileName);                                       
+          //scrollText(fileName);   
+*/                                              
           pauseOn = !pauseOn;
        }
        
