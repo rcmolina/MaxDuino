@@ -607,7 +607,13 @@ void loop(void) {
           if (pauseOn == 0) {
             //printtextF(PSTR("Paused"),0);
             #ifdef LCDSCREEN16x2
-              lcd.setCursor(0,0); lcd.print(F("Paused "));
+              lcd.setCursor(0,0); 
+              //lcd.print(F("Paused "));
+              char x = 0;
+              while (char ch=pgm_read_byte(PSTR("Paused ")+x)) {
+                lcd.print(ch);
+                x++;
+              }
             #endif
             #ifdef OLED1306
               setXY(0,0); 
@@ -624,7 +630,13 @@ void loop(void) {
           } else  {
             //printtextF(PSTR("Playing"),0);
             #ifdef LCDSCREEN16x2
-              lcd.setCursor(0,0); lcd.print(F("Playing"));            
+              lcd.setCursor(0,0); 
+              //lcd.print(F("Playing"));
+              char x = 0;
+              while (char ch=pgm_read_byte(PSTR("Playing")+x)) {
+                lcd.print(ch);
+                x++;
+              }                         
             #endif
             #ifdef OLED1306
               setXY(0,0); 
