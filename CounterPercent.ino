@@ -174,7 +174,7 @@ void lcdPercent() {
         currpct= 0;
         #ifdef LCDSCREEN16x2  
           lcd.setCursor(8,0);
-          lcd.print(newpct);lcd.print("%");  
+          lcd.print(newpct);lcd.print('%');lcd.print(' ');  
           //lcdSpinner(); 
         #endif
         #ifdef OLED1306
@@ -185,7 +185,7 @@ void lcdPercent() {
             if (newpct <100){setXY(8,0);sendChar(48+newpct/10); sendChar(48+newpct%10);}
             else {setXY(8,0);sendChar('1');sendChar('0');sendChar('0');}
             
-          sendChar('%');
+          sendChar('%');sendChar(' ');
      
   /*            u8g.firstPage();
           do {  
@@ -197,8 +197,7 @@ void lcdPercent() {
   
         #ifdef P8544
           lcd.setCursor(0,3);
-          lcd.print(newpct);
-          lcd.print("%");               
+          lcd.print(newpct);lcd.print('%');lcd.print(' ');             
         #endif
                              
     }
@@ -208,7 +207,7 @@ void lcdPercent() {
         //printtext(PlayBytes,0);
          #ifdef LCDSCREEN16x2            
             lcd.setCursor(8,0);
-            lcd.print(newpct);lcd.print("%"); 
+            lcd.print(newpct);lcd.print('%'); 
          #endif             
         #ifdef OLED1306
         
@@ -228,8 +227,7 @@ void lcdPercent() {
   
         #ifdef P8544
           lcd.setCursor(0,3);
-          lcd.print(newpct);
-          lcd.print("%");  
+          lcd.print(newpct);lcd.print('%');  
         #endif
         
         currpct = newpct;

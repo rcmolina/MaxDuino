@@ -610,7 +610,7 @@ void loop(void) {
               lcd.setCursor(0,0); 
               //lcd.print(F("Paused "));
               char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Paused ")+x)) {
+              while (char ch=pgm_read_byte(PSTR("Paused  ")+x)) {
                 lcd.print(ch);
                 x++;
               }
@@ -619,7 +619,7 @@ void loop(void) {
               setXY(0,0); 
               //sendStr((unsigned char *)("Paused "));
               char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Paused ")+x)) {
+              while (char ch=pgm_read_byte(PSTR("Paused  ")+x)) {
                 sendChar(ch);
                 x++;
               }              
@@ -633,7 +633,7 @@ void loop(void) {
               lcd.setCursor(0,0); 
               //lcd.print(F("Playing"));
               char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Playing")+x)) {
+              while (char ch=pgm_read_byte(PSTR("Playing ")+x)) {
                 lcd.print(ch);
                 x++;
               }                         
@@ -642,7 +642,7 @@ void loop(void) {
               setXY(0,0); 
               //sendStr2((unsigned char *)("Playing"));
               char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Playing")+x)) {
+              while (char ch=pgm_read_byte(PSTR("Playing ")+x)) {
                 sendChar(ch);
                 x++;
               }                           
@@ -1373,7 +1373,7 @@ void loop(void) {
          //printtextF(PSTR("PAUSED"),0);
          #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0);
-              lcd.print("PAUSED ");    
+              lcd.print(F("PAUSED "));    
          #endif 
          #ifdef OLED1306
               #ifdef XY
@@ -1386,7 +1386,7 @@ void loop(void) {
          #endif 
          #ifdef P8544
               lcd.setCursor(0,0);
-              lcd.print("PAUSED ");                       
+              lcd.print(F("PAUSED "));                       
          #endif                 
          scrollPos=0;
          scrollText(fileName);
@@ -1398,7 +1398,7 @@ void loop(void) {
          //printtextF(PSTR("PLAYing"),0);
          #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0);
-              lcd.print("PLAYing");    
+              lcd.print(F("PLAYing"));    
          #endif 
          #ifdef OLED1306
               #ifdef XY
@@ -1411,7 +1411,7 @@ void loop(void) {
          #endif 
          #ifdef P8544
               lcd.setCursor(0,0);
-              lcd.print("PLAYing");                       
+              lcd.print(F("PLAYing"));                       
          #endif            
          scrollPos=0;
          scrollText(fileName);
@@ -2018,11 +2018,11 @@ void SetPlayBlock()
     //     lcd.setCursor(11,0);lcd.print(" <<>>");
     //     lcd.setCursor(11,0);lcd.print(" Paus");
          lcd.setCursor(0,0);
-         lcd.print("BLK:");
+         lcd.print(F("BLK:"));
          lcd.print(block);lcd.print(' ');
          
          if (bytesRead > 0){
-           lcd.print("ID:");lcd.print(currentID,HEX); // Block ID en hex
+           lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
     //       lcd.print(' ');lcd.print(bytesRead,HEX);
          }
        #endif
