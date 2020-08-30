@@ -1206,7 +1206,7 @@ void TZXProcess() {
                 } else {
                   pauseOn=1;
                   currentTask = GETID;
-                  printtextF(PSTR("PAUSED*"),0);
+                  printtext2F(PSTR("PAUSED* "),0);                  
                   forcePause0=0;
                 }
               } else { 

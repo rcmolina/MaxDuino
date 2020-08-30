@@ -605,8 +605,8 @@ void loop(void) {
         } else {
           //If a file is playing, pause or unpause the file                  
           if (pauseOn == 0) {
-            //printtextF(PSTR("Paused"),0);
-            #ifdef LCDSCREEN16x2
+            printtext2F(PSTR("Paused  "),0);
+      /*      #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0); 
               //lcd.print(F("Paused "));
               char x = 0;
@@ -626,10 +626,11 @@ void loop(void) {
             #endif
             #ifdef P8544
             #endif 
+           */
             firstBlockPause = true;
           } else  {
-            //printtextF(PSTR("Playing"),0);
-            #ifdef LCDSCREEN16x2
+            printtext2F(PSTR("Playing "),0);
+       /*     #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0); 
               //lcd.print(F("Playing"));
               char x = 0;
@@ -640,7 +641,7 @@ void loop(void) {
             #endif
             #ifdef OLED1306
               setXY(0,0); 
-              //sendStr2((unsigned char *)("Playing"));
+              //sendStr((unsigned char *)("Playing"));
               char x = 0;
               while (char ch=pgm_read_byte(PSTR("Playing ")+x)) {
                 sendChar(ch);
@@ -648,7 +649,8 @@ void loop(void) {
               }                           
             #endif
             #ifdef P8544
-            #endif             
+            #endif 
+           */            
             firstBlockPause = false;      
           }
 /*                         
@@ -1370,8 +1372,8 @@ void loop(void) {
        //if file is playing and motor control is on then handle current motor state
        //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
        if(motorState==1 && pauseOn==0) {
-         //printtextF(PSTR("PAUSED"),0);
-         #ifdef LCDSCREEN16x2
+         printtext2F(PSTR("PAUSED  "),0);
+    /*     #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0);
               lcd.print(F("PAUSED "));    
          #endif 
@@ -1387,7 +1389,8 @@ void loop(void) {
          #ifdef P8544
               lcd.setCursor(0,0);
               lcd.print(F("PAUSED "));                       
-         #endif                 
+         #endif
+        */                 
          scrollPos=0;
          scrollText(fileName);
          //lcd_clearline(0);
@@ -1395,8 +1398,8 @@ void loop(void) {
          pauseOn = 1;
        } 
        if(motorState==0 && pauseOn==1) {
-         //printtextF(PSTR("PLAYing"),0);
-         #ifdef LCDSCREEN16x2
+         printtext2F(PSTR("PLAYing "),0);
+    /*     #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0);
               lcd.print(F("PLAYing"));    
          #endif 
@@ -1412,7 +1415,8 @@ void loop(void) {
          #ifdef P8544
               lcd.setCursor(0,0);
               lcd.print(F("PLAYing"));                       
-         #endif            
+         #endif
+        */            
          scrollPos=0;
          scrollText(fileName);
          //lcd_clearline(0);
@@ -1808,6 +1812,79 @@ void lcd_clearline(int l) {
   lcd.setCursor(0,l);
 }
 */
+
+void printtext2F(const char* text, int l) {  //Print text to screen. 
+  
+  #ifdef SERIALSCREEN
+  Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
+  #endif
+  
+  #ifdef LCDSCREEN16x2
+  /*  strncpy_P(fline, text, 16);
+    for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
+    //lcd.setCursor(0,l);
+    //lcd.print(F("                    "));
+    lcd.setCursor(0,l);
+    lcd.print(fline); */
+    //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
+    lcd.setCursor(0,l);
+
+    char x = 0;
+    while (char ch=pgm_read_byte(text+x)) {
+      lcd.print(ch);
+      x++;
+    }
+ //   for(x; x<16; x++) lcd.print(' ');  
+    
+  #endif
+
+ #ifdef OLED1306
+     #ifdef XY2
+      strncpy_P(fline, text, 16);
+    //  for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
+      sendStrXY(fline,0,l);
+     #endif
+     
+     #ifdef XY 
+      setXY(0,l);
+      
+      char x = 0;
+      while (char ch=pgm_read_byte(text+x)) {
+        sendChar(ch);
+        x++;
+      }
+   //   for(x; x<16; x++) sendChar(' ');
+     #endif
+/*
+      for(int i=0;i<16;i++)
+      {
+        int j;
+        if(i<strlen(text))  j=pgm_read_byte(text);
+        else  j=0x20;
+        sendChar(j);
+      }  
+*/       
+   
+  /*    u8g.firstPage();
+      do {  
+         u8g.drawStr( 0, 15, line0);   
+         u8g.drawStr( 0, 30, line1);    
+      } while( u8g.nextPage() ); */
+      //sendStrXY(line0,0,0);
+      //sendStrXY(line1,0,1);
+  #endif
+
+  #ifdef P8544
+    strncpy_P(fline, text, 14);
+  //  for(int i=strlen(fline);i<14;i++) fline[i]=0x20;
+    //lcd.setCursor(0,l);
+    //lcd.print(F("              "));
+    lcd.setCursor(0,l);
+    lcd.print(fline);
+    //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
+  #endif 
+   
+}
 
 void printtextF(const char* text, int l) {  //Print text to screen. 
   
