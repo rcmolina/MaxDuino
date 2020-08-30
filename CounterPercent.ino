@@ -47,7 +47,10 @@ void lcdTime() {
                if (lcdsegs % CNTRBASE != 0){itoa(lcdsegs%CNTRBASE,PlayBytes,10);lcd.setCursor(14,0);lcd.print(PlayBytes);} // es 10,20,30,40,50,60,70,80,90,110,120,..
                else 
                   if (lcdsegs % (CNTRBASE*10) != 0) {itoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);lcd.setCursor(13,0);lcd.print(PlayBytes);} // es 100,200,300,400,500,600,700,800,900,1100,..
-                  else {lcd.setCursor(13,0);lcd.print("000");} // es 000,1000,2000,...
+                  else {
+                    lcd.setCursor(13,0);
+                    //lcd.print("000");
+                    lcd.print('0');lcd.print('0');lcd.print('0');} // es 000,1000,2000,...
 /*
           if (lcdsegs % 10 != 0) {lcd.setCursor(15,0);lcd.print(lcdsegs%10);} // ultima cifra 1,2,3,4,5,6,7,8,9
           else 
@@ -137,7 +140,8 @@ void lcdTime() {
                   lcd.print(PlayBytes);} // es 100,200,300,400,500,600,700,800,900,1100,..
                   else {
                     lcd.setCursor(11,3);
-                    lcd.print("000");} // es 000,1000,2000,...
+                    //lcd.print("000");
+                    lcd.print('0');lcd.print('0');lcd.print('0');} // es 000,1000,2000,...
 /*
           if (lcdsegs % 10 != 0) {lcd.setCursor(15,0);lcd.print(lcdsegs%10);} // ultima cifra 1,2,3,4,5,6,7,8,9
           else 
