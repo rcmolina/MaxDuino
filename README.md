@@ -2,7 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
-* V1.59 Native Oric tap support.
+* V1.59 Oric native tap support.
 * V1.58 STM32 testing support thanks to @Sildenafile.
 * V1.57 Changed zx81 TSXControl to Speed to avoid polarity problems. Better zx81 file loading (@El Viejoven FX). Removed Amstrad tweaking to slower ID15, 
 so Oricium game now can load in 4 minutes in Oric Atmos, file attached for testing.

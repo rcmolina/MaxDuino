@@ -110,7 +110,7 @@
  //                     Better zx81 file loading (@El Viejoven FX). Removed Amstrad tweaking to slower ID15, 
  //                     Oricium game now can load in 4 minutes in Oric Atmos, file attached for testing.
  //               V1.58 STM32 testing support thanks to @Sildenafile.
- //               V1.59 Native Oric tap support.
+ //               V1.59 Oric native tap support.
  //      
 #ifdef __AVR_ATmega4809__
                           // In C:\Users\Rafael\AppData\Local\Arduino15\packages\arduino\hardware\megaavr\1.8.4
