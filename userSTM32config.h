@@ -7,7 +7,7 @@
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
-//#define tapORIC
+#define tapORIC
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
         #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
