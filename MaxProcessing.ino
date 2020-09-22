@@ -2015,7 +2015,7 @@ void OricBitWrite(){
     if (currentPeriod == ORICONEPULSE) {
  #endif
     // must be a one pulse
-        
+       
 /*    if(pass==2) {
       
       if ((currentBit>2) && (currentBit<11)) {
@@ -2044,11 +2044,11 @@ void OricBitWrite(){
             currentBit += -1;
             pass=0;          
       }
-      if ((currentBit==0) && (lastByte)) {
+      //if ((currentBit==0) && (lastByte)) {
         //currentTask = GETCHUNKID;
-        count = 255;
-        currentBlockTask = PAUSE;
-      }             
+      //  count = 255;
+      //  currentBlockTask = PAUSE;
+      //}             
   }
   else {
     // must be a zero pulse
@@ -2058,15 +2058,19 @@ void OricBitWrite(){
        }
        currentBit += -1;
        pass=0; 
-       if ((currentBit==0) && (lastByte)) {
+       //if ((currentBit==0) && (lastByte)) {
          //currentTask = GETCHUNKID;
-         count = 255;
-         currentBlockTask = PAUSE;
-       } 
+       //  count = 255;
+       //  currentBlockTask = PAUSE;
+       //} 
     }
    
   }
-  
+       if ((currentBit==0) && (lastByte)) {
+        //currentTask = GETCHUNKID;
+        count = 255;
+        currentBlockTask = PAUSE;
+      }    
 }
 
 void wave2() {
