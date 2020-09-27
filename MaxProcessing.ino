@@ -473,9 +473,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
-                      setXY(7,1);sendChar('1');sendChar('0');                    
-                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);sendChar(48+block%10);
+                      setXY(9,1);sendChar('1');sendChar('0');                    
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
                       setXY(7,4);sendChar('1');sendChar('0');
@@ -552,9 +552,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
-                      setXY(7,1);sendChar('1');sendChar('1');                      
-                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);sendChar(48+block%10);
+                      setXY(9,1);sendChar('1');sendChar('1');                      
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
                       setXY(7,4);sendChar('1');sendChar('1');                    
@@ -724,9 +724,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
-                      setXY(7,1);sendChar('1');sendChar('9');                     
-                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);sendChar(48+block%10);
+                      setXY(9,1);sendChar('1');sendChar('9');                     
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
                       setXY(7,4);sendChar('1');sendChar('9');                    
@@ -947,9 +947,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
-                      setXY(7,1);sendChar('4');sendChar('B');                     
-                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);sendChar(48+block%10);
+                      setXY(9,1);sendChar('4');sendChar('B');                     
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
                       setXY(7,4);sendChar('4');sendChar('B');                    
@@ -1094,9 +1094,9 @@ void TZXProcess() {
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
-                      setXY(7,1);sendChar('F');sendChar('E');                      
-                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);sendChar(48+block%10);
+                      setXY(9,1);sendChar('F');sendChar('E');                      
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
                       setXY(7,4);sendChar('F');sendChar('E');                    
