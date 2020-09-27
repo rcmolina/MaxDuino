@@ -472,12 +472,16 @@ void TZXProcess() {
                       setXY(15,2);
                       sendChar(48+block%10);   
                     #endif
-                    #ifdef XY2
-                      setXY(11,1);
-                      if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);
-                      sendChar(48+block%10);
+                    #if defined(XY2) && not defined(OLED1306_128_64)
+                      setXY(7,1);sendChar('1');sendChar('0');                    
+                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);sendChar(48+block%10);
                     #endif
+                    #if defined(XY2) && defined(OLED1306_128_64)
+                      setXY(7,4);sendChar('1');sendChar('0');
+                      setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(15,4);sendChar(48+block%10);
+                    #endif                    
               #endif
               #ifdef BLOCKID_INTO_MEM
                 if (block < maxblock) block++;
@@ -547,12 +551,16 @@ void TZXProcess() {
                       setXY(15,2);
                       sendChar(48+block%10);   
                     #endif
-                    #ifdef XY2
-                      setXY(11,1);
-                      if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);
-                      sendChar(48+block%10);
+                    #if defined(XY2) && not defined(OLED1306_128_64)
+                      setXY(7,1);sendChar('1');sendChar('1');                      
+                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);sendChar(48+block%10);
                     #endif
+                    #if defined(XY2) && defined(OLED1306_128_64)
+                      setXY(7,4);sendChar('1');sendChar('1');                    
+                      setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(15,4);sendChar(48+block%10);
+                    #endif                    
               #endif   
               #ifdef BLOCKID_INTO_MEM
                 if (block < maxblock) block++;
@@ -715,12 +723,16 @@ void TZXProcess() {
                       setXY(15,2);
                       sendChar(48+block%10);   
                     #endif
-                    #ifdef XY2
-                      setXY(11,1);
-                      if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);
-                      sendChar(48+block%10);
+                    #if defined(XY2) && not defined(OLED1306_128_64)
+                      setXY(7,1);sendChar('1');sendChar('9');                     
+                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);sendChar(48+block%10);
                     #endif
+                    #if defined(XY2) && defined(OLED1306_128_64)
+                      setXY(7,4);sendChar('1');sendChar('9');                    
+                      setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(15,4);sendChar(48+block%10);
+                    #endif                    
               #endif
         //#endif              
               #ifdef BLOCKID_INTO_MEM
@@ -934,12 +946,16 @@ void TZXProcess() {
                       setXY(15,2);
                       sendChar(48+block%10);   
                     #endif
-                    #ifdef XY2
-                      setXY(11,1);
-                      if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);
-                      sendChar(48+block%10);
+                    #if defined(XY2) && not defined(OLED1306_128_64)
+                      setXY(7,1);sendChar('4');sendChar('B');                     
+                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);sendChar(48+block%10);
                     #endif
+                    #if defined(XY2) && defined(OLED1306_128_64)
+                      setXY(7,4);sendChar('4');sendChar('B');                    
+                      setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(15,4);sendChar(48+block%10);
+                    #endif                    
               #endif     
               #ifdef BLOCKID_INTO_MEM
                 if (block < maxblock) block++;
@@ -1077,12 +1093,16 @@ void TZXProcess() {
                       setXY(15,2);
                       sendChar(48+block%10);   
                     #endif
-                    #ifdef XY2
-                      setXY(11,1);
-                      if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(12,1);
-                      sendChar(48+block%10);
+                    #if defined(XY2) && not defined(OLED1306_128_64)
+                      setXY(7,1);sendChar('F');sendChar('E');                      
+                      setXY(11,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);sendChar(48+block%10);
                     #endif
+                    #if defined(XY2) && defined(OLED1306_128_64)
+                      setXY(7,4);sendChar('F');sendChar('E');                    
+                      setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(15,4);sendChar(48+block%10);
+                    #endif                    
               #endif     
               #ifdef BLOCKID_INTO_MEM
                 if (block < maxblock) block++;
