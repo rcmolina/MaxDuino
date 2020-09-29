@@ -2,6 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
+* V1.61 Graphic 128x64 and text 128x32 combined mode for Oled screens. Optional 8x8 bold font.
 * V1.60 Oric tap speedup if speed greater than 2400.
 * V1.59 Oric native tap support.
 * V1.58 STM32 testing support thanks to @Sildenafile.
