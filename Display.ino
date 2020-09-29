@@ -96,7 +96,47 @@
     #endif
     
     #ifdef XY2
-    while(*string){
+    
+    int Xh=X, Xl=X;
+    char *stringL=string, *stringH=string;
+    while(*stringL){
+
+      setXY(Xl,Y);    
+      for(int i=0;i<8;i++){
+          unsigned int il=0;
+          unsigned int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
+          
+          for(int ib=0;ib<4;ib++){
+              if (bitRead (ril,ib)){
+                  il |= (1 << ib*2);
+                  il |= (1 << (ib*2)+1);
+              }
+          }
+          SendByte(il);
+      }
+      Xl++;    
+      stringL++;
+    }
+    
+    while(*stringH){      
+      setXY (Xh,Y+1);
+      for(int i=0;i<8;i++){
+         unsigned int ih=0;
+         unsigned int rih=(pgm_read_byte(myFont[*stringH-0x20]+i));
+        
+         for(int ic=4;ic<8;ic++){
+            if (bitRead (rih,ic)) {
+                ih |= (1 << (ic-4)*2);
+                ih |= (1 << ((ic-4)*2)+1);
+            }   
+          }
+          SendByte(ih);
+      }
+      Xh++;    
+     stringH++;
+    }
+    
+ /*   while(*string){
 
       setXY(X,Y);    
       for(int i=0;i<8;i++){
@@ -127,7 +167,7 @@
       }
       X++;    
      string++;
-    }
+    } */
     #endif
     }
     //==========================================================//
