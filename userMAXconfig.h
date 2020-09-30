@@ -122,4 +122,5 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 /////////////////////
 //#define BasicFont
 //#define BoldFont
-#define c64Font
+//#define c64Font
+#define zxFont

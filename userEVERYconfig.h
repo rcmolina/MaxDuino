@@ -122,4 +122,5 @@ byte lineaxy=2;
 /////////////////////
 //#define BasicFont
 //#define BoldFont
-#define c64Font
+//#define c64Font
+#define zxFont
