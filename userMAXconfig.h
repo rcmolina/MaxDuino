@@ -104,7 +104,8 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define LOAD_EEPROM_LOGO 
 
 #if defined(OLED1306_128_64) || defined(video64text32)
-  //#define Maxduino2Alf              // new Maxduino2 logo 128x64 by Alfredo Retrocant
+  //#define EmptyLogo               // to erase
+  //#define Maxduino2Alf            // new Maxduino2 logo 128x64 by Alfredo Retrocant
   #define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
 #else
 //#define LOGOARDUITAPE            // original arduitape logo
@@ -119,6 +120,6 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 /////////////////////
 //      FONTS      //
 /////////////////////
-#define BasicFont
+//#define BasicFont
 //#define BoldFont
-
+#define c64Font
