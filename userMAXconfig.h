@@ -156,5 +156,10 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define LapseFont
 //#define TentacleFont
 //#define ChicagoFont
-
+//#define GenevaMonoFont
+//#define PAW17Font
+//#define AmstradCPCFont
+//#define SpectrumFont
+//#define SinclairOutlineFont
+//#define LittleShadowFont
 #endif

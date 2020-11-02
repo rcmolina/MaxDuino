@@ -156,5 +156,10 @@ byte lineaxy=2;
 #define LapseFont
 //#define TentacleFont
 //#define ChicagoFont
-
+//#define GenevaMonoFont
+//#define PAW17Font
+//#define AmstradCPCFont
+//#define SpectrumFont
+//#define SinclairOutlineFont
+//#define LittleShadowFont
 #endif
