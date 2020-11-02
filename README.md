@@ -2,6 +2,7 @@
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
 
+* V1.62 aka "Marble". New StandardFont (8x8) pack. DoubleFont (8x16) support. Improved speed loading in oled marble mode (XY2force) @alferboy. MenuBLK2A option in userconfig, no dependencies from UEF (@merlinkv).
 * V1.61 Graphic 128x64 and text 128x32 combined mode for Oled screens. Optional 8x8 bold font. Better XY2 thanks to @alferboy.
 * V1.60 Oric tap speedup if speed greater than 2400.
 * V1.59 Oric native tap support.
