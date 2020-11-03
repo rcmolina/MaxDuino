@@ -533,18 +533,32 @@ void setup() {
   
   pinMode(chipSelect, OUTPUT);      //Setup SD card chipselect pin
 //  if (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
-#ifdef SDFat
-    while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {   
-#else
-    while (!SD.begin(chipSelect)) {   
-#endif         
      //Start SD card and check it's working
-    printtextF(PSTR("No SD Card"),0);
+//    printtextF(PSTR("No SD Card"),0);
     //lcd_clearline(0);
     //lcd.print(F("No SD Card"));
 //    return;
 //    delay(250);
-  } 
+//  } 
+#ifdef SDFat
+    while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
+     //Start SD card and check it's working
+      printtextF(PSTR("No SD Card"),0);
+    //lcd_clearline(0);
+    //lcd.print(F("No SD Card"));
+//    return;
+//    delay(250);
+    }        
+#else
+    while (!SD.begin(chipSelect)) {
+     //Start SD card and check it's working
+      printtextF(PSTR("No SD Card"),0);
+    //lcd_clearline(0);
+    //lcd.print(F("No SD Card"));
+//    return;
+//    delay(250);
+    }    
+#endif         
   
   //sd.chdir("/");                       //set SD to root directory
   UniSetup();                       //Setup TZX specific options
@@ -850,11 +864,13 @@ void loop(void) {
      }
 
 #ifdef OnPausePOLChg
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && digitalRead(btnStop)==LOW ){             // change polarity
-#else
-     if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 ){             // change polarity
-#endif
+
+     if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 
+                                                    #ifdef btnRoot_AS_PIVOT   
+                                                            && digitalRead(btnStop)==LOW   
+                                                    #endif
+                                                            ){             // change polarity
+
        // change tsx speed control/zx polarity/uefTurboMode
        TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
        #ifdef OLED1306 
@@ -984,13 +1000,14 @@ void loop(void) {
         lcd.print(PlayBytes);        
        }
       #endif
-#endif  
-
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnRoot)==LOW && start==0 && digitalRead(btnStop)==LOW ){                   // go menu
-#else
-     if(digitalRead(btnRoot)==LOW && start==0){
 #endif
+
+     if(digitalRead(btnRoot)==LOW && start==0
+                                        #ifdef btnRoot_AS_PIVOT
+                                              && digitalRead(btnStop)==LOW
+                                        #endif        
+                                              ){                   // go menu
+
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif
@@ -1052,11 +1069,12 @@ void loop(void) {
 */       
      }
 
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnStop)==LOW && start==1 && digitalRead(btnRoot)) {                                                   // stop
-#else
-     if(digitalRead(btnStop)==LOW && start==1) { 
-#endif
+     if(digitalRead(btnStop)==LOW && start==1
+                                        #ifdef btnRoot_AS_PIVOT
+                                                && digitalRead(btnRoot)
+                                        #endif
+                                              ){      
+
        stopFile();
 
        debounce(btnStop);
@@ -1143,13 +1161,13 @@ void loop(void) {
          delay(50);
        }
 */
-     }     
+     }
 
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot) ) {    
-#else
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 ) {             //  up block sequential search
-#endif
+     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1
+                                                  #ifdef btnRoot_AS_PIVOT
+                                                            && digitalRead(btnRoot)
+                                                  #endif
+                                                          ){             //  up block sequential search                                                                 
 /*
        bytesRead=11;                     // for tzx skip header(10) + GETID(11)
        currentTask=PROCESSID;
@@ -1220,11 +1238,12 @@ void loop(void) {
      }
 #endif
 
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==0 && digitalRead(btnRoot) ) {   
-#else
-     if(digitalRead(btnUp)==LOW && start==0 ) {                         // up dir sequential search
-#endif
+     if(digitalRead(btnUp)==LOW && start==0
+                                      #ifdef btnRoot_AS_PIVOT
+                                            && digitalRead(btnRoot)
+                                      #endif
+                                            ){                         // up dir sequential search                                           
+
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif
@@ -1267,11 +1286,11 @@ void loop(void) {
      }
 #endif
 
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)) {           
-#else
-     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 ) {      // down block sequential search
-#endif
+     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1
+                                                      #ifdef btnRoot_AS_PIVOT
+                                                            && digitalRead(btnRoot)
+                                                      #endif
+                                                            ){      // down block sequential search                                                           
 
 /*
        bytesRead=11;                     // for tzx skip header(10) + GETID(11)
@@ -1369,11 +1388,12 @@ void loop(void) {
      }
 #endif
 
-#ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnDown)==LOW && start==0 && digitalRead(btnRoot)) {                    // down dir sequential search
-#else
-     if(digitalRead(btnDown)==LOW && start==0 ) {                    // down dir sequential search
-#endif
+     if(digitalRead(btnDown)==LOW && start==0
+                                        #ifdef btnRoot_AS_PIVOT
+                                                && digitalRead(btnRoot)
+                                        #endif
+                                              ){                    // down dir sequential search                                             
+
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif
@@ -1641,9 +1661,6 @@ void playFile() {
   } else {
 #ifdef SDFat
     if(entry.cwd()->exists(sfileName)) {
-#else
-    if(SD.exists(sfileName)) {
-#endif
       printtextF(PSTR("Playing"),0);
       //printtext(PlayBytes,0);
       //lcd_clearline(0);
@@ -1659,7 +1676,27 @@ void playFile() {
           lcd.bitmap(Play, 1, 6);
         #endif      
       start=1;       
-    } else {
+    }    
+#else
+    if(SD.exists(sfileName)) {
+      printtextF(PSTR("Playing"),0);
+      //printtext(PlayBytes,0);
+      //lcd_clearline(0);
+      //lcd.print(PlayBytes);      
+      scrollPos=0;
+      pauseOn = 0;
+      scrollText(fileName);
+      currpct=100;
+      lcdsegs=0;
+      UniPlay(sfileName);           //Load using the short filename
+        #ifdef P8544
+          lcd.gotoRc(3,38);
+          lcd.bitmap(Play, 1, 6);
+        #endif      
+      start=1;       
+    }    
+#endif
+      else {
       #ifdef LCDSCREEN16x2
         printtextF(PSTR("No File Selected"),1);
       #endif      
@@ -1749,8 +1786,7 @@ void changeDir() {
 */  
 }
 
-void scrollText(char* text)
-{
+void scrollText(char* text){
   #ifdef LCDSCREEN16x2
   //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
   if(scrollPos<0) scrollPos=0;
