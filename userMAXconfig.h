@@ -162,4 +162,5 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 //#define SpectrumFont
 //#define SinclairOutlineFont
 //#define LittleShadowFont
+//#define ClairsysFont
 #endif

@@ -4,7 +4,7 @@
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
 //#define AYPLAY
-#define MenuBLK2A
+//#define MenuBLK2A
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
@@ -12,7 +12,7 @@
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
-        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
+        //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
 //#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
@@ -55,7 +55,7 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 #define OLED_ROTATE180
 #define OLED_address   0x3C           //0x3C or 0x3D
 #define OLED1306                      // Set if you are using OLED 1306 display
-    //#define OLED1306_128_64         // 128x64 resolution with 8 rows
+    #define OLED1306_128_64         // 128x64 resolution with 8 rows
     //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
     //#define video64text32
 //#define P8544                       // Set if you are Display Nokia 5110 display
@@ -67,9 +67,9 @@ byte skip2A = 0;                        // Pause on for BLK:2A
       
   #define SHOW_BLOCKPOS_LCD
   
-#define XY                         // use original settings for Oled line 0,1 and status for menu
-//#define XY2                      // use double size font wihtout status line for menu
-//#define XY2force
+//#define XY                         // use original settings for Oled line 0,1 and status for menu
+#define XY2                      // use double size font wihtout status line for menu
+#define XY2force
 #ifdef XY
 byte lineaxy=1;
 #endif
@@ -164,4 +164,5 @@ byte lineaxy=2;
 //#define SpectrumFont
 //#define SinclairOutlineFont
 //#define LittleShadowFont
+//#define ClairsysFont
 #endif

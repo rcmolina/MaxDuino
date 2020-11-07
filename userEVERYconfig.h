@@ -162,4 +162,5 @@ byte lineaxy=2;
 //#define SpectrumFont
 //#define SinclairOutlineFont
 //#define LittleShadowFont
+//#define ClairsysFont
 #endif

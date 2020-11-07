@@ -51,16 +51,21 @@
     // Set the cursor position in a 16 COL * 2 ROW map.
     static void setXY(unsigned char col,unsigned char row)
     {
-    sendcommand(0xb0+row); //set page address
-    
+    sendcommand(0xb0+row); //set page address (row)    
     #ifdef OLED1106_1_3
       sendcommand(0x02+(8*col&0x0f)); //set low col address
     #else
       sendcommand(0x00+(8*col&0x0f)); //set low col address
-    #endif
-    
-    sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
-    }
+    #endif    
+      sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
+
+    //sendcommand(0x21); // set column start and end address
+    //sendcommand(8*col);   // set column start address
+    //sendcommand(0x7f);  // set column end address
+    //sendcommand(0x22);  // set row start and end address
+    //sendcommand(row); // set row start address
+    //sendcommand(0x07);  // set row end address           
+    }   
     //==========================================================//
     // Prints a string regardless the cursor position.
     static void sendStr(unsigned char *string)
@@ -100,7 +105,14 @@
     int Xh=X, Xl=X;
     char *stringL=string, *stringH=string;
     
-    setXY(Xl,Y);    
+    //setXY(Xl,Y);   
+    sendcommand(0x22); // set row start and end address
+    sendcommand(Y);   // set row start address
+    sendcommand(Y+1);  // set row end address  
+        
+    sendcommand(0x21); // set column start and end address
+    sendcommand(8*X);   // set column start address
+    sendcommand(8*(X+strlen(string))-1);  // set column end address 
     while(*stringL){
       //setXY(Xl,Y);
       Wire.beginTransmission(OLED_address); // begin transmitting
@@ -123,7 +135,7 @@
       stringL++;
     }
     
-    setXY (Xh,Y+1);    
+    //setXY (Xh,Y+1);       
     while(*stringH){      
       //setXY (Xh,Y+1);      
       Wire.beginTransmission(OLED_address); // begin transmitting
@@ -354,7 +366,9 @@ static void init_OLED(void)
    // sendcommand(0x40);
    // sendcommand(0x2E);            // stop scroll
    // sendcommand(0xA4);        //DISPLAYALLON_RESUME        
-   // sendcommand(0xA6);        //NORMALDISPLAY             
+   // sendcommand(0xA6);        //NORMALDISPLAY 
+  sendcommand(0x20);            //Set Memory Addressing Mode
+  sendcommand(0x00);            //Set Memory Addressing Mode ab Horizontal addressing mode              
     sendcommand(0xAF);    //display on
 
 /*    sendcommand(0xFF); // U8G_ESC_CS(0) disable chip
