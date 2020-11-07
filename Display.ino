@@ -104,15 +104,17 @@
     
     int Xh=X, Xl=X;
     char *stringL=string, *stringH=string;
-    
-//    setXY(Xl,Y);   
-    sendcommand(0x22); // set row start and end address
-    sendcommand(Y);   // set row start address
-    sendcommand(Y+1);  // set row end address  
-        
-    sendcommand(0x21); // set column start and end address
-    sendcommand(8*X);   // set column start address
-    sendcommand(8*(X+strlen(string))-1);  // set column end address 
+
+    #if defined(OLED1106_1_3)
+      setXY(Xl,Y);
+    #else   
+      sendcommand(0x22); // set row start and end address
+      sendcommand(Y);   // set row start address
+      sendcommand(Y+1);  // set row end address         
+      sendcommand(0x21); // set column start and end address
+      sendcommand(8*X);   // set column start address
+      sendcommand(8*(X+strlen(string))-1);  // set column end address
+    #endif 
     while(*stringL){
       //setXY(Xl,Y);
       Wire.beginTransmission(OLED_address); // begin transmitting
@@ -135,7 +137,9 @@
       stringL++;
     }
     
-//    setXY (Xh,Y+1);       
+    #if defined(OLED1106_1_3)
+      setXY (Xh,Y+1);
+    #endif       
     while(*stringH){      
       //setXY (Xh,Y+1);      
       Wire.beginTransmission(OLED_address); // begin transmitting
@@ -196,14 +200,16 @@
     int Xh=X, Xl=X;
     char *stringL=string, *stringH=string;
     
-//    setXY(Xl,Y);   
-    sendcommand(0x22); // set row start and end address
-    sendcommand(Y);   // set row start address
-    sendcommand(Y+1);  // set row end address  
-        
-    sendcommand(0x21); // set column start and end address
-    sendcommand(8*X);   // set column start address
-    sendcommand(8*(X+strlen(string))-1);  // set column end address   
+    #if defined(OLED1106_1_3)
+      setXY(Xl,Y);
+    #else   
+      sendcommand(0x22); // set row start and end address
+      sendcommand(Y);   // set row start address
+      sendcommand(Y+1);  // set row end address         
+      sendcommand(0x21); // set column start and end address
+      sendcommand(8*X);   // set column start address
+      sendcommand(8*(X+strlen(string))-1);  // set column end address
+    #endif  
     while(*stringL){
       //setXY(Xl,Y);
       Wire.beginTransmission(OLED_address); // begin transmitting
@@ -217,7 +223,9 @@
       stringL++;
     }
     
-//    setXY (Xh,Y+1);      
+    #if defined(OLED1106_1_3)
+      setXY (Xh,Y+1);
+    #endif     
     while(*stringH){      
       //setXY (Xh,Y+1);      
       Wire.beginTransmission(OLED_address); // begin transmitting
@@ -377,6 +385,9 @@ static void init_OLED(void)
    #if defined(XY2) 
       sendcommand(0x20);            //Set Memory Addressing Mode
       sendcommand(0x00);            //Set Memory Addressing Mode ab Horizontal addressing mode
+   #else
+      sendcommand(0x20);            //Set Memory Addressing Mode
+      sendcommand(0x02);            //Set Memory Addressing Mode ab Page addressing mode      
    #endif              
     sendcommand(0xAF);    //display on
 
