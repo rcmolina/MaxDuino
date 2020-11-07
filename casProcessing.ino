@@ -447,9 +447,13 @@ void casduinoLoop()
 #endif
     } else {
          //lcdSpinner();
-         if (pauseOn == 0) {
-          lcdTime();
-          lcdPercent();
+         if (pauseOn == 0) {      
+          #if defined(SHOW_CNTR)
+            lcdTime();          
+          #endif
+          #if defined(SHOW_PCT)          
+            lcdPercent();
+          #endif        
          }
     } 
 }

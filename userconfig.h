@@ -5,17 +5,17 @@
 #define Use_MENU                          // removing menu saves space
 //#define AYPLAY
 //#define MenuBLK2A
-#define DIRECT_RECORDING
+//#define DIRECT_RECORDING
 #define ZX81SPEEDUP
-#define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
+//#define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
 #define tapORIC
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
         //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-//#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
-    #define Use_c112                      // integer gap chunk for .uef
-    #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
+#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
+    //#define Use_c112                      // integer gap chunk for .uef
+    //#define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
         #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef
@@ -77,6 +77,8 @@ byte lineaxy=1;
 byte lineaxy=2;
 #endif
 
+//#define SHOW_CNTR
+//#define SHOW_PCT
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss (sorry, no space for separator)
 #define MAXPAUSE_PERIOD   8300         // millis
 //#define OnPausePOLChg               // 

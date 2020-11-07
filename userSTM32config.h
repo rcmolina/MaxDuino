@@ -77,6 +77,8 @@ byte lineaxy=1;
 byte lineaxy=2;
 #endif
 
+#define SHOW_CNTR
+#define SHOW_PCT
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss (sorry, no space for separator)
 #define MAXPAUSE_PERIOD   8300         // millis
 #define OnPausePOLChg               // 

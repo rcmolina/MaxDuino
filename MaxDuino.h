@@ -191,7 +191,7 @@ word currentPeriod=1;
 #define SYNC2                 3
 #define DATA                  4
 #define PAUSE                 5
-#define HEADER                6
+#define OHEADER               6
 #define NAME                  7
 #define GAP                   8
 #define SYNCLAST              9
