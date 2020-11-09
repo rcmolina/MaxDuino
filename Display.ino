@@ -107,13 +107,14 @@
 
     #if defined(OLED1106_1_3)
       setXY(Xl,Y);
-    #else   
-      sendcommand(0x22); // set row start and end address
-      sendcommand(Y);   // set row start address
-      sendcommand(Y+1);  // set row end address         
-      sendcommand(0x21); // set column start and end address
-      sendcommand(8*X);   // set column start address
-      sendcommand(8*(X+strlen(string))-1);  // set column end address
+    #else
+      setXY(Xl,Y);   
+      //sendcommand(0x22); // set row start and end address
+      //sendcommand(Y);   // set row start address
+      //sendcommand(Y+1);  // set row end address         
+      //sendcommand(0x21); // set column start and end address
+      //sendcommand(8*X);   // set column start address
+      //sendcommand(8*(X+strlen(string))-1);  // set column end address
     #endif 
     while(*stringL){
       //setXY(Xl,Y);
@@ -139,6 +140,8 @@
     
     #if defined(OLED1106_1_3)
       setXY (Xh,Y+1);
+    #else
+      setXY (Xh,Y+1);    
     #endif       
     while(*stringH){      
       //setXY (Xh,Y+1);      
@@ -202,13 +205,14 @@
     
     #if defined(OLED1106_1_3)
       setXY(Xl,Y);
-    #else   
-      sendcommand(0x22); // set row start and end address
-      sendcommand(Y);   // set row start address
-      sendcommand(Y+1);  // set row end address         
-      sendcommand(0x21); // set column start and end address
-      sendcommand(8*X);   // set column start address
-      sendcommand(8*(X+strlen(string))-1);  // set column end address
+    #else
+      setXY(Xl,Y);       
+      //sendcommand(0x22); // set row start and end address
+      //sendcommand(Y);   // set row start address
+      //sendcommand(Y+1);  // set row end address         
+      //sendcommand(0x21); // set column start and end address
+      //sendcommand(8*X);   // set column start address
+      //sendcommand(8*(X+strlen(string))-1);  // set column end address
     #endif  
     while(*stringL){
       //setXY(Xl,Y);
@@ -225,6 +229,8 @@
     
     #if defined(OLED1106_1_3)
       setXY (Xh,Y+1);
+    #else
+      setXY (Xh,Y+1);    
     #endif     
     while(*stringH){      
       //setXY (Xh,Y+1);      

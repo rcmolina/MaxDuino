@@ -691,7 +691,8 @@ void loop(void) {
            */ 
             firstBlockPause = true;
           } else  {
-            printtext2F(PSTR("Playing "),0);
+            printtext2F(PSTR("Playing     "),0);
+            currpct=100;
        /*     #ifdef LCDSCREEN16x2
               lcd.setCursor(0,0); 
               //lcd.print(F("Playing"));
@@ -2188,16 +2189,45 @@ void SetPlayBlock()
          }
        #endif
        #ifdef OLED1306
-    //      setXY(11,0);sendStr(" <<>>");
-    //      setXY(11,0);sendStr(" Paus"); 
-          setXY(0,0);
-          sendStr((unsigned char *)"BLK:");
-          utoa(block, (char *)input, 10);sendStr(input);sendChar(' ');
-          if (bytesRead > 0){
-        //    setXY(11,0);
-            sendStr((unsigned char *)"ID:");utoa(currentID,(char *)input,16);sendStr((unsigned char *)strupr((char *)input)); // Block ID en hex
-     //       sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));            
-          }
+          #ifdef XY2
+              sendStrXY((unsigned char *)"BLK:",0,0);
+              input[0]=48+block/10;input[1]=48+block%10;input[2]=0;sendStrXY(input,4,0);
+              //utoa(block, (char *)input, 10);sendStrXY(input,4,0);//sendChar(' ');
+              if (bytesRead > 0){
+                sendStrXY((unsigned char *)" ID:", 6,0);
+                
+                if (currentID/16 < 10) input[0]=48+currentID/16;
+                else input[0]=55+currentID/16;
+                if (currentID%16 < 10) input[1]=48+currentID%16;
+                else input[1]=55+currentID%16;
+                                
+                input[2]=0;sendStrXY(input,10,0);
+                
+                //utoa(currentID,(char *)input,16);sendStrXY((unsigned char *)strupr((char *)input),10,0); // Block ID en hex
+                //sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));            
+              }          
+          #else
+        //      setXY(11,0);sendStr(" <<>>");
+        //      setXY(11,0);sendStr(" Paus"); 
+              setXY(0,0);
+              sendStr((unsigned char *)"BLK:");
+              input[0]=48+block/10;input[1]=48+block%10;input[2]=0;sendStr(input);
+              //utoa(block, (char *)input, 10);sendStr(input);//sendChar(' ');
+              if (bytesRead > 0){
+            //    setXY(11,0);
+                sendStr((unsigned char *)" ID:");
+
+                if (currentID/16 < 10) input[0]=48+currentID/16;
+                else input[0]=55+currentID/16;
+                if (currentID%16 < 10) input[1]=48+currentID%16;
+                else input[1]=55+currentID%16;
+                                
+                input[2]=0;sendStr(input);
+                
+                //utoa(currentID,(char *)input,16);sendStr((unsigned char *)strupr((char *)input)); // Block ID en hex
+         //       sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));            
+              }
+          #endif
        #endif      
        #ifdef P8544
           lcd.setCursor(12,3);lcd.print('B'+block);

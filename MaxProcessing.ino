@@ -1296,11 +1296,11 @@ void TZXProcess() {
                 if(currentBit >0) OricBitWrite();             
                 else {
                       if (count >0) {currentByte=0x24; currentBit = 11; bitChecksum = 0;lastByte=0; count--;} 
-                      else {count=9;lastByte=0;currentBlockTask=OHEADER;}
+                      else {count=9;lastByte=0;currentBlockTask=NEWPARAM;}
                 }
                 break;
                       
-            case OHEADER:            
+            case NEWPARAM:            
                 if(currentBit >0) OricBitWrite();
                 else {
                       if  (count >0) {
