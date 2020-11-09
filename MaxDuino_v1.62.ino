@@ -864,7 +864,7 @@ void loop(void) {
 */
      }
 
-#ifdef OnPausePOLChg
+#ifdef ONPAUSE_POLCHG
 
      if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 
                                                     #ifdef btnRoot_AS_PIVOT   
@@ -1163,7 +1163,8 @@ void loop(void) {
        }
 */
      }
-
+     
+#ifdef BLOCKMODE
      if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1
                                                   #ifdef btnRoot_AS_PIVOT
                                                             && digitalRead(btnRoot)
@@ -1206,7 +1207,8 @@ void loop(void) {
        }
  */      
      }
-#ifdef btnRoot_AS_PIVOT
+#endif
+#if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
      if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {  // up block half-interval search
 
 /*
@@ -1286,7 +1288,7 @@ void loop(void) {
 */
      }
 #endif
-
+#ifdef BLOCKMODE
      if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1
                                                       #ifdef btnRoot_AS_PIVOT
                                                             && digitalRead(btnRoot)
@@ -1356,8 +1358,8 @@ void loop(void) {
        }
 */
      }
-
-#ifdef btnRoot_AS_PIVOT
+#endif
+#if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
      if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {     // down block half-interval search
 
 /*

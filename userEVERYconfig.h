@@ -79,7 +79,8 @@ byte lineaxy=2;
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss (sorry, no space for separator)
 #define MAXPAUSE_PERIOD   8300         // millis
 //#define MAXPAUSE_PERIOD   520         // millis  
-#define OnPausePOLChg 
+#define ONPAUSE_POLCHG
+#define BLOCKMODE                   // REW or FF a block when in pause and Play to select it
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
