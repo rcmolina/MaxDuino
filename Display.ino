@@ -254,8 +254,12 @@ static void reset_display(void)
 {
   displayOff();
   clear_display();
-
-  
+  #if defined(video64text32)     // back to 128x32
+    sendcommand(0xA8);            //SSD1306_SETMULTIPLEX     
+    sendcommand(0x1f);            //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f     
+    sendcommand(0xDA);           //0xDA
+    sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */      
+  #endif
   displayOn();
 }
 
@@ -279,7 +283,7 @@ void displayOff(void)
 static void clear_display(void)
 {
   unsigned char i,k;
-  #ifdef OLED1306_128_64
+  #if defined(OLED1306_128_64) || defined(video64text32)
     for(k=0;k<8;k++)  // 8 LINES
   #else
     for(k=0;k<4;k++) // 4 LINES  
@@ -395,7 +399,7 @@ static void init_OLED(void)
       sendcommand(0x20);            //Set Memory Addressing Mode
       sendcommand(0x02);            //Set Memory Addressing Mode ab Page addressing mode      
    #endif              
-    sendcommand(0xAF);    //display on
+    //sendcommand(0xAF);    //display on
 
 /*    sendcommand(0xFF); // U8G_ESC_CS(0) disable chip
     sendcommand(0xd0 | ((0)&0x0f));
@@ -414,7 +418,7 @@ static void init_OLED(void)
   //sendcommand(0x00);            //Set Memory Addressing Mode ab Horizontal addressing mode
     //sendcommand(0x02);         // Set Memory Addressing Mode ab Page addressing mode(RESET)  
   
-  clear_display();
+  //clear_display();
   
   #if defined(OLED1306_128_64) || defined(video64text32)
     for(int j=0;j<8;j++)
@@ -534,15 +538,7 @@ static void init_OLED(void)
    
     }  
   }
-  #if defined(video64text32)     // back to 128x32
-    clear_display();  
-    sendcommand(0xAE);           //DISPLAYOFF
-    sendcommand(0xA8);            //SSD1306_SETMULTIPLEX     
-    sendcommand(0x1f);            //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f     
-    sendcommand(0xDA);           //0xDA
-    sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */      
-    sendcommand(0xAF);          //display on
-  #endif  
+  sendcommand(0xAF);    //display on
 }
 
 #endif
