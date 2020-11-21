@@ -381,7 +381,7 @@ static void init_OLED(void)
           sendcommand(0x27);                    // default 0x80 : (SMALL 0x00, LARGE 0xFF)
         #else
           sendcommand(0x81);                    //SETCONTRAS
-          sendcommand(0x80);                    //
+          sendcommand(0x60);                    // default 0x80 : (SMALL 0x00, LARGE 0xFF)
         #endif
     #endif
     
