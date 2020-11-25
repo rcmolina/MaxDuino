@@ -36,8 +36,8 @@
 int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200
 int period = 70;                        // 208 for BAUDRATE=1200
-byte mselectMask = 1;                   // Motor control state 1=on 0=off
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 1;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+byte mselectMask = 0;                   // Motor control state 1=on 0=off
+byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
 byte skip2A = 0;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
