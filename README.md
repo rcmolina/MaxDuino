@@ -1,6 +1,8 @@
+
 # maxduino
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
+* V1.65 Code rearrangement for esasier pinout modification. Support for the new Maple miniduino (STM32) from Antonio Villena.
 * V1.64 Thinary PCB support (cheap arduino nano every). Many thanks to Ricky El-Qasem for his help and his perseverance for this to work !!
 * V1.63 New Logos. Fixed side-effect on MSX cas when implementing Oric native tap files loading.
 * V1.62 aka "Marble". New StandardFont (8x8) pack. DoubleFont (8x16) support. Improved speed loading in oled marble mode (XY2force) @alferboy. MenuBLK2A option in userconfig, no dependencies from UEF (@merlinkv).
