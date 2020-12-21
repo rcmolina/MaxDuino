@@ -15,7 +15,7 @@ void checkForEXT (char *filename) {
     #endif
   }
  #if defined(__arm__) && defined(__STM32F1__)
-  else if(strstr_P(strlwr(filename + x), PSTR(".cdt"))) {PeriodOffset =20;}
+  else if(strstr_P(strlwr(filename + x), PSTR(".cdt"))) {PeriodOffset =28;}
  #endif
   else if(strstr_P(strlwr(filename + x), PSTR(".p"))) {casduino =0; currentTask=PROCESSID; currentID=ZXP;}
   else if(strstr_P(strlwr(filename + x), PSTR(".o"))) {casduino =0; currentTask=PROCESSID; currentID=ZXO;}
