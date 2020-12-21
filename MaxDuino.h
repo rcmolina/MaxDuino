@@ -74,7 +74,7 @@ byte spinpos = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
 unsigned int offset =2;
-byte PeriodOffset=0;
+
 volatile byte currentBit=0;
 //Keep track of which ID, Task, and Block Task we're dealing with
 byte currentID = 0;

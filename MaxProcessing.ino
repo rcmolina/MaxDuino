@@ -2334,8 +2334,15 @@ void wave2() {
   #if defined(__AVR__)
     Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
   #elif defined(__arm__) && defined(__STM32F1__)    
-    timer.setPeriod(newTime -4 -PeriodOffset);
-    timer.refresh();
+    //timer.setPeriod(newTime -4);
+    if (newTime < 65536) {
+      timer.setPrescaleFactor(72);
+      timer.setOverflow(newTime -4);
+    }else {
+      timer.setPrescaleFactor(72*500);
+      timer.setOverflow(newTime/500);      
+    }
+      timer.refresh();
   #endif
 
 }

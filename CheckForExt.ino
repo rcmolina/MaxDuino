@@ -2,7 +2,7 @@
 void checkForEXT (char *filename) {
     //Check for .xxx file extension as these have no header
   char x =0;
-  PeriodOffset =0;
+
   while (*(filename+x) && (*(filename+x) != '.')) x++;
   if(strstr_P(strlwr(filename + x), PSTR(".tap"))) {
     casduino =0; currentTask=PROCESSID; currentID=TAP;
@@ -14,9 +14,6 @@ void checkForEXT (char *filename) {
       }
     #endif
   }
- #if defined(__arm__) && defined(__STM32F1__)
-  else if(strstr_P(strlwr(filename + x), PSTR(".cdt"))) {PeriodOffset =28;}
- #endif
   else if(strstr_P(strlwr(filename + x), PSTR(".p"))) {casduino =0; currentTask=PROCESSID; currentID=ZXP;}
   else if(strstr_P(strlwr(filename + x), PSTR(".o"))) {casduino =0; currentTask=PROCESSID; currentID=ZXO;}
  #ifdef AYPLAY  
