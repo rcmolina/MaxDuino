@@ -2,6 +2,7 @@
 # maxduino
 
 https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
+* V1.66 aka "Beast Nano". New userconfig option for optional oled on screen print, so more space for nano to include oric and uef in the same upgrade. Fixed bug when dragon to msx switching without reset.
 * V1.65 Code rearrangement for esasier pinout modification. Support for the new Maple miniduino (STM32) from Antonio Villena.
 * V1.64 Thinary PCB support (cheap arduino nano every). Many thanks to Ricky El-Qasem for his help and his perseverance for this to work !!
 * V1.63 New Logos. Fixed side-effect on MSX cas when implementing Oric native tap files loading.
