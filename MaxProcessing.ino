@@ -1440,12 +1440,19 @@ void TZXProcess() {
           } else {
               if (forcePause0) { // Stop the Tape
                 if(!count==0) {
+
+                #if defined(__AVR__)
                   currentPeriod = 32769;
+                #elif defined(__arm__) && defined(__STM32F1__)
+                  currentPeriod = 50;
+                #endif
+
                   count += -1;
                 } else {
                   pauseOn=1;
                   currentTask = GETID;
                   printtext2F(PSTR("PAUSED* "),0);
+                  count = 255;
                   forcePause0=0;
                 }
               } else { 
