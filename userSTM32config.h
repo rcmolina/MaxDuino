@@ -89,7 +89,7 @@ byte lineaxy=2;
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
 #define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
-#define maxblock 19                   // maxblock if not using EEPROM
+#define maxblock 99                   // maxblock if not using EEPROM
 #define BLOCKID21_IN
 #define BLOCKTAP_IN
 #define OLEDPRINTBLOCK 

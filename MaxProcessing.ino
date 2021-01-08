@@ -1410,7 +1410,13 @@ void TZXProcess() {
                 //currentPeriod = 100; // 100ms pause
                 //bitSet(currentPeriod, 15);
                 if(!count==0) {
+
+                #if defined(__AVR__)
                   currentPeriod = 32769;
+                #elif defined(__arm__) && defined(__STM32F1__)
+                  currentPeriod = 50;
+                #endif
+
                   count += -1;
                 } else {
                   count= 100;
