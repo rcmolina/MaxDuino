@@ -1458,7 +1458,13 @@ void TZXProcess() {
         case IDEOF:
           //Handle end of file
           if(!count==0) {
+          
+          #if defined(__AVR__)
             currentPeriod = 32769;
+          #elif defined(__arm__) && defined(__STM32F1__)
+            currentPeriod = 50;
+          #endif
+                 
             count += -1;
           } else {
             stopFile();
@@ -2337,25 +2343,25 @@ void wave2() {
     Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
   #elif defined(__arm__) && defined(__STM32F1__)    
     //timer.setPeriod(newTime -4);
-    newTime += 8;
+    newTime += 2;
 
-/*    if (newTime < 65536/36) {
+    if (newTime < 65536/36) {
       timer.setPrescaleFactor(72/36);
       timer.setOverflow(newTime*36);
     }else
     if (newTime < 65536/18) {
       timer.setPrescaleFactor(72/18);
       timer.setOverflow(newTime*18);
-    }else */
+    }else
     if (newTime < 65536/16) {
       timer.setPrescaleFactor(72/16);
       timer.setOverflow(newTime*16);
     }else
-/*    if (newTime < 65536/8) {
+    if (newTime < 65536/8) {
       timer.setPrescaleFactor(72/8);
       timer.setOverflow(newTime*8);
     }else
-    if (newTime < 65536/4) {
+/*    if (newTime < 65536/4) {
       timer.setPrescaleFactor(72/4);
       timer.setOverflow(newTime*4);
     }else
@@ -2363,7 +2369,7 @@ void wave2() {
       timer.setPrescaleFactor(72/2);
       timer.setOverflow(newTime*2);
     }else */
-/*    if (newTime < 65536) {
+    if (newTime < 65536) {
       timer.setPrescaleFactor(72);
       timer.setOverflow(newTime);
     }else
@@ -2379,32 +2385,32 @@ void wave2() {
       timer.setPrescaleFactor(72*8);
       timer.setOverflow(newTime/8);
     }else
-    if (newTime < 65536*16) {
+/*    if (newTime < 65536*16) {
       timer.setPrescaleFactor(72*16);
       timer.setOverflow(newTime/16);
     }else
     if (newTime < 65536*32) {
       timer.setPrescaleFactor(72*32);
       timer.setOverflow(newTime/32);
-    }else
+    }else */
     if (newTime < 65536*64) {
       timer.setPrescaleFactor(72*64);
       timer.setOverflow(newTime/64);
     }else
-    if (newTime < 65536*128) {
+/*    if (newTime < 65536*128) {
       timer.setPrescaleFactor(72*128);
       timer.setOverflow(newTime/128);
-    }else */
+    }else
     if (newTime < 65536*256) {
       timer.setPrescaleFactor(72*256);
       timer.setOverflow(newTime/256);
-/*    }else
+    }else */
     if (newTime < 65536*512) {                                    
       timer.setPrescaleFactor(72*512);
       timer.setOverflow(newTime/512);
     }else {                           
       timer.setPrescaleFactor(72*512);
-      timer.setOverflow(65535); */       
+      timer.setOverflow(65535);      
     }
       timer.refresh();
   #endif
