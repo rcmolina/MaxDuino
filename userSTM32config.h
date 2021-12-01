@@ -70,7 +70,7 @@ byte skip2A = 0;                        // Pause on for BLK:2A
   
 //#define XY                         // use original settings for Oled line 0,1 and status for menu
 #define XY2                      // use double size font wihtout status line for menu
-//#define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
+#define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
     //#define XY2shadedplay 
 #ifdef XY
 byte lineaxy=1;

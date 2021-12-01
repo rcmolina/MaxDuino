@@ -51,7 +51,6 @@
     // Set the cursor position in a 16 COL * 2 ROW map.
     static void setXY(unsigned char col,unsigned char row)
     {
-
       Wire.beginTransmission(OLED_address); //begin transmitting
       Wire.write(0x80); //command mode
       Wire.write(0xb0+(row)); //set page address (row)
@@ -73,6 +72,7 @@
     #endif    
       sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
 */
+
     //sendcommand(0x21); // set column start and end address
     //sendcommand(8*col);   // set column start address
     //sendcommand(0x7f);  // set column end address
@@ -129,44 +129,12 @@
       //sendcommand(0x21); // set column start and end address
       //sendcommand(8*X);   // set column start address
       //sendcommand(8*(X+strlen(string))-1);  // set column end address
-    #endif
-/*    
-    #if defined(OLED1106_1_3)
-      //setXY (Xl,Y);
-          //sendcommand(0xb0+(Y)); //set page address (row)
-          //sendcommand(0x02+(8*Xl&0x0f)); //set low col address
-          //sendcommand(0x10+((8*Xl>>4)&0x0f)); //set high col address
-      Wire.beginTransmission(OLED_address); //begin transmitting
-      Wire.write(0x80); //command mode
-      Wire.write(0xb0+(Y)); //set page address (row)
-      Wire.write(0x80); //command mode            
-      Wire.write(0x02+(8*Xl&0x0f)); //set low col address
-      Wire.write(0x80); //command mode       
-      Wire.write(0x10+((8*Xl>>4)&0x0f)); //set high col address    
-      Wire.endTransmission(); // stop transmitting           
-    #else
-      //setXY (Xl,Y);
-          //sendcommand(0xb0+(Y)); //set page address (row) 
-          //sendcommand(0x00+(8*Xl&0x0f)); //set low col address
-          //sendcommand(0x10+((8*Xl>>4)&0x0f)); //set high col address
-      Wire.beginTransmission(OLED_address); //begin transmitting
-      Wire.write(0x80); //command mode
-      Wire.write(0xb0+(Y)); //set page address (row)
-      Wire.write(0x80); //command mode            
-      Wire.write(0x00+(8*Xl&0x0f)); //set low col address
-      Wire.write(0x80); //command mode       
-      Wire.write(0x10+((8*Xl>>4)&0x0f)); //set high col address    
-      Wire.endTransmission(); // stop transmitting                
-    #endif
-*/
-    Wire.beginTransmission(OLED_address); // begin transmitting
-    Wire.setClock(I2CCLOCK);
-    Wire.write(0x40);//data mode     
+    #endif 
     while(*stringL){
       //setXY(Xl,Y);
-    //  Wire.beginTransmission(OLED_address); // begin transmitting
-    //  Wire.setClock(I2CCLOCK);
-    //  Wire.write(0x40);//data mode
+      Wire.beginTransmission(OLED_address); // begin transmitting
+      Wire.setClock(I2CCLOCK);     
+      Wire.write(0x40);//data mode
       for(int i=0;i<8;i++){
           int il=0;
           int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
@@ -174,63 +142,27 @@
           for(int ib=0;ib<4;ib++){
               if (bitRead (ril,ib)){
                   il |= (1 << ib*2);
-                  #if not defined(XY2shadedplay)
-                    il |= (1 << (ib*2)+1);
-                  #else  
-                    if (start==0) il |= (1 << (ib*2)+1);
-                  #endif
+                  il |= (1 << (ib*2)+1);
               }
           }
           //SendByte(il);
           Wire.write(il);
       }
-      //Wire.endTransmission(); // stop transmitting
+      Wire.endTransmission(); // stop transmitting
       Xl++;    
       stringL++;
     }
-    Wire.endTransmission(); // stop transmitting
-          
+    
     #if defined(OLED1106_1_3)
-      setXY (Xh,Y+1);         
+      setXY (Xh,Y+1);
     #else
-      setXY (Xh,Y+1);          
-    #endif    
-/*    #if defined(OLED1106_1_3)
-      //setXY (Xh,Y+1);
-          //sendcommand(0xb0+(Y+1)); //set page address (row)
-          //sendcommand(0x02+(8*Xh&0x0f)); //set low col address
-          //sendcommand(0x10+((8*Xh>>4)&0x0f)); //set high col address
-      Wire.beginTransmission(OLED_address); //begin transmitting
-      Wire.write(0x80); //command mode
-      Wire.write(0xb0+(Y+1)); //set page address (row)
-      Wire.write(0x80); //command mode            
-      Wire.write(0x02+(8*Xh&0x0f)); //set low col address
-      Wire.write(0x80); //command mode              
-      Wire.write(0x10+((8*Xh>>4)&0x0f)); //set high col address    
-      Wire.endTransmission(); // stop transmitting           
-    #else
-      //setXY (Xh,Y+1);
-          //sendcommand(0xb0+(Y+1)); //set page address (row) 
-          //sendcommand(0x00+(8*Xh&0x0f)); //set low col address
-          //sendcommand(0x10+((8*Xh>>4)&0x0f)); //set high col address
-      Wire.beginTransmission(OLED_address); //begin transmitting
-      Wire.write(0x80); //command mode
-      Wire.write(0xb0+(Y+1)); //set page address (row)
-      Wire.write(0x80); //command mode            
-      Wire.write(0x00+(8*Xh&0x0f)); //set low col address
-      Wire.write(0x80); //command mode              
-      Wire.write(0x10+((8*Xh>>4)&0x0f)); //set high col address    
-      Wire.endTransmission(); // stop transmitting             
-    #endif*/
-
-    Wire.beginTransmission(OLED_address); // begin transmitting
-    Wire.setClock(I2CCLOCK);
-    Wire.write(0x40);//data mode  
+      setXY (Xh,Y+1);    
+    #endif       
     while(*stringH){      
       //setXY (Xh,Y+1);      
-    //  Wire.beginTransmission(OLED_address); // begin transmitting
-    //  Wire.setClock(I2CCLOCK);
-    //  Wire.write(0x40);//data mode          
+      Wire.beginTransmission(OLED_address); // begin transmitting
+      Wire.setClock(I2CCLOCK);
+      Wire.write(0x40);//data mode          
       for(int i=0;i<8;i++){
          int ih=0;
          int rih=(pgm_read_byte(myFont[*stringH-0x20]+i));
@@ -238,22 +170,17 @@
          for(int ic=4;ic<8;ic++){
             if (bitRead (rih,ic)) {
                 ih |= (1 << (ic-4)*2);
-                #if not defined(XY2shadedplay)
-                  ih |= (1 << ((ic-4)*2)+1);
-                #else
-                  if (start==0) ih |= (1 << ((ic-4)*2)+1);
-                #endif
+                ih |= (1 << ((ic-4)*2)+1);
             }   
           }
           //SendByte(ih);
           Wire.write(ih);          
       }
-      //Wire.endTransmission(); // stop transmitting      
+      Wire.endTransmission(); // stop transmitting      
       Xh++;    
       stringH++;
     }
-    Wire.endTransmission(); // stop transmitting  
-          
+    
  /*   while(*string){
 
       setXY(X,Y);    
@@ -302,51 +229,41 @@
       //sendcommand(0x21); // set column start and end address
       //sendcommand(8*X);   // set column start address
       //sendcommand(8*(X+strlen(string))-1);  // set column end address
-    #endif
-
-    Wire.beginTransmission(OLED_address); // begin transmitting
-    Wire.setClock(I2CCLOCK);
-    Wire.write(0x40);//data mode
+    #endif  
     while(*stringL){
       //setXY(Xl,Y);
-    //  Wire.beginTransmission(OLED_address); // begin transmitting
-    //  Wire.setClock(I2CCLOCK);
-    //  Wire.write(0x40);//data mode
+      Wire.beginTransmission(OLED_address); // begin transmitting
+      Wire.setClock(I2CCLOCK);
+      Wire.write(0x40);//data mode
       for(int i=0;i<8;i++){
           int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
           Wire.write(ril);
       }
-      //Wire.endTransmission(); // stop transmitting
+      Wire.endTransmission(); // stop transmitting
       Xl++;    
       stringL++;
     }
-    Wire.endTransmission(); // stop transmitting
-          
+    
     #if defined(OLED1106_1_3)
       setXY (Xh,Y+1);
     #else
       setXY (Xh,Y+1);    
-    #endif
-
-    Wire.beginTransmission(OLED_address); // begin transmitting
-    Wire.setClock(I2CCLOCK);
-    Wire.write(0x40);//data mode            
+    #endif     
     while(*stringH){      
       //setXY (Xh,Y+1);      
-    //  Wire.beginTransmission(OLED_address); // begin transmitting
-    //  Wire.setClock(I2CCLOCK);
-    //  Wire.write(0x40);//data mode          
+      Wire.beginTransmission(OLED_address); // begin transmitting
+      Wire.setClock(I2CCLOCK);
+      Wire.write(0x40);//data mode          
       for(int i=0;i<8;i++){
           int rih=(pgm_read_byte(myFont[*stringH-0x20]+i+8));
           Wire.write(rih);          
       }
-      //Wire.endTransmission(); // stop transmitting      
+      Wire.endTransmission(); // stop transmitting      
       Xh++;    
       stringH++;
     }
-    Wire.endTransmission(); // stop transmitting
-           
-    #endif  
+    
+    #endif    
     }
     //==========================================================//
 
