@@ -121,13 +121,20 @@ TimerCounter timer(2);
   uint8_t SpecialChar [8]= { 0x00, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00, 0x00 };
   #define SCREENSIZE 16  
 #elif defined(OLED1306)
-  #ifdef Use_SoftWire
+  #if defined(Use_SoftWire) && defined(__AVR_ATmega2560__) 
+    #define SDA_PORT PORTD
+    #define SDA_PIN 1 
+    #define SCL_PORT PORTD
+    #define SCL_PIN 0 
+    #include <SoftWire.h>
+    SoftWire Wire = SoftWire();
+  #elif defined(Use_SoftWire) && not defined(__AVR_ATmega2560__) 
     #define SDA_PORT PORTC
     #define SDA_PIN 4 
     #define SCL_PORT PORTC
     #define SCL_PIN 5 
     #include <SoftWire.h>
-    SoftWire Wire = SoftWire(); 
+    SoftWire Wire = SoftWire();     
   #else
     #include <Wire.h>
   #endif

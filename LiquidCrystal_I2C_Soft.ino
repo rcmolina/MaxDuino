@@ -23,15 +23,22 @@ inline void LiquidCrystal_I2C::write(uint8_t value) {
 
 #endif
 
-#ifdef Use_SoftWire
-    #define SDA_PORT PORTC
-    #define SDA_PIN 4 
-    #define SCL_PORT PORTC
-    #define SCL_PIN 5 
-    #include <SoftWire.h>
-    SoftWire Wire = SoftWire();
+#if defined(Use_SoftWire) && defined(__AVR_ATmega2560__)
+  #define SDA_PORT PORTD
+  #define SDA_PIN 1 
+  #define SCL_PORT PORTD
+  #define SCL_PIN 0 
+  #include <SoftWire.h>
+  SoftWire Wire = SoftWire();
+#elif defined(Use_SoftWire) && not defined(__AVR_ATmega2560__)
+  #define SDA_PORT PORTC
+  #define SDA_PIN 4 
+  #define SCL_PORT PORTC
+  #define SCL_PIN 5 
+  #include <SoftWire.h>
+  SoftWire Wire = SoftWire();     
 #else
- #include "Wire.h"
+  #include <Wire.h>
 #endif
 
 // When the display powers up, it is configured as follows:
