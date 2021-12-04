@@ -1,7 +1,7 @@
 
 # maxduino
 
-https://www.va-de-retro.com/foros/viewtopic.php?t=5541&start=9999
+https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 * V1.73 aka "Christmas21 edition". Better config frontend, some adjustments in hwconfig.h
 * V1.72 New suboption XY2shadedplay for XY2. Softwire working with both OLED and LCD to save extra 550 bytes,I2C can be configured in fastmode for better performance.
 * V1.71 aka "Clive". Better Blockmode: when menu pressed in pause mode, jump 20 blocks with REW or FF
