@@ -134,7 +134,7 @@
  //               V1.72 New suboption XY2shadedplay for XY2. Softwire working with both OLED and LCD to save extra 550 bytes, 
  //                     I2C can be configured in fastmode for better performance. 
  //               V1.73 aka "Christmas21 edition". Better config frontend, some adjustments in hwconfig.h
- //               V1.74 aka "Christmas21 Eve". Use SoftI2CMaster instead of Softwire to save more space, new adjusted configs.
+ //               V1.74 aka "Christmas21 Eve". Used SoftI2CMaster instead of Softwire to save more space, new adjusted configs.
  //
 #include <EEPROM.h>
 
