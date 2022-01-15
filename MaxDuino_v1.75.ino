@@ -2161,11 +2161,18 @@ void GetAndPlayBlock()
    #ifdef BLOCKID_NOMEM_SEARCH 
       //block=1; //forcing block number for debugging
       
+      unsigned long oldbytesRead;           //TAP
       bytesRead=0;                          //TAP 
       if (currentID!=TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
 
-      int i=1;
+      //int i=0;
+      #ifdef BLKBIGSIZE
+        int i = 0;
+      #else
+        byte i = 0;
+      #endif      
       while (i<= block) {
+        oldbytesRead = bytesRead;
         //if (currentID!=TAP) if(ReadByte(bytesRead)==1) currentID = outByte;  //TZX with blocks GETID
         if(ReadByte(bytesRead)==1){
           if (currentID!=TAP) currentID = outByte;  //TZX with blocks GETID
@@ -2204,14 +2211,14 @@ void GetAndPlayBlock()
           case ID20:  bytesRead+=2;
                       break;
           case ID21:  if(ReadByte(bytesRead)==1) bytesRead += outByte;
-                      //#if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
-                      //  i++;
-                      //#endif          
-                      break;
-          case ID22:  
                       #if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
                         i++;
                       #endif          
+                      break;
+          case ID22:  
+                      //#if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
+                      //  i++;
+                      //#endif          
                       break;
           case ID24:  bytesRead+=2;
                       break;                                                                                
@@ -2253,7 +2260,8 @@ void GetAndPlayBlock()
       //ltoa(bytesRead,PlayBytes,16);printtext(PlayBytes,lineaxy);
               
    #endif   
-   
+
+   bytesRead= oldbytesRead;
    if (currentID==TAP) currentTask=PROCESSID;
    else {
     currentTask=GETID;    //Get new TZX Block
