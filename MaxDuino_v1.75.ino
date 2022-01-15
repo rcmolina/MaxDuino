@@ -2204,11 +2204,14 @@ void GetAndPlayBlock()
           case ID20:  bytesRead+=2;
                       break;
           case ID21:  if(ReadByte(bytesRead)==1) bytesRead += outByte;
+                      //#if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
+                      //  i++;
+                      //#endif          
+                      break;
+          case ID22:  
                       #if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
                         i++;
                       #endif          
-                      break;
-          case ID22:
                       break;
           case ID24:  bytesRead+=2;
                       break;                                                                                
