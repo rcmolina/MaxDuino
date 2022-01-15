@@ -2,6 +2,7 @@
 # maxduino
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
+* V1.75 New option to handle more than 255 block in Blockmode if needed. Decrease block count in Blockmode to skip some blocks thus matching live oled block count.
 * V1.74 aka "Christmas21 Eve". Used SoftI2CMaster instead of Softwire to save more space, new adjusted configs.
 * V1.73 aka "Christmas21 edition". Better config frontend, some adjustments in hwconfig.h
 * V1.72 New suboption XY2shadedplay for XY2. Softwire working with both OLED and LCD to save extra 550 bytes,I2C can be configured in fastmode for better performance.
