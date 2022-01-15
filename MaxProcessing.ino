@@ -775,7 +775,7 @@ void TZXProcess() {
           //Process ID19 - Generalized data block
           switch (currentBlockTask) {
             case READPARAM:
-        #ifdef ID19REW      
+        #ifdef BLOCKID19_IN      
               #ifdef BLOCKID_INTO_MEM
                     blockOffset[block%maxblock] = bytesRead;
                     blockID[block%maxblock] = currentID;
@@ -789,7 +789,7 @@ void TZXProcess() {
                       EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
                     #endif                   
               #endif
-        //#ifdef ID19REW                
+        //#ifdef BLOCKID19_IN                
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
                       setXY(7,2);
@@ -831,19 +831,19 @@ void TZXProcess() {
               #endif   
         #endif
               if(r=ReadDword(bytesRead)==4) {
-                #ifdef ID19REW
+                #ifdef BLOCKID19_IN
                   bytesToRead = outLong;
                 #endif
               }
               if(r=ReadWord(bytesRead)==2) {
                 //Pause after this block in milliseconds
                 pauseLength = outWord;
-                #ifdef ID19REW
+                #ifdef BLOCKID19_IN
                   //bytesToRead += -2;
                 #endif              
               }
               bytesRead += 86 ;  // skip until DataStream filename
-              #ifdef ID19REW
+              #ifdef BLOCKID19_IN
                 //bytesToRead += -86 ; // skip SYMDEF bytes inside block ID                       
                 bytesToRead += -88 ;    // pauseLength + SYMDEFs
               #endif
@@ -1839,7 +1839,7 @@ void ZX8081DataBlock() {
   if(currentBit==0) {                         //Check for byte end/first byte
     if(r=ReadByte(bytesRead)==1) {            //Read in a byte
       currentByte = outByte;
-    #ifdef ID19REW        
+    #ifdef BLOCKID19_IN        
         bytesToRead += -1;
         if((bytesToRead == -1) && (currentID == ID19)) {    
           bytesRead += -1;                      //rewind a byte if we've reached the end

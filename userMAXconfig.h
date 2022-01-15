@@ -7,7 +7,6 @@
 #define MenuBLK2A
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
-#define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
 #define tapORIC
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
@@ -94,6 +93,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 //#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
 #define BLOCKID_NOMEM_SEARCH          // Loop and search for a block
 #define maxblock 99                   // maxblock if not using EEPROM
+#define BLOCKID19_IN                  // trace id19 block for zx81 .tzx to be rewinded
 #define BLOCKID21_IN
 #define BLOCKTAP_IN
 #define OLEDPRINTBLOCK 

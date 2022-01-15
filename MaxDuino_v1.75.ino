@@ -2197,7 +2197,7 @@ void GetAndPlayBlock()
                       if(ReadLong(bytesRead)==3) bytesRead += outLong; 
                       break;
           case ID19:  if(ReadDword(bytesRead)==4) bytesRead += outLong;
-                      #if defined(OLEDBLKMATCH)
+                      #if defined(OLEDBLKMATCH) //&& defined(BLOCKID19_IN)
                         i++;
                       #endif          
                       break;                      
