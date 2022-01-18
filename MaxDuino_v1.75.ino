@@ -963,7 +963,7 @@ void loop(void) {
        #if defined(BLOCKID_NOMEM_SEARCH)
          //oldMinBlock = 0;
          //oldMaxBlock = 99;
-         if ((block -jblks) > 0) block=block-jblks;
+         if (block > jblks) block=block-jblks;
          else block = 0;
        #endif        
 /*    

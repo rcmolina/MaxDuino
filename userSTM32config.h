@@ -87,7 +87,7 @@ byte lineaxy=2;
 #define BLKSJUMPwithROOT            // use menu button in pause mode to switch blocks to jump
 #define BM_BLKSJUMP 20               // when menu pressed in pause mode, how may blocks to jump with REW OR FF
 #define BLKBIGSIZE                   // max number of block > 255
-//#define OLEDBLKMATCH               // Match block numbers with REW/FF
+#define OLEDBLKMATCH               // Match block numbers with REW/FF
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
