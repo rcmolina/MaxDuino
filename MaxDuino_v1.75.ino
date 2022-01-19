@@ -2172,9 +2172,10 @@ void GetAndPlayBlock()
         byte i = 0;
       #endif      
       while (i<= block) {
-        oldbytesRead = bytesRead;
+
         //if (currentID!=TAP) if(ReadByte(bytesRead)==1) currentID = outByte;  //TZX with blocks GETID
         if(ReadByte(bytesRead)==1){
+          oldbytesRead = bytesRead-1;
           if (currentID!=TAP) currentID = outByte;  //TZX with blocks GETID
           if (currentID==TAP) bytesRead--;
         }
