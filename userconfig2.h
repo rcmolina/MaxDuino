@@ -97,7 +97,7 @@ byte lineaxy=2;
 #define BLOCKID_NOMEM_SEARCH          // Loop and search for a block
 #define maxblock 19                   // maxblock if not using EEPROM
 //#define BLOCKID19_IN                // trace id19 block for zx81 .tzx to be rewinded
-//#define BLOCKID21_IN
+#define BLOCKID21_IN
 #define BLOCKTAP_IN
 #define OLEDPRINTBLOCK 
 #define BLOCK_EEPROM_START 512
