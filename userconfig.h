@@ -30,7 +30,7 @@
 #elif CONFIGFILE == 6
 #include "userconfig6.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*  7:OLD BOOTLOADER 30720, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, NO Use_UEF_c104, OLEDBLKMATCH */
+/*  7:OLD BOOTLOADER 30720, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, NO Use_UEF_c117, OLEDBLKMATCH */
 #elif CONFIGFILE == 7
 #include "userconfig7.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
