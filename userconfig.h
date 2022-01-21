@@ -3,11 +3,15 @@
 //////////////////////          FAST CONFIG FRONT-END FOR CLASSIC ARDUINO NANO OR PRO MINI         ////////////////////////
 //***********************************************************************************************************************//
 #ifndef CONFIGFILE
-#define CONFIGFILE 1
+#define CONFIGFILE 0
 #endif
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*   0:OLD BOOTLOADER 30720, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO MenuBLK2A, OLEDBLKMATCH, BLKBIGSIZE   */
+#if CONFIGFILE == 0
+#include "userconfig0.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*  1:OLD BOOTLOADER 30720, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, AYPLAY, NO MenuBLK2A, NO Use_Dragon_sLeader, NO Use_hqUEF  */
-#if CONFIGFILE == 1
+#elif CONFIGFILE == 1
 #include "userconfig1.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*             2:OPTIBOOT BOOTLOADER 32256, OLED1106_1_3, 1,3", SoftI2CMaster, I2CFAST, XY2, XY2force, AYPLAY            */
@@ -29,8 +33,8 @@
 /*                    6:PRO MICRO 28672, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO Use_CAS                    */
 #elif CONFIGFILE == 6
 #include "userconfig6.h"
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*  7:OLD BOOTLOADER 30720, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, NO Use_UEF_c117, OLEDBLKMATCH */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*  7:OLD /BOOTLOADER 30720, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, NO Use_UEF_c117, OLEDBLKMATCH */
 #elif CONFIGFILE == 7
 #include "userconfig7.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
