@@ -39,8 +39,15 @@ void checkForEXT (char *filename) {
       if (ch1 == 0x55) {out=HIGH;dragonMode=1;period=249;count=255;}
     #endif    
   }
+  bytesRead=0;
+  currentType=typeNothing;
+  currentTask=lookHeader;
+  fileStage=0;
+  //noInterrupts();
+//  clearBuffer();
+  isStopped=false;
+  //interrupts();              
  #endif 
-
 }
 
 
