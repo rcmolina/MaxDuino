@@ -33,14 +33,15 @@ void UniPlay(char *filename){
     blockID[i] = 0;
   }
 */
-
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
   bytesRead=0;                                //start of file
   currentTask=GETFILEHEADER;                  //First task: search for header
-  checkForEXT (filename);
- #ifdef ID11CDTspeedup
   char x =0;
   while (*(filename+x) && (*(filename+x) != '.')) x++;
+  checkForEXT (filename+x);    
+ #ifdef ID11CDTspeedup  
+  //char x =0;
+  //while (*(filename+x) && (*(filename+x) != '.')) x++;
   if (!strcasecmp_P(filename + x, PSTR(".cdt"))) AMScdt = 1;
   else  AMScdt = 0;
  #endif   
@@ -69,6 +70,12 @@ void UniPlay(char *filename){
 //    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
   }
   else {
+    bytesRead=0;currentType=typeNothing;currentTask=lookHeader;fileStage=0;
+    //noInterrupts();
+    clearBuffer();
+    isStopped=false;
+    //interrupts(); 
+    
     #if defined(__AVR__)
       Timer1.initialize(period);
       Timer1.attachInterrupt(wave);
@@ -79,7 +86,8 @@ void UniPlay(char *filename){
       timer.resume();   
     #endif        
   }
-#else
+#endif
+#ifndef Use_CAS
     currentBlockTask = READPARAM;               //First block task is to read in parameters
     clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
     isStopped=false;

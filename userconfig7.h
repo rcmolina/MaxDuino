@@ -12,7 +12,7 @@
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
-        //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
+        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
             //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
@@ -34,11 +34,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
-int BAUDRATE = 3600;
+int BAUDRATE = 3850;
 byte scale = 2;                         // 1 for BAUDRATE 1200
-int period = 70;                        // 208 for BAUDRATE=1200
-byte mselectMask = 1;                   // Motor control state 1=on 0=off
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 1;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+int period = 68;                        // 208 for BAUDRATE=1200
+byte mselectMask = 0;                   // Motor control state 1=on 0=off
+byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
 byte skip2A = 0;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,10 +100,10 @@ byte lineaxy=2;
 //#define BLOCKID15_IN
 //#define BLOCKID19_IN                // trace id19 block for zx81 .tzx to be rewinded
 //#define BLOCKID21_IN
-//#define BLOCKTAP_IN
+#define BLOCKTAP_IN
 #define OLEDPRINTBLOCK 
 #define BLOCK_EEPROM_START 512
-#define LOAD_EEPROM_SETTINGS
+//#define LOAD_EEPROM_SETTINGS
 #define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
 #define OSTATUSLINE
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ byte lineaxy=2;
 //#define EEPROM_LOGO_COMPRESS
 //#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-#define LOAD_EEPROM_LOGO 
+//#define LOAD_EEPROM_LOGO 
 
 #if defined(OLED1306_128_64) || defined(video64text32)
   //#define EmptyLogo               // to erase
