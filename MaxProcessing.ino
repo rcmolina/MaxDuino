@@ -33,15 +33,14 @@ void UniPlay(char *filename){
     blockID[i] = 0;
   }
 */
+
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
   bytesRead=0;                                //start of file
   currentTask=GETFILEHEADER;                  //First task: search for header
+  checkForEXT (filename);
+ #ifdef ID11CDTspeedup  
   char x =0;
   while (*(filename+x) && (*(filename+x) != '.')) x++;
-  checkForEXT (filename+x);    
- #ifdef ID11CDTspeedup  
-  //char x =0;
-  //while (*(filename+x) && (*(filename+x) != '.')) x++;
   if (!strcasecmp_P(filename + x, PSTR(".cdt"))) AMScdt = 1;
   else  AMScdt = 0;
  #endif   
@@ -74,8 +73,7 @@ void UniPlay(char *filename){
     //noInterrupts();
     clearBuffer();
     isStopped=false;
-    //interrupts(); 
-    
+    //interrupts();       
     #if defined(__AVR__)
       Timer1.initialize(period);
       Timer1.attachInterrupt(wave);
@@ -86,8 +84,7 @@ void UniPlay(char *filename){
       timer.resume();   
     #endif        
   }
-#endif
-#ifndef Use_CAS
+#else
     currentBlockTask = READPARAM;               //First block task is to read in parameters
     clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
     isStopped=false;
@@ -659,8 +656,8 @@ void TZXProcess() {
               #endif
               #if defined(BLOCKID_NOMEM_SEARCH) 
                 block++;
-              #endif             
-
+              #endif 
+                          
           #if not defined(ID11CDTspeedup)
               if(r=ReadWord(bytesRead)==2) {
                 pilotLength = TickToUs(outWord);
@@ -721,6 +718,7 @@ void TZXProcess() {
               }
             }    
           #endif
+                           
               if(r=ReadWord(bytesRead)==2) {
                 pilotPulses = outWord;
               }
@@ -798,62 +796,6 @@ void TZXProcess() {
         case ID15:
           //process ID15 - Direct Recording          
           if(currentBlockTask==READPARAM) {
-      #ifdef BLOCKID15_IN   
-          #ifdef BLOCKID_INTO_MEM
-              blockOffset[block%maxblock] = bytesRead;
-              blockID[block%maxblock] = currentID;
-          #endif
-          #ifdef BLOCK_EEPROM_PUT
-            #if defined(__AVR__)
-              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-            #elif defined(__arm__) && defined(__STM32F1__)
-              EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-              EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
-            #endif                
-          #endif
-     
-          #if defined(OLED1306) && defined(OLEDPRINTBLOCK) 
-                #ifdef XY
-                  setXY(7,2);
-                  sendChar('1');sendChar('5');
-                  setXY(14,2);
-              //    if (block == 0) sendChar('0');
-              //    if (block == 10) sendChar('1');
-                  if ((block%10) == 0) sendChar(48+(block/10)%10);  
-                  setXY(15,2);
-                  sendChar(48+block%10);   
-                #endif
-                #if defined(XY2) && not defined(OLED1306_128_64)
-                  setXY(9,1);sendChar('1');sendChar('5');                    
-                  setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
-                  setXY(13,1);sendChar(48+block%10);
-                #endif
-                #if defined(XY2) && defined(OLED1306_128_64)
-                  #ifdef XY2force
-                    sendStrXY("15",7,4);
-                    if ((block%10) == 0) {itoa((block/10)%10,(char *)input,10);sendStrXY((char *)input,14,4);}
-                    //itoa(block%10,input,10);sendStrXY(input,15,4);
-                    input[0]=48+block%10;input[1]=0;sendStrXY((char *)input,15,4);
-                  #else                      
-                    setXY(7,4);sendChar('1');sendChar('5');
-                    setXY(14,4);if ((block%10) == 0) sendChar(48+(block/10)%10);
-                    setXY(15,4);sendChar(48+block%10);
-                  #endif
-                #endif                    
-          #endif
-          #if defined(BLOCKID_INTO_MEM)
-            if (block < maxblock) block++;
-            else block = 0;
-          #endif
-          #if defined(BLOCK_EEPROM_PUT) 
-            if (block < 99) block++;
-            else block = 0; 
-          #endif
-          #if defined(BLOCKID_NOMEM_SEARCH) 
-            block++;
-          #endif         
-      #endif    
             if(r=ReadWord(bytesRead)==2) {     
               //Number of T-states per sample (bit of data) 79 or 158 - 22.6757uS for 44.1KHz
               //SampleLength = TickToUs(outWord) + TickToUs(outWord)/9;
