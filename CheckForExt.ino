@@ -1,18 +1,15 @@
 
 void checkForEXT (char *filename) {
     //Check for .xxx file extension as these have no header
-  char x =0;
+  char x =0,ch1;
   while (*(filename+x) && (*(filename+x) != '.')) x++;
   //if(strstr_P(strlwr(filename + x), PSTR(".tap"))) {
   if (!strcasecmp_P(filename + x, PSTR(".tap"))) {
   //if (strcasestr_P(filename, PSTR(".tap"))) {    
     casduino =0; currentTask=PROCESSID; currentID=TAP;
     #ifdef tapORIC
-      if((readfile(1,bytesRead))==1) {
-         if (input[0] == 0x16) {
-            currentID=ORIC;
-         }
-      }
+       entry.read(ch1,bytesRead);
+       if (ch1 == 0x16) {currentID=ORIC;}
     #endif
   }
   //else if(strstr_P(strlwr(filename + x), PSTR(".p"))) {casduino =0; currentTask=PROCESSID; currentID=ZXP;}
@@ -35,30 +32,15 @@ void checkForEXT (char *filename) {
   //else if(strstr_P(strlwr(filename + x), PSTR(".cas"))) {
   else if (!strcasecmp_P(filename + x, PSTR(".cas"))) {
   //else if (strcasestr_P(filename, PSTR(".cas"))) {    
-    casduino =1; 
-    out=LOW;
-    dragonMode=0;
-    if((readfile(1,bytesRead))==1) {
-      #if defined(Use_CAS) && defined(Use_DRAGON)
-        //if(!memcmp_P(input,DRAGON,1)) {
-        if (input[0] == 0x55) {
-          out=HIGH;
-          dragonMode=1;
-          period=249;
-          count=255;
-        }
-      #endif
-    }
-    bytesRead=0;
-    currentType=typeNothing;
-    currentTask=lookHeader;
-    fileStage=0;
-    //noInterrupts();
-    clearBuffer();
-    isStopped=false;
-    //interrupts();            
+    casduino =1; out=LOW;dragonMode=0;
+    #if defined(Use_CAS) && defined(Use_DRAGON)
+      //if(!memcmp_P(input,DRAGON,1)) {
+      entry.read(ch1,bytesRead);
+      if (ch1 == 0x55) {out=HIGH;dragonMode=1;period=249;count=255;}
+    #endif    
   }
- #endif
+ #endif 
 
 }
+
 
