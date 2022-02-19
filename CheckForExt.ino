@@ -51,7 +51,7 @@ void checkForEXT (char *filename) {
     currentTask=lookHeader;
     fileStage=0;
     //noInterrupts();
-//    clearBuffer();
+    clearBuffer();
     isStopped=false;
     //interrupts();            
   }
