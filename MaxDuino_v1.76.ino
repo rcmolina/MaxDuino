@@ -137,6 +137,8 @@
  //               V1.74 aka "Christmas21 Eve". Used SoftI2CMaster instead of Softwire to save more space, new adjusted configs.
  //               V1.75 New option to handle more than 255 block in Blockmode if needed. Decrease block count in Blockmode
  //                     to skip some blocks thus matching live oled block count.
+ //               V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly 
+ //                     for Amstrad CPC ID11 blocks (like TSXControl).
  //
 #include <EEPROM.h>
 
