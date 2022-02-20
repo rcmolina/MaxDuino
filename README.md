@@ -1,3 +1,4 @@
+
 # maxduino
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
@@ -28,7 +29,7 @@ so Oricium game now can load in 4 minutes in Oric Atmos, file attached for testi
 * V1.53 Some rework for Arduino nano every and timers TCA / TCB0 and using last SDFat for better speed.
 * V1.52 New arduino nano EVERY micro supported. Need work for turbo loading. Compressed logo where only even columns are used for load/save with EEPROM. Different config files for new high capacity chips (Riccardo Repetto).
 * V1.51 Dragon TOSEC files with short leader loading now.
-* V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schrï¿½der).
+* V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
 * V1.49 ID15 adjustment for slow Amstrad musical loaders.
 * V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es). Remove warnings when compilation from IDE (@llopis).
 * V1.47 Optional BLOCKID_INTO_MEM if loading many turbo short blocks. BLOCK_EEPROM_PUT must be disabled when loading Amstrad cpc Breaking Baud demo. Bug fixed: block counter should not be incremented when pausing. 
