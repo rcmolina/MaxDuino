@@ -6,10 +6,9 @@
 
 //#define buffsize            219
 //#define dragonBuff          4
-#define buffsize            208  // Impar para CoCo
-#define dragonBuff          1     // Ajuste para que wbuffer sea divisible entre 8: (208+1-1)/8
-
-
+/* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
+#define buffsize            207  // Impar para CoCo
+#define dragonBuff          0     // Ajuste para que wbuffer sea divisible entre 8: (207+1-0)/8
 
 /* Header Definitions */
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
