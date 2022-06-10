@@ -104,17 +104,9 @@ TimerCounter timer(2);
 #endif
 
 #ifdef SDFat
-  #include <SdFat.h>
+#include <SdFat.h>
 #else
-  #include <SD.h>
-  #define SdFile File
-  #define SdFat SDClass
-  #define chdir open
-  #define openNext openNextFile
-  #define isDir() isDirectory()
-  #define fileSize size
-  #define seekSet seek
-  File cwdentry;
+#error No longer have support for SD.h  .  Use SDFat.
 #endif
 
 #define scrollSpeed   250           //text scroll delay
@@ -203,5 +195,3 @@ TimerCounter timer(2);
 #else
   #define SCREENSIZE 16
 #endif
-
-
