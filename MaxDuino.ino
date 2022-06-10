@@ -160,11 +160,11 @@ char fline[17];
 SdFat sd;
 SdBaseFile entry, currentDir, tmpdir;
 
-#define filenameLength 88
+#define filenameLength 256
 
 char fileName[filenameLength + 1];     //Current filename
 unsigned int fileNameLen;
-#define nMaxPrevSubDirs 3
+#define nMaxPrevSubDirs 10
 char prevSubDir[SCREENSIZE+1];
 uint16_t DirFilePos[nMaxPrevSubDirs];  //File Positions in Directory to be restored (also, history of subdirectories)
 byte subdir = 0;
