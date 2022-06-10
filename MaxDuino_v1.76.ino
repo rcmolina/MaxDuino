@@ -158,7 +158,7 @@
 char fline[17];
 
 SdFat sd;                           //Initialise Sd card 
-SdFile entry;                       //SD card file
+SdBaseFile entry;                       //SD card file
 
 #define subdirLength     22         // hasta 62 no incrementa el consumo de RAM
 #define filenameLength   4*subdirLength  //Maximum length for scrolling filename, hasta 255 no incrementa consumo RAM
@@ -2337,5 +2337,3 @@ switch(subdir){
 
 #endif
 }
-
-
