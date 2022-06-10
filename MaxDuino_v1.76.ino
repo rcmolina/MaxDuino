@@ -447,7 +447,7 @@ void loop(void) {
             #endif
             #ifdef OLED1306
               setXY(0,0); 
-              //sendStr((unsigned char *)("Paused "));
+              //sendStr("Paused ");
               char x = 0;
               while (char ch=pgm_read_byte(PSTR("Paused  ")+x)) {
                 sendChar(ch);
@@ -473,7 +473,7 @@ void loop(void) {
             #endif
             #ifdef OLED1306
               setXY(0,0); 
-              //sendStr((unsigned char *)("Playing"));
+              //sendStr("Playing");
               char x = 0;
               while (char ch=pgm_read_byte(PSTR("Playing ")+x)) {
                 sendChar(ch);
@@ -533,7 +533,7 @@ void loop(void) {
           #ifdef OLED1306
             //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000); sendStrXY(PlayBytes,0,0);
             if (currpct <100) {                         
-              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));setXY (8,0);sendStr((unsigned char *)(PlayBytes));
+              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));setXY (8,0);sendStr(PlayBytes);
             } else {                          // Block number must me printed after REW
                 setXY(14,2);
                 sendChar(48+(block)/10);
@@ -571,7 +571,7 @@ void loop(void) {
             #endif                 
                               
             setXY(13,0);
-            sendStr((unsigned char *)(PlayBytes));
+            sendStr(PlayBytes);
 
         //    if (currpct==100){
         //      setXY(14,2);
@@ -702,15 +702,15 @@ void loop(void) {
           char len=0;
           setXY(0,0);
           //sendStr(itoa(oldMinFile,input,10));sendChar('<');
-          //itoa(oldMinFile,input,10); sendStr(input);sendChar('<'); len += strlen(input) + 1;
+          //itoa(oldMinFile,input,10); sendStr((char *)input);sendChar('<'); len += strlen(input) + 1;
           sendStr(itoa(oldMinFile,input,10));sendChar('<');len += strlen(input) + 1;
           
           //sendStr(itoa(currentFile,input,10));sendChar('<');
-          //itoa(currentFile,input,10); sendStr(input);sendChar('<'); len += strlen(input) + 1;
+          //itoa(currentFile,input,10); sendStr((char *)input);sendChar('<'); len += strlen(input) + 1;
           sendStr(itoa(currentFile,input,10));sendChar('<'); len += strlen(input) + 1;
                 
           //sendStr(itoa(oldMaxFile,input,10));
-          //itoa(oldMaxFile,input,10); sendStr(input);  len += strlen(input);
+          //itoa(oldMaxFile,input,10); sendStr((char *)input);  len += strlen(input);
           sendStr(itoa(oldMaxFile,input,10)); len += strlen(input);                   
           //const char len=strlen(itoa(oldMinFile,input,10)) + 1 + strlen(itoa(currentFile,input,10)) + 1 + strlen(itoa(oldMaxFile,input,10));
           for(char x=len;x<16;x++) sendChar(' ');                       
@@ -725,7 +725,7 @@ void loop(void) {
           
           setXY(0,0);
           sendStr(oldMinFileName);sendChar(' ');sendChar('<');
-          sendStr(input);sendChar('<');sendChar(' ');
+          sendStr((char *)input);sendChar('<');sendChar(' ');
           sendStr(oldMaxFileName);
            
         #endif
@@ -1268,7 +1268,7 @@ void loop(void) {
          #ifdef OLED1306
               #ifdef XY
                 setXY(0,0);
-                sendStr((unsigned char *)"PAUSED ");
+                sendStr("PAUSED ");
               #endif
               #ifdef XY2
                 sendStrXY("PAUSED ",0,0);
@@ -1294,7 +1294,7 @@ void loop(void) {
          #ifdef OLED1306
               #ifdef XY
                 setXY(0,0);
-                sendStr((unsigned char *)"PLAYing");
+                sendStr("PLAYing");
               #endif
               #ifdef XY2
                 sendStrXY("PLAYing",0,0);
@@ -1954,29 +1954,29 @@ void printtext(char* text, int l) {  //Print text to screen.
 void OledStatusLine() {
   #ifdef XY
     setXY(4,2);
-    sendStr((unsigned char*)"ID:   BLK:");
+    sendStr("ID:   BLK:");
  //   setXY(11,2);
  //   sendStr("BLK:");
     #ifdef OLED1306_128_64
       setXY(0,7);
       //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
-      itoa(BAUDRATE,(char *)input,10);sendStr(input);
+      itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       setXY(5,7);
-      if(mselectMask==1) sendStr((unsigned char *)" M:ON");
-      else sendStr((unsigned char *)"m:off");    
+      if(mselectMask==1) sendStr(" M:ON");
+      else sendStr("m:off");    
       setXY(11,7); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr((unsigned char *)" %^ON");
-      else sendStr((unsigned char *)"%^off");    
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
+      else sendStr("%^off");    
     #else
       setXY(0,3);
       //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
-      itoa(BAUDRATE,(char *)input,10);sendStr(input);
+      itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       setXY(5,3);
-      if(mselectMask==1) sendStr((unsigned char *)" M:ON");
-      else sendStr((unsigned char *)"m:off");    
+      if(mselectMask==1) sendStr(" M:ON");
+      else sendStr("m:off");    
       setXY(11,3); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr((unsigned char *)" %^ON");
-      else sendStr((unsigned char *)"%^off");
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
+      else sendStr("%^off");
     #endif
   #endif
   #ifdef XY2                        // Y with double value
@@ -2039,7 +2039,7 @@ void SetPlayBlock()
                 if (block < 100) sendStrXY((char *)input,10,0);
                 else sendStrXY((char *)input,11,0);
                 
-                //utoa(currentID,(char *)input,16);sendStrXY((unsigned char *)strupr((char *)input),10,0); // Block ID en hex
+                //utoa(currentID,(char *)input,16);sendStrXY(strupr((char *)input),10,0); // Block ID en hex
                 //sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));
          
               //}          
@@ -2054,22 +2054,22 @@ void SetPlayBlock()
               else sendStr((char *)(input+1));
             #endif                           
               setXY(0,0);
-              sendStr((unsigned char *)"BLK:");
-              //input[0]=48+(block/10)%10;input[1]=48+block%10;input[2]=0;sendStr(input);
+              sendStr("BLK:");
+              //input[0]=48+(block/10)%10;input[1]=48+block%10;input[2]=0;sendStr((char *)input);
 
-              sendStr(input);//sendChar(' ');
+              sendStr((char *)input);//sendChar(' ');
               //if (bytesRead > 0){
             //    setXY(11,0);
-                sendStr((unsigned char *)" ID:");
+                sendStr(" ID:");
 
                 if (currentID/16 < 10) input[0]=48+currentID/16;
                 else input[0]=55+currentID/16;
                 if (currentID%16 < 10) input[1]=48+currentID%16;
                 else input[1]=55+currentID%16;
                                 
-                input[2]=0;sendStr(input);
+                input[2]=0;sendStr((char *)input);
                 
-                //utoa(currentID,(char *)input,16);sendStr((unsigned char *)strupr((char *)input)); // Block ID en hex
+                //utoa(currentID,(char *)input,16);sendStr(strupr((char *)input)); // Block ID en hex
          //       sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));
            
               //}
@@ -2337,5 +2337,3 @@ switch(subdir){
 
 #endif
 }
-
-
