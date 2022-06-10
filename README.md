@@ -4,6 +4,7 @@
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 * V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly for Amstrad CPC ID11 blocks (like TSXControl).
 A bunch of bugs solved: At last solved memory corruption problem when reconfiguring options due to wrong buffer overflow , also reoptimized size to free more space. Changed also logic for searching extension when reading file (thanks to David Hooper alias stripwax).
+Double font i2c_start syntax error (@alferboy).
 * V1.75 New option to handle more than 255 block in Blockmode if needed. Decrease block count in Blockmode to skip some blocks thus matching live oled block count.
 * V1.74 aka "Christmas21 Eve". Used SoftI2CMaster instead of Softwire to save more space, new adjusted configs.
 * V1.73 aka "Christmas21 edition". Better config frontend, some adjustments in hwconfig.h
