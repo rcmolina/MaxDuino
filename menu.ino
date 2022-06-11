@@ -2,8 +2,11 @@
 void menuMode()
  {
       //Return to root of the SD card.
-      changeDirRoot();
-      while(digitalRead(btnMselect)==LOW) {
+       sd.chdir(true);
+       getMaxFile();
+       currentFile=1;
+       seekFile(currentFile);  
+       while(digitalRead(btnMselect)==LOW) {
          //prevent button repeats by waiting until the button is released.
          delay(50);
        }
@@ -457,3 +460,4 @@ void checkLastButton()
         //  sendChar(lastbtn+'0');
   delay(50);
 }
+
