@@ -1638,12 +1638,12 @@ void TZXProcess() {
                   u8g.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
               } while( u8g.nextPage() ); */
               //printtextF(PSTR("ID? "),0);
-              //utoa(currentID,PlayBytes,16);setXY(4,0);sendStr((unsigned char *)PlayBytes);
+              //utoa(currentID,PlayBytes,16);setXY(4,0);sendStr(PlayBytes);
               //ltoa(bytesToRead,PlayBytes,16);strcat_P(PlayBytes,PSTR(" - L: "));printtext(PlayBytes,lineaxy);
 
               ltoa(bytesRead,PlayBytes,16);printtext(PlayBytes,lineaxy);
               //ltoa(bytesRead,PlayBytes,16);strcat_P(PlayBytes,PSTR(" - L: "));printtext(PlayBytes,lineaxy);
-              //utoa(loopCount,PlayBytes,10);setXY(10,lineaxy);sendStr((unsigned char *)PlayBytes);
+              //utoa(loopCount,PlayBytes,10);setXY(10,lineaxy);sendStr(PlayBytes);
 
           #endif 
           
@@ -2789,4 +2789,3 @@ void FlushBuffer(long newcount) {
       return;
     }  
 }
-

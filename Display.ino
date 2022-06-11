@@ -120,7 +120,7 @@
     }   
     //==========================================================//
     // Prints a string regardless the cursor position.
-    static void sendStr(unsigned char *string)
+    static void sendStr(const char *string)
     {
     unsigned char i=0;
     while(*string)
@@ -135,7 +135,7 @@
     //==========================================================//
     // Prints a string in coordinates X Y, being multiples of 8.
     // This means we have 16 COLS (0-15) and 8 ROWS (0-7).
-    static void sendStrXY( char *string, int X, int Y)
+    static void sendStrXY(const char *string, int X, int Y)
     {
     #ifdef XY
     setXY(X,Y);
@@ -155,7 +155,7 @@
     #if defined(XY2) && not defined(DoubleFont)
     
     int Xh=X, Xl=X;
-    char *stringL=string, *stringH=string;
+    const char *stringL=string, *stringH=string;
 
     #if defined(OLED1106_1_3)
       setXY(Xl,Y);
