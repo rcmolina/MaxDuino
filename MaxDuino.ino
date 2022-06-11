@@ -161,12 +161,14 @@ SdFat sd;                           //Initialise Sd card
 SdBaseFile entry;                       //SD card file
 
 #define subdirLength     22         // hasta 62 no incrementa el consumo de RAM
-#define filenameLength   4*subdirLength  //Maximum length for scrolling filename, hasta 255 no incrementa consumo RAM
+#define filenameLength   8*subdirLength  //Maximum length for scrolling filename, hasta 255 no incrementa consumo RAM
 
 char fileName[filenameLength + 1];    //Current filename
 char sfileName[13];                   //Short filename variable
-char prevSubDir[3][subdirLength];    // Subir a la EPROM ¿?
-int DirFilePos[3];                   //File Positios in Directory to be restored
+
+#define nMaxPrevSubDirs 6
+char prevSubDir[nMaxPrevSubDirs][subdirLength];    // Subir a la EPROM ¿?
+int DirFilePos[nMaxPrevSubDirs];                   //File Position in Directory to be restored
 byte subdir = 0;
 unsigned long filesize;             // filesize used for dimensioning AY files
 
