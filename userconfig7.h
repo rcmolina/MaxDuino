@@ -3,8 +3,8 @@
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
-//#define AYPLAY
-//#define MenuBLK2A
+#define AYPLAY
+#define MenuBLK2A
 #define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
