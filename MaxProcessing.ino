@@ -2510,11 +2510,21 @@ void writeHeader2() {
     hdrptr += 1;                   // increase header string vector pointer
     if(hdrptr<20) {                     //Read a byte until we reach end of tap header
       //currentByte = TAPHdr[hdrptr];
-       currentByte = pgm_read_byte(TAPHdr+hdrptr);     
-      if(hdrptr==13){                           // insert calculated block length minus LEN bytes
-            currentByte = lowByte(ayblklen-3);
+      currentByte = pgm_read_byte(TAPHdr+hdrptr);
+      if (hdrptr>=3 && hdrptr<=12) {
+         if (hdrptr-3 < strlen(fileName)) {
+            currentByte = fileName[hdrptr-3];
+            if (currentByte<0x20 || currentByte>0x7f) {
+              currentByte = '?';
+            }
+         } else {
+            currentByte = ' ';
+         }
+      }
+      else if(hdrptr==13){                           // insert calculated block length minus LEN bytes
+          currentByte = lowByte(ayblklen-3);
       } else if(hdrptr==14){
-            currentByte = highByte(ayblklen);
+          currentByte = highByte(ayblklen);
       }
       blkchksum = blkchksum ^ currentByte;    // Keep track of Chksum
     //}    
