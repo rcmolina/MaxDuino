@@ -1376,8 +1376,8 @@ void TZXProcess() {
          //   break;
             
             case PAUSE:
-              currentPeriod = PAUSELENGTH;
-              bitSet(currentPeriod, 15);
+              //currentPeriod = PAUSELENGTH;
+              //bitSet(currentPeriod, 15);
               currentBlockTask=PILOT;
               //if (currentID=ZXP)  currentBlockTask=PILOT;
               //else currentBlockTask=DATA;
@@ -1402,8 +1402,8 @@ void TZXProcess() {
          //   break;
                         
             case PAUSE:
-              currentPeriod = PAUSELENGTH;
-              bitSet(currentPeriod, 15);
+              //currentPeriod = PAUSELENGTH;
+              //bitSet(currentPeriod, 15);
               currentBlockTask=DATA;
             break; 
             
@@ -2425,7 +2425,7 @@ void wave2() {
       #endif
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
-        pinState = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
+        pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;
         workingPeriod = workingPeriod - 1; 
         if (bitRead(workingPeriod, 13)) {
           bitClear(workingPeriod,13);                       
