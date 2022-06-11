@@ -3,7 +3,7 @@
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
-11/06/2022: SdFat improvements. ZX:inject the real filename into the fake ay header + Refixed inversion for zx loading.
+11/06/2022: SdFat improvements. ZX:inject the real filename into the fake ay header + Refixed inversion for zx polarity loading.
 zx81:Removed initial pause from zx81 loading to avoid inversion problems.
 
 No more version Numbers due to collaborative new contributions for the project, so ROLLING VERSION now.
