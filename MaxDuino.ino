@@ -296,7 +296,7 @@ void setup() {
 //    return;
 //    delay(250);
 //  } 
-#ifdef SDFat
+
     while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
      //Start SD card and check it's working
       printtextF(PSTR("No SD Card"),0);
@@ -304,17 +304,7 @@ void setup() {
     //lcd.print(F("No SD Card"));
 //    return;
 //    delay(250);
-    }        
-#else
-    while (!SD.begin(chipSelect)) {
-     //Start SD card and check it's working
-      printtextF(PSTR("No SD Card"),0);
-    //lcd_clearline(0);
-    //lcd.print(F("No SD Card"));
-//    return;
-//    delay(250);
     }    
-#endif         
   
   //sd.chdir("/");                       //set SD to root directory
   UniSetup();                       //Setup TZX specific options
@@ -1403,29 +1393,19 @@ void seekFile(int pos) {
   if (REWIND==1) {  
     RewindSD();
     for(int i=1;i<=pos-1;i++) {
-#ifdef SDFat
+
       entry.openNext(entry.cwd(),O_READ);
       entry.close();
-#else
-      entry=cwdentry.openNextFile();
-      entry.close();
-#endif
+
     }
   }
 
   if (pos==1) {RewindSD();}
-#ifdef SDFat
+
   entry.openNext(entry.cwd(),O_READ);
   entry.getName(fileName,filenameLength);
   entry.getSFN(sfileName);
-#else
-  entry = cwdentry.openNextFile();
-  //entry.openNext(entry.cwd(),O_READ);
-  //entry.getName(fileName,filenameLength);
-  //entry.getSFN(sfileName); 
-  char* sfileName=entry.name();
-  char* fileName=sfileName;
-#endif
+
   filesize = entry.fileSize();
   #ifdef AYPLAY
   ayblklen = filesize + 3;  // add 3 file header, data byte and chksum byte to file length
@@ -1486,7 +1466,7 @@ void playFile() {
     //If selected file is a directory move into directory
     changeDir();
   } else {
-#ifdef SDFat
+
     if(entry.cwd()->exists(sfileName)) {
       printtextF(PSTR("Playing"),0);
       //printtext(PlayBytes,0);
@@ -1504,25 +1484,7 @@ void playFile() {
         #endif      
       start=1;       
     }    
-#else
-    if(SD.exists(sfileName)) {
-      printtextF(PSTR("Playing"),0);
-      //printtext(PlayBytes,0);
-      //lcd_clearline(0);
-      //lcd.print(PlayBytes);      
-      scrollPos=0;
-      pauseOn = 0;
-      scrollText(fileName);
-      currpct=100;
-      lcdsegs=0;
-      UniPlay(sfileName);           //Load using the short filename
-        #ifdef P8544
-          lcd.gotoRc(3,38);
-          lcd.bitmap(Play, 1, 6);
-        #endif      
-      start=1;       
-    }    
-#endif
+
       else {
       #ifdef LCDSCREEN16x2
         printtextF(PSTR("No File Selected"),1);
@@ -1543,7 +1505,6 @@ void playFile() {
 void getMaxFile() {    
   //gets the total files in the current directory and stores the number in maxFile
   
-#ifdef SDFat
   RewindSD();
   maxFile=0;
   while(entry.openNext(entry.cwd(),O_READ)) {
@@ -1551,16 +1512,7 @@ void getMaxFile() {
     entry.close();
     maxFile++;
   }
-#else
-  //RewindSD();
 
-  while(entry=cwdentry.openNextFile()) {
-    //entry.getName(fileName,filenameLength);
-    entry.close();
-    maxFile++;
-  }
-
-#endif
   oldMaxFile = maxFile;
   //entry.cwd()->rewind();
 }
@@ -2289,51 +2241,23 @@ void GetFileName (int pos)
 {
   RewindSD();
   for(int i=1;i<=pos-1;i++) {
-#ifdef SDFat
+
     entry.openNext(entry.cwd(),O_READ);
     entry.close();
-#else
-    entry = cwdentry.openNextFile();
-    entry.close();
-#endif
+
   }
   //if (pos==1) {entry.cwd()->rewind();}
-#ifdef SDFat
+
   entry.openNext(entry.cwd(),O_READ);
   entry.getName(fileName,filenameLength);
   //entry.getSFN(sfileName);
   entry.close();
   //scrollPos=0;
   //scrollText(fileName);
-#else
 
-  entry = cwdentry.openNextFile();
-  char* fileName=entry.name();
-  entry.close();
-#endif
 }
 
 void RewindSD()
 {
-#ifdef SDFat
   entry.cwd()->rewind();
-#else
-
-switch(subdir){
-        case 0:
-           strcat(fileName,"/");
-           break;
-        case 1:          
-           strcat(strcat(fileName,"/"),prevSubDir[0]);
-           break;
-        case 2:
-        default:
-           strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]);
-           break;        
-       }
-
-  cwdentry = SD.open(fileName);
-  //cwdentry.rewindDirectory();
-
-#endif
 }

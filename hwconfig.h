@@ -20,7 +20,6 @@
     //#error This chip does not support Softwire. Please undefine Use_SoftWire
   #endif  
   
-  #define SDFat
                           //
                           // PATCH PROCERURE NEEDED FOR NANO EVERY AND THINARY TO SWAP TIMERS AND AVOID HANGING
                           //
@@ -54,10 +53,8 @@
     #undef Use_SoftWire
   #endif
      
-  #define SDFat
   //#define TimerOne  
 #else  //__AVR_ATmega328P__
-  #define SDFat
   //#define TimerOne
 #endif
 
@@ -103,19 +100,9 @@ TimerCounter timer(2);
   #endif
 #endif
 
-#ifdef SDFat
-  #include <SdFat.h>
-#else
-  #include <SD.h>
-  #define SdFile File
-  #define SdFat SDClass
-  #define chdir open
-  #define openNext openNextFile
-  #define isDir() isDirectory()
-  #define fileSize size
-  #define seekSet seek
-  File cwdentry;
-#endif
+
+#include <SdFat.h>
+
 
 #define scrollSpeed   250           //text scroll delay
 #define scrollWait    3000          //Delay before scrolling starts
