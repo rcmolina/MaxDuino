@@ -2,6 +2,10 @@
 # maxduino
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
+
+11/06/2022: SdFat improvements
+
+No more version Numbers due to collaborative new contributions for the project, so ROLLING VERSION now.
 * V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly for Amstrad CPC ID11 blocks (like TSXControl).
 A bunch of bugs solved: At last solved memory corruption problem when reconfiguring options due to wrong buffer overflow , also reoptimized size to free more space. Changed also logic for searching extension when reading file (thanks to David Hooper alias stripwax).
 Double font i2c_start syntax error (@alferboy).
