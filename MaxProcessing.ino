@@ -14,15 +14,11 @@ void UniPlay(char *filename){
 //  #elif defined(__arm__) && defined(__STM32F1__)
 //    timer.pause();
 //  #endif
-#ifdef SDFat
+
   if(!entry.open(filename,O_READ)) {
   //  printtextF(PSTR("Error Opening File"),0);
   }
-#else
-  if(!SD.open(filename,O_READ)) {
-  //  printtextF(PSTR("Error Opening File"),0);
-  }
-#endif
+
   block=0;                                    // Initial block when starting
 //  currpct = 100;
 //  newpct = 0;
