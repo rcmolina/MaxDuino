@@ -1545,22 +1545,24 @@ void changeDir() {
     sd.chdir("/");
   } else {
      //if (subdir >0) entry.cwd()->getName(prevSubDir[subdir-1],filenameLength); // Antes de cambiar
-     DirFilePos[subdir] = currentFile;
-     sd.chdir(fileName);
-     if (strlen(fileName) > subdirLength) {
-      //entry.getSFN(sfileName);
-      strcpy(prevSubDir[subdir], sfileName);
-     }
-     else {
-      strcpy(prevSubDir[subdir], fileName);
-     }
-     
-     //entry.cwd()->getName(prevSubDir[subdir],filenameLength);
-     //entry.getSFN(sfileName);
-     //strcpy(prevSubDir[subdir], sfileName);
-     //strcpy(prevSubDir[subdir], fileName);
-     
-     subdir++;      
+     if (subdir < nMaxPrevSubDirs) {
+       DirFilePos[subdir] = currentFile;
+       sd.chdir(fileName);
+       if (strlen(fileName) > subdirLength) {
+        //entry.getSFN(sfileName);
+        strcpy(prevSubDir[subdir], sfileName);
+       }
+       else {
+        strcpy(prevSubDir[subdir], fileName);
+       }
+       
+       //entry.cwd()->getName(prevSubDir[subdir],filenameLength);
+       //entry.getSFN(sfileName);
+       //strcpy(prevSubDir[subdir], sfileName);
+       //strcpy(prevSubDir[subdir], fileName);
+       
+       subdir++;  
+     }    
   }
   getMaxFile();
 /*
