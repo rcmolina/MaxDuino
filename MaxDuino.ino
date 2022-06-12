@@ -814,10 +814,13 @@ void loop(void) {
               #endif
 
           #else             
-             subdir=0;
+             subdir=0;            
+             /*
              prevSubDir[0][0]='\0';
              prevSubDir[1][0]='\0';
              prevSubDir[2][0]='\0';
+             */
+             for(int i=0;i<nMaxPrevSubDirs;i++) prevSubDir[i][0]='\0';
              sd.chdir("/");
              getMaxFile();
              currentFile=1;
@@ -856,7 +859,17 @@ void loop(void) {
        #endif     
        fileName[0]='\0';
        subdir--;
-       prevSubDir[subdir][0]='\0';     
+       prevSubDir[subdir][0]='\0'; 
+
+       if (subdir==0)strcat(fileName,"/");
+       else {
+         for(int i=0;i<=subdir-1;i++) {
+          strcat(fileName,"/");
+          strcat(fileName,prevSubDir[i]);
+         }
+       }
+       sd.chdir(fileName);
+/*
        switch(subdir){
         case 0:
            //sprintf(fileName,"%s",prevSubDir[0]);
@@ -872,13 +885,14 @@ void loop(void) {
            subdir = 2;
            sd.chdir(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]));
            break;
-    /*   case 3:
+    //   case 3:
        //default:
            //sprintf(fileName,"%s%s/%s/%s",prevSubDir[0],prevSubDir[1],prevSubDir[2],prevSubDir[3]);
            //subdir = 3;
-           sd.chdir(strcat(strcat(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),"/"),prevSubDir[2]),true); 
-           break; */         
+        //   sd.chdir(strcat(strcat(strcat(strcat(strcat(strcat(fileName,"/"),prevSubDir[0]),"/"),prevSubDir[1]),"/"),prevSubDir[2]),true); 
+        //   break;        
        }
+*/
        //Return to prev Dir of the SD card.
        //sd.chdir(fileName,true);
        //sd.chdir("/CDT");       
