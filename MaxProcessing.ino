@@ -7,7 +7,7 @@ word TickToUs(word ticks) {
   return (word)((((long(ticks) << 2) + 7) >> 1) / 7);
 }
 
-void UniPlay(char *filename){
+void UniPlay(){
   setBaud();
 //  #if defined(__AVR__)
 //    Timer1.stop();                              //Stop timer interrupt
@@ -15,7 +15,9 @@ void UniPlay(char *filename){
 //    timer.pause();
 //  #endif
 
-  if(!entry.open(filename,O_READ)) {
+  // on entry, currentFile is already pointing to the file entry you want to play
+  // and fileName is already set
+  if(!entry.open(&currentDir, currentFile, O_RDONLY)) {
   //  printtextF(PSTR("Error Opening File"),0);
   }
 
@@ -36,7 +38,7 @@ void UniPlay(char *filename){
   //char x =0;
   //while (*(filename+x) && (*(filename+x) != '.')) x++;
   //checkForEXT (filename+x);
-  char *lastdotptr= strrchr(filename,'.');
+  char *lastdotptr= strrchr(fileName,'.');
   checkForEXT (lastdotptr);
  #ifdef ID11CDTspeedup  
   //if (!strcasecmp_P(filename + x, PSTR(".cdt"))) AMScdt = 1;
@@ -141,8 +143,7 @@ void TZXStop() {
   entry.close();                              //Close file                                                                                // DEBUGGING Stuff
   //lcd.setCursor(0,1);
   //lcd.print(blkchksum,HEX); lcd.print(F("ck ")); lcd.print(bytesRead); lcd.print(F(" ")); lcd.print(ayblklen);
-  REWIND=1;   
-  seekFile(currentFile); 
+  seekFile(); 
   bytesRead=0;                                // reset read bytes PlayBytes
   blkchksum = 0;                              // reset block chksum byte for AY loading routine
   AYPASS = 0;                                 // reset AY flag

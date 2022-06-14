@@ -17,8 +17,7 @@ void casStop()
   start=0;
   //interrupts();
   entry.close();
-  //REWIND=1;   
-  seekFile(currentFile);
+  seekFile();
   bytesRead=0;
   dragonMode=0;
   casduino=0;
