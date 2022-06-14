@@ -160,11 +160,10 @@ char fline[17];
 SdFat sd;                           //Initialise Sd card 
 SdBaseFile entry, currentDir, tmpdir;                       //SD card file and directory
 
-#define subdirLength     22         // hasta 62 no incrementa el consumo de RAM
-#define filenameLength   8*subdirLength  //Maximum length for scrolling filename, hasta 255 no incrementa consumo RAM
+#define filenameLength 256
 
 char fileName[filenameLength + 1];    //Current filename
-#define nMaxPrevSubDirs 6
+#define nMaxPrevSubDirs 10
 char prevSubDir[SCREENSIZE+1];
 uint16_t DirFilePos[nMaxPrevSubDirs];  //File Positions in Directory to be restored (also, history of subdirectories)
 byte subdir = 0;
