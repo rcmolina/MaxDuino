@@ -13,7 +13,7 @@
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
         #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-            //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
+            #define Expand_All            // Expand short Leaders in ALL file header blocks. 
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
@@ -88,7 +88,7 @@ byte lineaxy=2;
 #define BLOCKMODE                   // REW or FF a block when in pause and Play to select it
 #define BLKSJUMPwithROOT            // use menu button in pause mode to switch blocks to jump
 #define BM_BLKSJUMP 20               // when menu pressed in pause mode, how may blocks to jump with REW OR FF
-//#define BLKBIGSIZE                   // max number of block > 255
+#define BLKBIGSIZE                   // max number of block > 255
 #define OLEDBLKMATCH               // Match block numbers with REW/FF
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
