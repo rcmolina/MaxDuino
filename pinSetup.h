@@ -1,3 +1,6 @@
+#ifndef PINSETUP_H_INCLUDED
+#define PINSETUP_H_INCLUDED
+
 #ifdef __AVR_ATmega2560__
 #define outputPin           23 
 #define INIT_OUTPORT        DDRA |=  _BV(1)         // El pin23 es el bit1 del PORTA
@@ -302,3 +305,16 @@
 //  digitalWrite(btnRoot, HIGH); 
   PORTD |= _BV(btnRoot);
 #endif
+
+#ifdef BUTTON_ADC
+// for a 10-bit ADC, each button is calibrated to the band between this value and the next value above (or 1023 for upper limit)
+// The bands are intentionally set very wide, and far apart
+// Each button acts as a voltage divider between 10k and the following resistors:
+#define btnADCPlayLow 980 // 0 ohm
+#define btnADCStopLow 900 // 1k ohm
+#define btnADCRootLow 700 // 2.4k ohm
+#define btnADCDownLow 400 // 10k ohm
+#define btnADCUpLow 200 // 20k ohm
+#endif
+
+#endif // #define PINSETUP_H_INCLUDED

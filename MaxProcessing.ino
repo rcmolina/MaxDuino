@@ -1660,7 +1660,7 @@ void TZXProcess() {
   
           //delay(8000);
            noInterrupts();  
-           while(digitalRead(btnStop)==HIGH) {
+           while(!button_stop()) {
              //waits until the button Stop is pressed.
              //delay(50);
            }
