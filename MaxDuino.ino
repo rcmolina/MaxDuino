@@ -146,6 +146,8 @@
   #include "userEVERYconfig.h"
 #elif defined(__arm__) && defined(__STM32F1__)
   #include "userSTM32config.h"  
+#elif defined(SEEED_XIAO_M0)
+  #include "userSEEEDUINO_XIAO_M0config.h"
 #else //__AVR_ATmega328P__
   #include "userconfig.h"
 #endif
