@@ -2014,7 +2014,11 @@ void SetPlayBlock()
 //    count = 255;                                //End of file buffer flush
 //    EndOfFile=false;
 //    digitalWrite(outputPin, pinState);
+  #if defined(__AVR__)
     Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
+  #elif defined(__arm__) && defined(__STM32F1__) 
+    timer.setSTM32Period(1000);
+  #endif     
   }
 
 
