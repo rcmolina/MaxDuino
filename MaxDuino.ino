@@ -1064,7 +1064,7 @@ void loop(void) {
        debounce(button_down);
      }
 #endif
-          
+
      if(start==1 && (!oldMotorState==motorState) && mselectMask==1 ) {  
        //if file is playing and motor control is on then handle current motor state
        //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
@@ -1889,11 +1889,13 @@ void SetPlayBlock()
 //    count = 255;                                //End of file buffer flush
 //    EndOfFile=false;
 //    digitalWrite(outputPin, pinState);
-  #if defined(__AVR__)
+  #if defined(__AVR__) || defined(__SAMD21__)
     Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
   #elif defined(__arm__) && defined(__STM32F1__) 
     timer.setSTM32Period(1000);
-  #endif     
+  #else
+    #error unknown timer
+  #endif
   }
 
 

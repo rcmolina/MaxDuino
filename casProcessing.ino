@@ -7,10 +7,12 @@ void casPause()
 
 void casStop()
 {
-  #if defined(__AVR__)
+  #if defined(__AVR__) || defined(__SAMD21__)
     Timer1.stop();
   #elif defined(__arm__) && defined(__STM32F1__)
     timer.pause();
+  #else
+    #error unknown timer
   #endif
   //noInterrupts();
   isStopped=true;
@@ -480,6 +482,3 @@ void casduinoLoop()
          }
     } 
 }
-
-
-
