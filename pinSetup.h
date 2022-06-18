@@ -40,13 +40,13 @@
   //#define WRITE_HIGH              gpio_write_bit(GPIOA, 9, HIGH)
 
 #elif defined(__AVR_ATmega32U4__) 
-//    #define INIT_OUTPORT         DDRE |=  _BV(1)         // El pin PE6 es el bit6 del PORTE
-//    #define WRITE_LOW           PORTE &= ~_BV(1)         // El pin PE6 es el bit6 del PORTE
-//    #define WRITE_HIGH          PORTE |=  _BV(1)         // El pin PE6 es el bit6 del PORTE
 #define outputPin           7    // this pin is 5V tolerant and PWM output capable
-#define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
-#define WRITE_LOW               digitalWrite(outputPin,LOW)
-#define WRITE_HIGH              digitalWrite(outputPin,HIGH)
+//#define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
+  #define INIT_OUTPORT         DDRE |=  _BV(6)         // El pin PE6 es el bit6 del PORTE
+//#define WRITE_LOW               digitalWrite(outputPin,LOW)
+  #define WRITE_LOW           PORTE &= ~_BV(6)         // El pin PE6 es el bit6 del PORTE
+//#define WRITE_HIGH              digitalWrite(outputPin,HIGH)
+  #define WRITE_HIGH          PORTE |=  _BV(6)         // El pin PE6 es el bit6 del PORTE
   
 #elif defined(SEEED_XIAO_M0)
   #define outputPin           0

@@ -64,6 +64,11 @@
     //#error This chip does not support Softwire. Please undefine Use_SoftWire
   #endif  
 
+#elif defined(__AVR_ATmega32U4__)
+//#undef Use_SoftI2CMaster
+//#undef Use_SoftWire
+//#undef I2CFAST
+
 #else  //__AVR_ATmega328P__
   //#define TimerOne
 #endif
