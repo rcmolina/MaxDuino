@@ -3,6 +3,7 @@
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
+18/06/2022 SAMD21 Support (@David), tested Arduino Micro and new pin definitions (@Rafa)
 14/06/2022 SdFat much improved, now userconfig7.h with all options activated, and also until 10 subdirs and max filelength 256. David is your hero!
 11/06/2022: ZX:inject the real filename into the fake ay header + Refixed inversion for zx polarity loading.
 zx81:Removed initial pause from zx81 loading to avoid inversion problems.
