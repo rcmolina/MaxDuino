@@ -235,7 +235,7 @@ class TimerCounter
     static unsigned char clockSelectBits;
 };
 
-#elif defined(__AVR_ATmega328P__)
+#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__)
 class TimerCounter
 {
   public:
