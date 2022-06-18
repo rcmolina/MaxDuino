@@ -40,7 +40,7 @@ void menuMode()
       return false;
   }
   
-  
+
   uint8_t EEPROM_put(uint16_t address, byte data) {
     if (EEPROM.init()==EEPROM_OK) {
       EEPROM.write(address, (uint16_t) data); 
@@ -353,11 +353,14 @@ void menuMode()
     }
     checkLastButton();
   }
+  #ifdef LOAD_EEPROM_SETTINGS
   updateEEPROM();
+  #endif
 
   debounce(button_stop);
  }
 
+#ifdef LOAD_EEPROM_SETTINGS
  void updateEEPROM()
  {
   /* Setting Byte: 
@@ -445,6 +448,7 @@ void menuMode()
   //UniSetup();
  
  }
+#endif
 
 void checkLastButton()
 {

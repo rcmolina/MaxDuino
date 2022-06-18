@@ -140,8 +140,6 @@
  //               V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly 
  //                     for Amstrad CPC ID11 blocks (like TSXControl).
  //
-#include <EEPROM.h>
-
 #if defined(__AVR_ATmega2560__)
   #include "userMAXconfig.h"
 #elif defined(__AVR_ATmega4809__) || defined(__AVR_ATmega4808__)
@@ -155,6 +153,10 @@
 #include "MaxDuino.h"
 #include "hwconfig.h"
 #include "buttons.h"
+
+#if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO) || defined(LOAD_EEPROM_SETTINGS)
+#include <EEPROM.h>
+#endif
 
 char fline[17];
 
