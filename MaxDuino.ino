@@ -173,9 +173,11 @@ unsigned long filesize;             // filesize used for dimensioning AY files
 byte scrollPos = 0;                 //Stores scrolling text position
 unsigned long scrollTime = millis() + scrollWait;
 
-
+#ifndef NO_MOTOR
 byte motorState = 1;                //Current motor control state
 byte oldMotorState = 1;             //Last motor control state
+#endif
+
 byte start = 0;                     //Currently playing flag
 
 byte pauseOn = 0;                   //Pause state
@@ -371,7 +373,10 @@ void loop(void) {
       scrollText(fileName);
     }
   }
+  #ifndef NO_MOTOR
   motorState=digitalRead(btnMotor);
+  #endif
+  
   #if (SPLASH_SCREEN && TIMEOUT_RESET)
       if (millis() - timeDiff_reset > 1000) //check timeout reset every second
       {
@@ -400,10 +405,12 @@ void loop(void) {
         if(start==0) {
           //If no file is play, start playback
           playFile();
+          #ifndef NO_MOTOR
           if (mselectMask == 1){  
             //oldMotorState = !motorState;  //Start in pause if Motor Control is selected
             oldMotorState = 0;
           }
+          #endif
           delay(50);
           
         } else {
@@ -1065,7 +1072,8 @@ void loop(void) {
      }
 #endif
 
-     if(start==1 && (!oldMotorState==motorState) && mselectMask==1 ) {  
+     #ifndef NO_MOTOR
+     if(start==1 && (oldMotorState!=motorState) && mselectMask==1 ) {  
        //if file is playing and motor control is on then handle current motor state
        //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
        if(motorState==1 && pauseOn==0) {
@@ -1123,6 +1131,7 @@ void loop(void) {
        }
        oldMotorState=motorState;
      }
+     #endif
   }
 }
 
