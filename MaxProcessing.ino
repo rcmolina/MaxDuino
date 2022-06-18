@@ -9,10 +9,12 @@ word TickToUs(word ticks) {
 
 void UniPlay(){
   setBaud();
-//  #if defined(__AVR__)
+//  #if defined(__AVR__) || defined(__SAMD21__)
 //    Timer1.stop();                              //Stop timer interrupt
 //  #elif defined(__arm__) && defined(__STM32F1__)
 //    timer.pause();
+//  #else
+//    #error unknown timer
 //  #endif
 
   // on entry, currentFile is already pointing to the file entry you want to play
@@ -58,14 +60,16 @@ void UniPlay(){
    // digitalWrite(outputPin, pinState);
 //    digitalWrite(outputPin, LOW);
     WRITE_LOW;
-    #if defined(__AVR__)    
+    #if defined(__AVR__) || defined(__SAMD21__)
       Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
       Timer1.attachInterrupt(wave2);
     #elif defined(__arm__) && defined(__STM32F1__)
       //timer.setCount(0);
       timer.setPeriod(1000);
       timer.attachInterrupt(2,wave2); // channel 2
-      timer.resume();      
+      timer.resume();    
+    #else
+      #error unknown timer  
     #endif
 //    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
   }
@@ -75,7 +79,7 @@ void UniPlay(){
     clearBuffer();
     isStopped=false;
     //interrupts();       
-    #if defined(__AVR__)
+    #if defined(__AVR__) || defined(__SAMD21__)
       Timer1.initialize(period);
       Timer1.attachInterrupt(wave);
     #elif defined(__arm__) && defined(__STM32F1__)
@@ -83,6 +87,8 @@ void UniPlay(){
       timer.setPeriod(period);
       timer.attachInterrupt(2,wave); // channel 2
       timer.resume();   
+    #else
+      #error unknown timer
     #endif        
   }
 #else
@@ -97,7 +103,7 @@ void UniPlay(){
    // digitalWrite(outputPin, pinState);
 //    digitalWrite(outputPin, LOW);
     WRITE_LOW;
-    #if defined(__AVR__)    
+    #if defined(__AVR__) || defined(__SAMD21__)
       Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
       Timer1.attachInterrupt(wave2);
     #elif defined(__arm__) && defined(__STM32F1__)
@@ -105,6 +111,8 @@ void UniPlay(){
       timer.setPeriod(1000);
       timer.attachInterrupt(2,wave2); // channel 2
       timer.resume();      
+    #else
+      #error unknown timer
     #endif
 //    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
 #endif
@@ -133,10 +141,12 @@ void UniPlay(char *filename) {
 */
 
 void TZXStop() {
-  #if defined(__AVR__)
+  #if defined(__AVR__) || defined(__SAMD21__)
     Timer1.stop();                              //Stop timer
   #elif defined(__arm__) && defined(__STM32F1__)
     timer.pause();
+  #else
+    #error unknown timer
   #endif
   isStopped=true;
   start=0;
@@ -1559,11 +1569,13 @@ void TZXProcess() {
               if (forcePause0) { // Stop the Tape
                 if(!count==0) {
 
-                #if defined(__AVR__)
+                #if defined(__AVR__) || defined(__SAMD21__)
                   currentPeriod = 32769;
                   //currentPeriod = 50;
                 #elif defined(__arm__) && defined(__STM32F1__)
                   currentPeriod = 50;
+                #else
+                  #error unknown timer
                 #endif
 
                   count += -1;
@@ -1585,7 +1597,7 @@ void TZXProcess() {
           //Handle end of file
           if(!count==0) {
           
-          #if defined(__AVR__)
+          #if defined(__AVR__) || defined(__SAMD21__)
             //currentPeriod = 32769;
             //currentPeriod = 10;
             
@@ -1596,6 +1608,8 @@ void TZXProcess() {
             
           #elif defined(__arm__) && defined(__STM32F1__)
             currentPeriod = 50;
+          #else
+            #error unknown timer
           #endif
                  
             count += -1;
@@ -1660,7 +1674,7 @@ void TZXProcess() {
   
           //delay(8000);
            noInterrupts();  
-           while(digitalRead(btnStop)==HIGH) {
+           while(!button_stop()) {
              //waits until the button Stop is pressed.
              //delay(50);
            }
@@ -2483,13 +2497,15 @@ void wave2() {
   //fudgeTime = micros() - fudgeTime;         //Compensate for stupidly long ISR
   //Timer1.setPeriod(newTime - fudgeTime);    //Finally set the next pulse length
   
-  #if defined(__AVR__)
+  #if defined(__AVR__) || defined(__SAMD21__)
     Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
   #elif defined(__arm__) && defined(__STM32F1__)    
     //timer.setPeriod(newTime -4);
     newTime += 2;
     //timer.setPeriod(newTime);    
     timer.setSTM32Period(newTime);
+  #else
+    #error unknown timer
     
   #endif
 
@@ -2605,10 +2621,12 @@ void setBaud()
 //  scale=BAUDRATE/1200;
 //  period=208/scale;
   //Timer1.setPeriod(period);
-  #if defined(__AVR__)
+  #if defined(__AVR__) || defined(__SAMD21__)
     Timer1.stop();
   #elif defined(__arm__) && defined(__STM32F1__)
     timer.pause();
+  #else
+    #error unknown timer
   #endif
 }
 
@@ -2758,7 +2776,7 @@ void DelayedStop() {
           //Handle end of file
           if(!count==0) {
           
-          #if defined(__AVR__)
+          #if defined(__AVR__) || defined(__SAMD21__)
             //currentPeriod = 32769;
             //currentPeriod = 10;
             
@@ -2769,6 +2787,8 @@ void DelayedStop() {
             
           #elif defined(__arm__) && defined(__STM32F1__)
             currentPeriod = 50;
+          #else
+            #error unknown timer
           #endif
                  
             count += -1;
@@ -2782,11 +2802,13 @@ void FlushBuffer(long newcount) {
     //bitSet(currentPeriod, 15);
     if(!count==0) {
 
-    #if defined(__AVR__)
+    #if defined(__AVR__) || defined(__SAMD21__)
       currentPeriod = 32769;
       //currentPeriod = 32768 + 4096 + 10;
     #elif defined(__arm__) && defined(__STM32F1__)
       currentPeriod = 50;
+    #else
+      #error unknown timer
     #endif
 
       count += -1;

@@ -54,6 +54,16 @@
   #endif
      
   //#define TimerOne  
+#elif defined(__SAMD21__)
+  #ifdef Use_SoftI2CMaster
+    #undef Use_SoftI2CMaster
+    //#error This chip does not support SoftI2CMaster. Please undefine Use_SoftI2CMaster
+  #endif
+  #ifdef Use_SoftWire
+    #undef Use_SoftWire
+    //#error This chip does not support Softwire. Please undefine Use_SoftWire
+  #endif  
+
 #else  //__AVR_ATmega328P__
   //#define TimerOne
 #endif
@@ -76,6 +86,9 @@ TimerCounter timer(2);
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
   #define memcmp_P(a, b, n) memcmp((a), (b), (n)) 
   #define strcasecmp_P(a,b) strcasecmp((a), (b)) 
+#elif defined(__SAMD21__)
+  #include "TimerCounter.h"
+  TimerCounter Timer1;
 #else
   #include "TimerCounter.h"
   TimerCounter Timer1;              // preinstatiate
@@ -190,5 +203,3 @@ TimerCounter timer(2);
 #else
   #define SCREENSIZE 16
 #endif
-
-

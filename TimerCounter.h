@@ -97,9 +97,8 @@ class TimerCounter:public HardwareTimer
     }
 
 };
-#else
 
-#if defined(__AVR_ATmega4809__) || defined(__AVR_ATmega4808__)
+#elif defined(__AVR_ATmega4809__) || defined(__AVR_ATmega4808__)
 class TimerCounter
 {
   public:
@@ -234,8 +233,9 @@ class TimerCounter
     // properties
     static unsigned short pwmPeriod;
     static unsigned char clockSelectBits;
-};    
-#else  //__AVR_ATmega328P__
+};
+
+#elif defined(__AVR_ATmega328P__)
 class TimerCounter
 {
   public:
@@ -314,11 +314,245 @@ class TimerCounter
     // properties
     static unsigned short pwmPeriod;
     static unsigned char clockSelectBits;
-};    
-#endif
+};
 
+#elif defined(__SAMD21__)
+  // The following, including the MyTC3Timer class, is a modified version of SAMDTimer (from SAMD_TimerInterrupt)
+  // incorporating significant fixes to period accuracy and reducing instruction count of setInterval function
+  // see https://github.com/khoih-prog/SAMD_TimerInterrupt/issues/18
+  // and https://github.com/khoih-prog/SAMD_TimerInterrupt/issues/17
+  // (see https://github.com/stripwax/SAMD_TimerInterrupt )
+  // The author of SAMD_TimerInterrupt has made it clear that they have no intention to address these behaviours,
+  // so we must resort to not using SAMD_TimerInterrupt...
+  // As an aside, the TimerTC3 library also has the same bugs (as well as one or two others), as it is derived from
+  // the same logic as SAMD_TimerInterrupt, and therefore also cannot be used by this project...
+  
+  typedef void (*timerCallback)  ();
+  timerCallback TC3_callback;
+  
+  void TC3_Handler()
+  {
+    // get timer struct
+    TcCount16* TC = (TcCount16*) TC3;
+    
+    // If the compare register matching the timer count, trigger this interrupt
+    if (TC->INTFLAG.bit.MC0 == 1) 
+    {
+      if (TC3_callback)
+        (*TC3_callback)();
+      TC->INTFLAG.bit.MC0 = 1; // write 1 here, to clear the interrupt tr
+    }
+  }
+  
+  #define SAMD_TC3        ((TcCount16*) TC3)
+  
+  #include "Arduino.h"
+  #define TIMER_HZ      48000000L
+  
+class TimerCounter
+{
+  public:
+    TimerCounter()
+    {
+      TC3_callback = NULL;
+    }
+    
+    //****************************
+    //  Configuration
+    //****************************
+    void initialize(unsigned long microseconds=1000)
+    {
+      TcCount16* _Timer = SAMD_TC3;
+
+      noInterrupts();
+      REG_GCLK_CLKCTRL = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_ID (GCM_TCC2_TC3));
+      
+      while ( GCLK->STATUS.bit.SYNCBUSY);
+              
+      _Timer->CTRLA.reg &= ~TC_CTRLA_ENABLE; // ensure clock is disabled.  necessary, in order to configure clock, anyway.
+
+      // Use the 16-bit timer
+      _Timer->CTRLA.reg |= TC_CTRLA_MODE_COUNT16;
+      
+      while (_Timer->STATUS.bit.SYNCBUSY);
+
+      // Use match mode so that the timer counter resets when the count matches the compare register
+      _Timer->CTRLA.reg |= TC_CTRLA_WAVEGEN_MFRQ;
+      
+      while (_Timer->STATUS.bit.SYNCBUSY);
+  
+      TC3_callback = NULL;
+
+      _setPeriod_TIMER_TC3(microseconds); // this does not enable the timer, just configures it
+      interrupts();
+    }
+
+    void _setPeriod_TIMER_TC3(unsigned long microseconds)
+    {
+      TcCount16* _Timer = SAMD_TC3;
+      
+      bool ctrla_enabled = _Timer->CTRLA.reg & TC_CTRLA_ENABLE;
+      
+      _Timer->CTRLA.reg &= ~TC_CTRLA_ENABLE;
+      while (_Timer->STATUS.bit.SYNCBUSY);
+
+      _Timer->CTRLA.reg &= ~(TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCALER_DIV256 | TC_CTRLA_PRESCALER_DIV64 | TC_CTRLA_PRESCALER_DIV16 | TC_CTRLA_PRESCALER_DIV4 | TC_CTRLA_PRESCALER_DIV2 | TC_CTRLA_PRESCALER_DIV1);
+      while (_Timer->STATUS.bit.SYNCBUSY);
+
+      // impose some kind of minimum cycle time, to avoid deadlock
+      if (microseconds < 100)
+      {
+        microseconds = 100;
+      }
+      // avoid wraparound for periods longer than the maximum permitted with the widest prescaler
+      if (microseconds > 1398080)
+      {
+        microseconds = 1398080;
+      }
+
+      uint32_t cycles = (TIMER_HZ/1000000) * microseconds;
+      if (cycles > (65535*256)) 
+      {
+        // Set prescaler to 1024
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV1024;
+        cycles >>= 10;
+      } 
+      else if (cycles > (65535*64))
+      {
+        // Set prescaler to 256
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV256;
+        cycles >>= 8;
+      } 
+      else if (cycles > (65535*16))
+      {
+        // Set prescaler to 64
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV64;
+        cycles >>= 6;
+      } 
+      else if (cycles > (65535*8))
+      {
+        // Set prescaler to 16
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV16;
+        cycles >>= 4;
+      } 
+      else if (cycles > (65535*4))
+      {
+        // Set prescaler to 8
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV8;
+        cycles >>= 3;
+      } 
+      else if (cycles > (65535*2))
+      {
+        // Set prescaler to 4
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV4;
+        cycles >>= 2;
+      } 
+      else if (cycles > 65535)
+      {
+        // Set prescaler to 2
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV2;
+        cycles >>= 1;
+      } 
+      else
+      {
+        // Set prescaler to 1, cycles is unchanged
+        _Timer->CTRLA.reg |= TC_CTRLA_PRESCALER_DIV1;
+      }
+      while (_Timer->STATUS.bit.SYNCBUSY);
+
+      _Timer->CC[0].reg = cycles;
+      while (_Timer->STATUS.bit.SYNCBUSY);
+
+      if (ctrla_enabled)
+      {
+        // so re-enable the clock
+        _Timer->CTRLA.reg |= TC_CTRLA_ENABLE;
+        while (_Timer->STATUS.bit.SYNCBUSY); // per datasheet, sync is not required when just setting the enabled bit
+      }
+
+//    TODO: make this only disable/enable the timer (via CTRLA) if the prescaler actually changed
+//    (if prescaler didn't change, you could just set the new CC[0].reg , which should be super quick to do)
+
+//    TODO use the fancy code instead
+//      // Make sure the count is in a proportional position to where it was
+//      // to prevent any jitter or disconnect when changing the compare value.
+//      _Timer->READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10); // 0x10 is the offset of the 16-bit count register
+//      while (_Timer->STATUS.bit.SYNCBUSY);
+//      uint16_t prev_counter = _Timer->COUNT.reg;
+//
+//      // cannot update ctrla at the same time as the enabled bit is set
+//      _Timer->CTRLA.reg &= ~TC_CTRLA_ENABLE;
+//      while (_Timer->STATUS.bit.SYNCBUSY);
+//
+//      // need to synchronise the count and cc values
+//      _Timer->READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x18); // 0x18 is the offset of the 16-bit CC0 register
+//      while (_Timer->STATUS.bit.SYNCBUSY);
+//
+//      uint16_t old_compare_value = _Timer->CC[0].reg;
+//      _Timer->CC[0].reg = (uint16_t)(-1); // max, so that changing Count doesn't end up wrapping it back to zero again due to the continuous comparison
+//
+//      _Timer->COUNT.reg = map(prev_counter, 0, old_compare_value, 0, _compareValue);
+//      while (_Timer->STATUS.bit.SYNCBUSY);
+//      
+//      _Timer->CC[0].reg = _compareValue;
+//      while (_Timer->STATUS.bit.SYNCBUSY);
+//
+//      _Timer->CTRLA.reg = ctrla | TC_CTRLA_ENABLE;
+//      while (_Timer->STATUS.bit.SYNCBUSY);
+    }
+    
+    void setPeriod(unsigned long microseconds)
+    {
+      _setPeriod_TIMER_TC3(microseconds);
+      // start(); //  should this also START the timer?
+    }
+
+    void stop()
+    {
+      noInterrupts();
+      TcCount16* _Timer = SAMD_TC3;
+
+      // disable the timer
+      _Timer->CTRLA.reg &= ~TC_CTRLA_ENABLE;
+      while (_Timer->STATUS.bit.SYNCBUSY);
+
+      // Disable the compare interrupt
+      SAMD_TC3->INTENCLR.reg = 0;
+      SAMD_TC3->INTENCLR.bit.MC0 = 1;
+      NVIC_DisableIRQ(TC3_IRQn);
+
+      interrupts();
+    }
+
+    //****************************
+    //  Interrupt Function
+    //****************************
+    void attachInterrupt(void (*isr)())
+    {
+      noInterrupts();
+
+      TcCount16* _Timer = SAMD_TC3;
+
+      // disable the timer (this might not be necessary)
+      _Timer->CTRLA.reg &= ~TC_CTRLA_ENABLE;
+      while (_Timer->STATUS.bit.SYNCBUSY);
+      
+      TC3_callback = isr;
+      
+      // Enable the compare interrupt
+      SAMD_TC3->INTENSET.reg = 0;
+      SAMD_TC3->INTENSET.bit.MC0 = 1;
+      NVIC_EnableIRQ(TC3_IRQn);
+
+      // enable the timer:
+      _Timer->CTRLA.reg |= TC_CTRLA_ENABLE;
+      while (_Timer->STATUS.bit.SYNCBUSY);
+      
+      interrupts();
+    }
+};
+
+#else
+#error Missing definition of TimerCounter
 #endif
 //extern TimerCounter Timer1;
-
-
-

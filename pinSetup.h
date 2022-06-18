@@ -1,3 +1,6 @@
+#ifndef PINSETUP_H_INCLUDED
+#define PINSETUP_H_INCLUDED
+
 #ifdef __AVR_ATmega2560__
 #define outputPin           23 
 #define INIT_OUTPORT        DDRA |=  _BV(1)         // El pin23 es el bit1 del PORTA
@@ -45,6 +48,17 @@
 #define WRITE_LOW               digitalWrite(outputPin,LOW)
 #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
   
+#elif defined(SEEED_XIAO_M0)
+  #define outputPin           0
+  #define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
+  //#define INIT_OUTPORT            pinMode(outputPin,OUTPUT); GPIOA->regs->CRH |=  0x00000030  
+  #define WRITE_LOW               digitalWrite(outputPin,LOW)
+  //#define WRITE_LOW               GPIOA->regs->ODR &= ~0b0000001000000000
+  //#define WRITE_LOW               gpio_write_bit(GPIOA, 9, LOW)
+  #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
+  //#define WRITE_HIGH              GPIOA->regs->ODR |=  0b0000001000000000
+  //#define WRITE_HIGH              gpio_write_bit(GPIOA, 9, HIGH)
+
 #else  //__AVR_ATmega328P__
   //#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
   #define outputPin           9
@@ -116,6 +130,16 @@
   #define btnDown       12            //Down button
   #define btnMotor      0             //Motor Sense (connect pin to gnd to play, NC for pause)
   #define btnRoot       1             //Return to SD card root
+#elif defined(SEEED_XIAO_M0)
+//
+// Pin definition for Seeeduino Xiao M0 boards
+//
+
+#define chipSelect    12            //Sd card chip select pin - map to LED (on assumption that SD CS is actually just tied directly to GND)
+#define BUTTON_ADC
+#define btnADC        A3 // analog input pin for ADC buttons
+#define NO_MOTOR    // because no spare gpio
+
 #else
   const byte chipSelect = 10;          //Sd card chip select pin
   
@@ -277,6 +301,11 @@
   PORTD |= _BV(3);
 
    
+#elif defined (SEEED_XIAO_M0)
+
+  // BUTTON PIN CONFIGURATION
+  // n.a.
+  
 #else  //__AVR_ATmega328P__
   //pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
 //  digitalWrite(btnPlay,HIGH); // Wrte for INPUT_PULLUP if input type is only INPUT
@@ -302,3 +331,16 @@
 //  digitalWrite(btnRoot, HIGH); 
   PORTD |= _BV(btnRoot);
 #endif
+
+#ifdef BUTTON_ADC
+// for a 10-bit ADC, each button is calibrated to the band between this value and the next value above (or 1023 for upper limit)
+// The bands are intentionally set very wide, and far apart
+// Each button acts as a voltage divider between 10k and the following resistors:
+#define btnADCPlayLow 980 // 0 ohm
+#define btnADCStopLow 900 // 1k ohm
+#define btnADCRootLow 700 // 2.4k ohm
+#define btnADCDownLow 400 // 10k ohm
+#define btnADCUpLow 200 // 20k ohm
+#endif
+
+#endif // #define PINSETUP_H_INCLUDED

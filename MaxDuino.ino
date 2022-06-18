@@ -140,20 +140,25 @@
  //               V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly 
  //                     for Amstrad CPC ID11 blocks (like TSXControl).
  //
-#include <EEPROM.h>
-
 #if defined(__AVR_ATmega2560__)
   #include "userMAXconfig.h"
 #elif defined(__AVR_ATmega4809__) || defined(__AVR_ATmega4808__)
   #include "userEVERYconfig.h"
 #elif defined(__arm__) && defined(__STM32F1__)
   #include "userSTM32config.h"  
+#elif defined(SEEED_XIAO_M0)
+  #include "userSEEEDUINO_XIAO_M0config.h"
 #else //__AVR_ATmega328P__
   #include "userconfig.h"
 #endif
 
 #include "MaxDuino.h"
 #include "hwconfig.h"
+#include "buttons.h"
+
+#if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO) || defined(LOAD_EEPROM_SETTINGS)
+#include <EEPROM.h>
+#endif
 
 char fline[17];
 
@@ -172,9 +177,11 @@ unsigned long filesize;             // filesize used for dimensioning AY files
 byte scrollPos = 0;                 //Stores scrolling text position
 unsigned long scrollTime = millis() + scrollWait;
 
-
+#ifndef NO_MOTOR
 byte motorState = 1;                //Current motor control state
 byte oldMotorState = 1;             //Last motor control state
+#endif
+
 byte start = 0;                     //Currently playing flag
 
 byte pauseOn = 0;                   //Pause state
@@ -272,12 +279,7 @@ void setup() {
 #include "pinSetup.h"
 
   #ifdef SPLASH_SCREEN
-      while (digitalRead(btnPlay) == HIGH & 
-             digitalRead(btnStop) == HIGH &
-             digitalRead(btnUp)   == HIGH &
-             digitalRead(btnDown) == HIGH &
-             digitalRead(btnRoot) == HIGH)
-      {
+      while (!button_any()){
         delay(100);              // Show logo (OLED) or text (LCD) and remains until a button is pressed.
       }   
       #ifdef OLED1306    
@@ -375,7 +377,10 @@ void loop(void) {
       scrollText(fileName);
     }
   }
+  #ifndef NO_MOTOR
   motorState=digitalRead(btnMotor);
+  #endif
+  
   #if (SPLASH_SCREEN && TIMEOUT_RESET)
       if (millis() - timeDiff_reset > 1000) //check timeout reset every second
       {
@@ -399,15 +404,17 @@ void loop(void) {
   if (millis() - timeDiff > 50) {   // check switch every 50ms 
      timeDiff = millis();           // get current millisecond count
       
-     if(digitalRead(btnPlay) == LOW) {
+     if(button_play()) {
         //Handle Play/Pause button
         if(start==0) {
           //If no file is play, start playback
           playFile();
+          #ifndef NO_MOTOR
           if (mselectMask == 1){  
             //oldMotorState = !motorState;  //Start in pause if Motor Control is selected
             oldMotorState = 0;
           }
+          #endif
           delay(50);
           
         } else {
@@ -603,19 +610,14 @@ void loop(void) {
           pauseOn = !pauseOn;
        }
        
-       debounce(btnPlay);         
-/*       while(digitalRead(btnPlay)==LOW) {
-        //prevent button repeats by waiting until the button is released.
-        delay(50);
-       }
-*/
+       debounce(button_play);
      }
 
 #ifdef ONPAUSE_POLCHG
 
-     if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 
+     if(button_root() && start==1 && pauseOn==1 
                                                     #ifdef btnRoot_AS_PIVOT   
-                                                            && digitalRead(btnStop)==LOW   
+                                                            && button_stop()
                                                     #endif
                                                             ){             // change polarity
 
@@ -624,22 +626,13 @@ void loop(void) {
        #if defined(OLED1306) && defined(OSTATUSLINE) 
           OledStatusLine();
        #endif 
-       debounce(btnRoot);  
-//       while(digitalRead(btnRoot)==LOW) {
-//         //prevent button repeats by waiting until the button is released.
-//         delay(50);
-//       }
-
+       debounce(button_root);
      }
 #endif
 
 #ifdef btnRoot_AS_PIVOT
-     //checkLastButton();
-     //if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false;
      lastbtn=false;     
-     if(digitalRead(btnRoot)==LOW && start==0 && !lastbtn) {                                          // show min-max dir
-       //if(digitalRead(btnRoot)==LOW && start==0 && digitalRead(btnStop)==LOW ){ 
-       //printtextF(PSTR(VERSION),0);
+     if(button_root() && start==0 && !lastbtn) {                                          // show min-max dir
        
        #ifdef SHOW_DIRPOS
         #if defined(LCDSCREEN16x2) && !defined(SHOW_STATUS_LCD) && !defined(SHOW_DIRNAMES)
@@ -708,7 +701,7 @@ void loop(void) {
            
         #endif
       #endif        
-        while(digitalRead(btnRoot)==LOW && !lastbtn) {
+        while(button_root() && !lastbtn) {
            //prevent button repeats by waiting until the button is released.
            //delay(50);
            lastbtn = 1;
@@ -718,23 +711,12 @@ void loop(void) {
      }
      
      #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
-       if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
-       //if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && digitalRead(btnStop)==LOW ){
-/*  
-        lcd.setCursor(0,0);
-        lcd.print(BAUDRATE);
-        lcd.print(' ');
-        if(mselectMask==1) lcd.print(F(" M:ON"));
-        else lcd.print(F("m:off"));
-        lcd.print(' ');
-        if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
-        else lcd.print(F("%^off"));                                     ^
-*/
+       if(button_root() && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
         lcd.setCursor(11,0);
          if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
         else lcd.print(F("%^off"));  
                
-        while(digitalRead(btnRoot)==LOW && start==1 && !lastbtn) {
+        while(button_root() && start==1 && !lastbtn) {
          //prevent button repeats by waiting until the button is released.
          //delay(50);
          lastbtn = 1;
@@ -750,9 +732,9 @@ void loop(void) {
       #endif
 #endif
 
-     if(digitalRead(btnRoot)==LOW && start==0
+     if(button_root() && start==0
                                         #ifdef btnRoot_AS_PIVOT
-                                              && digitalRead(btnStop)==LOW
+                                              && button_stop()
                                         #endif        
                                               ){                   // go menu
 
@@ -808,49 +790,33 @@ void loop(void) {
           #endif         
        #endif
 
-       debounce(btnRoot);  
-/*       while(digitalRead(btnRoot)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50);
-       }
-*/       
+       debounce(button_root);
      }
 
-     if(digitalRead(btnStop)==LOW && start==1
+     if(button_stop() && start==1
                                         #ifdef btnRoot_AS_PIVOT
-                                                && digitalRead(btnRoot)
+                                                && !button_root()
                                         #endif
                                               ){      
 
        stopFile();
 
-       debounce(btnStop);
-/*  
-       while(digitalRead(btnStop)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50);
-       }
-*/       
+       debounce(button_stop);
      }
 
-     if(digitalRead(btnStop)==LOW && start==0 && subdir >0) {               // back subdir
+     if(button_stop() && start==0 && subdir >0) {               // back subdir
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif     
        changeDirParent();
 
-       debounce(btnStop);   
-/*       while(digitalRead(btnStop)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50);
-       }
-*/
+       debounce(button_stop);   
      }
      
 #ifdef BLOCKMODE
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1
+     if(button_up() && start==1 && pauseOn==1
                                                   #ifdef btnRoot_AS_PIVOT
-                                                            && digitalRead(btnRoot)
+                                                            && !button_root()
                                                   #endif
                                                           ){             //  up block sequential search                                                                 
 /*
@@ -888,17 +854,11 @@ void loop(void) {
        SetPlayBlock();
 */
        GetAndPlayBlock();       
-       //debounce(btnUp);
-       debouncemax(btnUp);         
-/*       while(digitalRead(btnUp)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
- */      
+       debouncemax(button_up);
      }
 #endif
 #if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {  // up block half-interval search
+     if(button_up() && start==1 && pauseOn==1 && button_root()) {  // up block half-interval search
 
 /*
        bytesRead=11;                     // for tzx skip header(10) + GETID(11)
@@ -921,18 +881,13 @@ void loop(void) {
        SetPlayBlock();
 */
        GetAndPlayBlock();    
-       debounce(btnUp);         
-/*       while(digitalRead(btnUp)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
- */      
+       debounce(button_up);
      }
 #endif
 
-     if(digitalRead(btnUp)==LOW && start==0
+     if(button_up() && start==0
                                       #ifdef btnRoot_AS_PIVOT
-                                            && digitalRead(btnRoot)
+                                            && !button_root()
                                       #endif
                                             ){                         // up dir sequential search                                           
 
@@ -943,24 +898,11 @@ void loop(void) {
        scrollTime=millis()+scrollWait;
        scrollPos=0;
        upFile();
-       debouncemax(btnUp);   
-/*       
-       timeDiff2 = millis();           // get current millisecond count  
-       while ((digitalRead(btnUp)==LOW) && (millis() - timeDiff2 < 200)) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }        
-*/       
-       //debounce(btnUp);       
-/*       while(digitalRead(btnUp)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
-*/
+       debouncemax(button_up);
      }
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnUp)==LOW && start==0 && digitalRead(btnRoot)==LOW) {      // up dir half-interval search
+     if(button_up() && start==0 && button_root()) {      // up dir half-interval search
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif
@@ -969,16 +911,11 @@ void loop(void) {
        scrollPos=0;
        upHalfSearchFile();
        
-       debounce(btnUp);       
-/*       while(digitalRead(btnUp)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
-*/
+       debounce(button_up);
      }
 #endif
 #if defined(BLOCKMODE) && defined(BLKSJUMPwithROOT)
-     if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1){      // change blocks to jump 
+     if(button_root() && start==1 && pauseOn==1){      // change blocks to jump 
       if (jblks==BM_BLKSJUMP) jblks=1; else jblks=BM_BLKSJUMP;
        #ifdef LCDSCREEN16x2
           lcd.setCursor(15,0); if (jblks==BM_BLKSJUMP) lcd.print(F("^")); else lcd.print(F("\'"));
@@ -990,13 +927,13 @@ void loop(void) {
                 setXY(15,0);if (jblks==BM_BLKSJUMP) sendChar('^'); else sendChar('\'');  
           #endif
        #endif      
-      debounce(btnRoot);
+      debounce(button_root);
      }
 #endif
 #ifdef BLOCKMODE
-     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1
+     if(button_down() && start==1 && pauseOn==1
                                                       #ifdef btnRoot_AS_PIVOT
-                                                            && digitalRead(btnRoot)
+                                                            && !button_root()
                                                       #endif
                                                             ){      // down block sequential search                                                           
 
@@ -1079,17 +1016,11 @@ void loop(void) {
        SetPlayBlock();
 */
        GetAndPlayBlock();    
-       //debounce(btnDown);
-       debouncemax(btnDown);                  
-/*       while(digitalRead(btnDown)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50);
-       }
-*/
+       debouncemax(button_down);
      }
 #endif
 #if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-     if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {     // down block half-interval search
+     if(button_down() && start==1 && pauseOn==1 && button_root()) {     // down block half-interval search
 
 /*
        bytesRead=11;                     // for tzx skip header(10) + GETID(11)
@@ -1111,18 +1042,13 @@ void loop(void) {
        SetPlayBlock();
 */
        GetAndPlayBlock();    
-       debounce(btnDown);                  
-/*       while(digitalRead(btnDown)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50);
-       }
-*/
+       debounce(button_down);
      }
 #endif
 
-     if(digitalRead(btnDown)==LOW && start==0
+     if(button_down() && start==0
                                         #ifdef btnRoot_AS_PIVOT
-                                                && digitalRead(btnRoot)
+                                                && !button_root()
                                         #endif
                                               ){                    // down dir sequential search                                             
 
@@ -1133,24 +1059,11 @@ void loop(void) {
        scrollTime=millis()+scrollWait;
        scrollPos=0;
        downFile();
-       debouncemax(btnDown);
-/*
-       timeDiff2 = millis();           // get current millisecond count  
-       while ((digitalRead(btnDown)==LOW) && (millis() - timeDiff2 < 200)) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
-*/ 
-       //debounce(btnDown);      
-/*       while(digitalRead(btnDown)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
-*/
+       debouncemax(button_down);
      }
 
 #ifdef btnRoot_AS_PIVOT
-     if(digitalRead(btnDown)==LOW && start==0 && digitalRead(btnRoot)==LOW ) {              // down dir half-interval search
+     if(button_down() && start==0 && button_root()) {              // down dir half-interval search
        #if (SPLASH_SCREEN && TIMEOUT_RESET)
             timeout_reset = TIMEOUT_RESET;
        #endif
@@ -1159,16 +1072,12 @@ void loop(void) {
        scrollPos=0;
        downHalfSearchFile();
        
-       debounce(btnDown);      
-/*       while(digitalRead(btnDown)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
-*/
+       debounce(button_down);
      }
 #endif
-          
-     if(start==1 && (!oldMotorState==motorState) && mselectMask==1 ) {  
+
+     #ifndef NO_MOTOR
+     if(start==1 && (oldMotorState!=motorState) && mselectMask==1 ) {  
        //if file is playing and motor control is on then handle current motor state
        //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
        if(motorState==1 && pauseOn==0) {
@@ -1226,29 +1135,8 @@ void loop(void) {
        }
        oldMotorState=motorState;
      }
+     #endif
   }
-}
-
-void debounce(int boton){
-  while(digitalRead(boton)==LOW){
-    //prevent button repeats by waiting until the button is released.
-    delay(50);
-  }
-}
-
-void debouncemax(int boton){
-//  timeDiff2 = millis();
-//  while ((digitalRead(boton)==LOW) && (millis() - timeDiff2 < 200)) {
-//    //prevent button repeats by waiting until the button is released.
-//    delay(50);
-//  }
-  int i=4;
-  while ((digitalRead(boton)==LOW) && (i>0)) {
-    //prevent button repeats by waiting until the button is released.
-    delay(50);
-    i--;
-  }
-
 }
 
 void upFile() {    
@@ -2014,11 +1902,13 @@ void SetPlayBlock()
 //    count = 255;                                //End of file buffer flush
 //    EndOfFile=false;
 //    digitalWrite(outputPin, pinState);
-  #if defined(__AVR__)
+  #if defined(__AVR__) || defined(__SAMD21__)
     Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
   #elif defined(__arm__) && defined(__STM32F1__) 
     timer.setSTM32Period(1000);
-  #endif     
+  #else
+    #error unknown timer
+  #endif
   }
 
 
