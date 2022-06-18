@@ -35,7 +35,16 @@
   #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
   //#define WRITE_HIGH              GPIOA->regs->ODR |=  0b0000001000000000
   //#define WRITE_HIGH              gpio_write_bit(GPIOA, 9, HIGH)
-      
+
+#elif defined(__AVR_ATmega32U4__) 
+//    #define INIT_OUTPORT         DDRE |=  _BV(1)         // El pin PE6 es el bit6 del PORTE
+//    #define WRITE_LOW           PORTE &= ~_BV(1)         // El pin PE6 es el bit6 del PORTE
+//    #define WRITE_HIGH          PORTE |=  _BV(1)         // El pin PE6 es el bit6 del PORTE
+#define outputPin           7    // this pin is 5V tolerant and PWM output capable
+#define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
+#define WRITE_LOW               digitalWrite(outputPin,LOW)
+#define WRITE_HIGH              digitalWrite(outputPin,HIGH)
+  
 #else  //__AVR_ATmega328P__
   //#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
   #define outputPin           9
@@ -98,6 +107,15 @@
 #define btnMotor      PA8     //Motor Sense (connect pin to gnd to play, NC for pause)
 #define btnRoot       PA4           //Return to SD card root
 
+#elif defined(__AVR_ATmega32U4__) 
+  const byte chipSelect = SS;          //Sd card chip select pin
+  
+  #define btnPlay       4            //Play Button
+  #define btnStop       30            //Stop Button
+  #define btnUp         6            //Up button
+  #define btnDown       12            //Down button
+  #define btnMotor      0             //Motor Sense (connect pin to gnd to play, NC for pause)
+  #define btnRoot       1             //Return to SD card root
 #else
   const byte chipSelect = 10;          //Sd card chip select pin
   
@@ -231,6 +249,33 @@
   digitalWrite(btnMotor,HIGH);
   pinMode(btnRoot, INPUT_PULLUP);
   digitalWrite(btnRoot, HIGH); 
+
+#elif defined(__AVR_ATmega32U4__) 
+  
+//  pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//  digitalWrite(btnPlay,HIGH); // Wrte for INPUT_PULLUP if input type is only INPUT
+  PORTD |= _BV(4);
+  
+//  pinMode(btnStop,INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//  digitalWrite(btnStop,HIGH);
+  PORTD |= _BV(5);
+
+//  pinMode(btnUp,INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//  digitalWrite(btnUp,HIGH);
+  PORTD |= _BV(7);
+
+//  pinMode(btnDown,INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//  digitalWrite(btnDown,HIGH);
+  PORTD |= _BV(6);
+
+//  pinMode(btnMotor, INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//  digitalWrite(btnMotor,HIGH);
+  PORTD |= _BV(2);
+  
+//  pinMode(btnRoot, INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//  digitalWrite(btnRoot, HIGH); 
+  PORTD |= _BV(3);
+
    
 #else  //__AVR_ATmega328P__
   //pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
