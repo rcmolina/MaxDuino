@@ -2498,7 +2498,7 @@ void wave2() {
   //Timer1.setPeriod(newTime - fudgeTime);    //Finally set the next pulse length
   
   #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
+    Timer1.setPeriod(newTime +6);    //Finally set the next pulse length
   #elif defined(__arm__) && defined(__STM32F1__)    
     //timer.setPeriod(newTime -4);
     newTime += 2;
