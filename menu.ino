@@ -50,6 +50,18 @@ void menuMode()
   }
   #endif
 
+enum MenuItems{
+  BAUD_RATE,
+#ifndef NO_MOTOR
+  MOTOR_CTL,
+#endif
+  TSX_POL_UEFSW,
+#ifdef MenuBLK2A
+  BLK2A,
+#endif
+  _Num_Menu_Items
+};
+
  void menuMode()
  { 
   byte menuItem=0;
@@ -61,17 +73,19 @@ void menuMode()
     if(updateScreen) {
       printtextF(PSTR("Menu"),0);
       switch(menuItem) {
-        case 0:
+        case MenuItems::BAUD_RATE:
         printtextF(PSTR("Baud Rate ?"),lineaxy);
         break;
-        case 1:
+      #ifndef NO_MOTOR
+        case MenuItems::MOTOR_CTL:
         printtextF(PSTR("Motor Ctrl ?"),lineaxy);
         break;
-        case 2:
+      #endif
+        case MenuItems::TSX_POL_UEFSW:
         printtextF(PSTR("TSXCzxpUEFSW ?"),lineaxy);
         break;
       #ifdef MenuBLK2A
-        case 3:
+        case MenuItems::BLK2A:
         printtextF(PSTR("Skip BLK:2A ?"),lineaxy);
         break;       
       #endif
@@ -80,13 +94,7 @@ void menuMode()
       updateScreen=false;
     }
     if(button_down() && !lastbtn){
-      #ifdef MenuBLK2A
-      if(menuItem<3) menuItem+=1;
-      #endif
-      #ifndef MenuBLK2A
-      if(menuItem<2) menuItem+=1;      
-      #endif
-      
+      if(menuItem<MenuItems::_Num_Menu_Items-1) menuItem+=1;
       lastbtn=true;
       updateScreen=true;
     }
@@ -97,7 +105,7 @@ void menuMode()
     }
     if(button_play() && !lastbtn) {
       switch(menuItem){
-        case 0:
+        case MenuItems::BAUD_RATE:
           subItem=0;
           updateScreen=true;
           lastbtn=true;
@@ -186,168 +194,26 @@ void menuMode()
           updateScreen=true;
         break;
 
-        case 1:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(!button_stop() || lastbtn) {
-            if(updateScreen) {
-              printtextF(PSTR("Motor Ctrl"),0);
-              if(mselectMask==0) printtextF(PSTR("off *"),lineaxy);
-              else  printtextF(PSTR("ON *"),lineaxy);
-        /*      switch(subItem) {
-                case 0:
-                  printtextF(PSTR("off"),lineaxy);
-                  if(mselectMask==0) printtextF(PSTR("off *"),lineaxy);
-                break;
-                case 1:
-                  printtextF(PSTR("ON"),lineaxy);
-                  if(mselectMask==1) printtextF(PSTR("ON *"),lineaxy);
-                break;                
-              } */
-              updateScreen=false;
-            }
-      /*              
-            if(button_down() && !lastbtn){
-              if(subItem<1) subItem+=1;
-              lastbtn=true;
-              updateScreen=true;
-            }
-            if(button_up() && !lastbtn) {
-              if(subItem>0) subItem+=-1;
-              lastbtn=true;
-              updateScreen=true;
-            }  */
-            
-            if(button_play() && !lastbtn) {
-              mselectMask= !mselectMask;
-          /*    switch(subItem) {
-                case 0:
-                  mselectMask=0;
-                break;
-                case 1:
-                  mselectMask=1;
-                break;
-              } */
-              lastbtn=true;
-              updateScreen=true;
-              #if defined(OLED1306) && defined(OSTATUSLINE) 
-                OledStatusLine();
-              #endif              
-            }
-            checkLastButton();
-          }
+   #ifndef NO_MOTOR
+        case MenuItems::MOTOR_CTL:
+          doOnOffSubmenu(PSTR("Motor Ctrl"), mselectMask);
           lastbtn=true;
           updateScreen=true;
-        break;
+          break;
+   #endif
 
-        case 2:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(!button_stop() || lastbtn) {
-            if(updateScreen) {
-              printtextF(PSTR("TSXCzxpolUEFSW"),0);
-              if(TSXCONTROLzxpolarityUEFSWITCHPARITY==0) printtextF(PSTR("off *"),lineaxy);
-              else  printtextF(PSTR("ON *"),lineaxy);
-          /*    switch(subItem) {
-                case 0:
-                  printtextF(PSTR("off"),1);
-                  if(TSXCONTROLzxpolarityUEFSWITCHPARITY==0) printtextF(PSTR("off *"),1);
-                break;
-                case 1:
-                  printtextF(PSTR("ON"),1);
-                  if(TSXCONTROLzxpolarityUEFSWITCHPARITY==1) printtextF(PSTR("ON *"),1);
-                break;                
-              } */
-              updateScreen=false;
-            }
-          /*          
-            if(button_down() && !lastbtn){
-              if(subItem<1) subItem+=1;
-              lastbtn=true;
-              updateScreen=true;
-            }
-            if(button_up() && !lastbtn) {
-              if(subItem>0) subItem+=-1;
-              lastbtn=true;
-              updateScreen=true;
-            } */
-            if(button_play() && !lastbtn) {
-              TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
-          /*    switch(subItem) {
-                case 0:
-                  TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
-                break;
-                case 1:
-                  TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
-                break;
-              } */
-              lastbtn=true;
-              updateScreen=true;
-              #if defined(OLED1306) && defined(OSTATUSLINE) 
-                OledStatusLine();
-              #endif
-            }
-            checkLastButton();
-          }
+        case MenuItems::TSX_POL_UEFSW:
+          doOnOffSubmenu(PSTR("TSXCzxpolUEFSW"), TSXCONTROLzxpolarityUEFSWITCHPARITY);
           lastbtn=true;
           updateScreen=true;
-        break;
+          break;
+          
    #ifdef MenuBLK2A
-        case 3:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(!button_stop() || lastbtn) {
-            if(updateScreen) {
-              printtextF(PSTR("Skip BLK:2A"),0);
-              if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
-              else  printtextF(PSTR("ON *"),lineaxy);
-          /*    switch(subItem) {
-                case 0:
-                  printtextF(PSTR("off"),lineaxy);
-                  if(skip2A==0) printtextF(PSTR("off *"),lineaxy);
-                break;
-                case 1:
-                  printtextF(PSTR("ON"),lineaxy);
-                  if(skip2A==1) printtextF(PSTR("ON *"),lineaxy);
-                break;                
-              }    */
-              updateScreen=false;
-            }
-          /*          
-            if(button_down() && !lastbtn){
-              if(subItem<1) subItem+=1;
-              lastbtn=true;
-              updateScreen=true;
-            }
-            if(button_up() && !lastbtn) {
-              if(subItem>0) subItem+=-1;
-              lastbtn=true;
-              updateScreen=true;
-            }  */
-            if(button_play() && !lastbtn) {
-              skip2A = !skip2A;
-          /*    switch(subItem) {
-                case 0:
-                  skip2A=0;
-                break;
-                case 1:
-                  skip2A=1;
-                break;
-              } */
-              lastbtn=true;
-              updateScreen=true;
-              #if defined(OLED1306) && defined(OSTATUSLINE) 
-            //    OledStatusLine();
-              #endif
-            } 
-            checkLastButton();
-          }
+        case MenuItems::BLK2A:
+          doOnOffSubmenu(PSTR("Skip BLK:2A"), skip2A);
           lastbtn=true;
           updateScreen=true;
-        break;
+          break;
    #endif     
       }
     }
@@ -359,6 +225,30 @@ void menuMode()
 
   debounce(button_stop);
  }
+
+void doOnOffSubmenu(const char * title, byte& refVar)
+{
+  bool updateScreen=true;
+  lastbtn=true;
+  while(!button_stop() || lastbtn) {
+    if(updateScreen) {
+      printtextF(title,0);
+      if(refVar==0) printtextF(PSTR("off *"),lineaxy);
+      else  printtextF(PSTR("ON *"),lineaxy);
+      updateScreen=false;
+    }
+    
+    if(button_play() && !lastbtn) {
+      refVar = !refVar;
+      lastbtn=true;
+      updateScreen=true;
+      #if defined(OLED1306) && defined(OSTATUSLINE) 
+        OledStatusLine();
+      #endif              
+    }
+    checkLastButton();
+  }
+}
 
 #ifdef LOAD_EEPROM_SETTINGS
  void updateEEPROM()
@@ -390,8 +280,12 @@ void menuMode()
     break;
   }
 
+  #ifndef NO_MOTOR
   if(mselectMask) settings |=128;
+  #endif
+
   if(TSXCONTROLzxpolarityUEFSWITCHPARITY) settings |=64;
+  
   #ifdef MenuBLK2A
   if(skip2A) settings |=32;
   #endif
@@ -414,17 +308,21 @@ void menuMode()
   #endif
       
   if(!settings) return;
-
+  
+  #ifndef NO_MOTOR
   if(bitRead(settings,7)) {
     mselectMask=1;
   } else {
     mselectMask=0;
   }
+  #endif
+
   if(bitRead(settings,6)) {
     TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
   } else {
     TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
   }
+  
   #ifdef MenuBLK2A
   if(bitRead(settings,5)) {
     skip2A=1;
@@ -432,6 +330,7 @@ void menuMode()
     skip2A=0;
   }   
   #endif
+  
   if(bitRead(settings,0)) {
     BAUDRATE=1200;
   }
@@ -444,9 +343,6 @@ void menuMode()
   if(bitRead(settings,3)) {
     BAUDRATE=3850;  
   }
-//  setBaud();
-  //UniSetup();
- 
  }
 #endif
 
