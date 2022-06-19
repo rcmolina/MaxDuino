@@ -122,8 +122,9 @@
 #define btnRoot       PA4           //Return to SD card root
 
 #elif defined(__AVR_ATmega32U4__) 
+  #define NO_MOTOR  
   const byte chipSelect = SS;          //Sd card chip select pin
-  
+
   #define btnPlay       4            //Play Button
   #define btnStop       30            //Stop Button
   #define btnUp         6            //Up button

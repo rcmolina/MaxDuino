@@ -1747,9 +1747,11 @@ void OledStatusLine() {
       setXY(0,7);
       //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
       itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
-      setXY(5,7);
-      if(mselectMask==1) sendStr(" M:ON");
-      else sendStr("m:off");    
+      #ifndef NO_MOTOR       
+        setXY(5,7);
+        if(mselectMask==1) sendStr(" M:ON");
+        else sendStr("m:off");
+      #endif    
       setXY(11,7); 
       if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
       else sendStr("%^off");    
@@ -1757,9 +1759,11 @@ void OledStatusLine() {
       setXY(0,3);
       //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
       itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
-      setXY(5,3);
-      if(mselectMask==1) sendStr(" M:ON");
-      else sendStr("m:off");    
+      #ifndef NO_MOTOR        
+        setXY(5,3);
+        if(mselectMask==1) sendStr(" M:ON");
+        else sendStr("m:off");
+      #endif    
       setXY(11,3); 
       if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
       else sendStr("%^off");
@@ -1767,14 +1771,13 @@ void OledStatusLine() {
   #endif
   #ifdef XY2                        // Y with double value
     #ifdef OLED1306_128_64          // 8 rows supported
-        sendStrXY("ID:   BLK:",4,4);
-         
+        sendStrXY("ID:   BLK:",4,4);        
         //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
         itoa(BAUDRATE,(char *)input,10);sendStrXY((char *)input,0,6);
-        
-        if(mselectMask==1) sendStrXY(" M:ON",5,6);
-        else sendStrXY("m:off",5,6);  
-          
+        #ifndef NO_MOTOR       
+          if(mselectMask==1) sendStrXY(" M:ON",5,6);
+          else sendStrXY("m:off",5,6);  
+        #endif      
         if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStrXY(" %^ON",11,6);
         else sendStrXY("%^off",11,6);           
     #else
