@@ -1580,16 +1580,14 @@ void TZXProcess() {
 
                   count += -1;
                 } else {
-                  pauseOn=1;
                   currentTask = GETID;
-                  printtext2F(PSTR("PAUSED* "),0);
                   count = 255;
-                  forcePause0=0;
+                  ForcePauseAfter0();
                 }
               } else { 
                 currentTask = GETID;
                 if(EndOfFile==true) currentID=IDEOF;
-              } 
+              }
           } 
         break;
     
@@ -2815,6 +2813,14 @@ void FlushBuffer(long newcount) {
     } else {
       count= newcount;
       currentBlockTask=SYNC1;
+      if (!skip2A) ForcePauseAfter0();
       return;
     }  
 }
+void ForcePauseAfter0() {
+    pauseOn=1;
+    printtext2F(PSTR("PAUSED* "),0);
+    forcePause0=0;
+    return;  
+}
+
