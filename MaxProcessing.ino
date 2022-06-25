@@ -1517,11 +1517,11 @@ void TZXProcess() {
                 if (currentBit >0) OricBitWrite();
                 else {
                   ReadByte(bytesRead);currentByte=outByte;currentBit = 11; bitChecksum = 0;lastByte=0;
-                  if (currentByte==0x00) {count=1;currentBit = 0; currentBlockTask=NAMELAST;}
+                  if (currentByte==0x00) {count=1;currentBit = 0; currentBlockTask=NAME00;}
                 }               
                 break;
                 
-             case NAMELAST:
+             case NAME00:
                 if(currentBit >0) OricBitWrite();             
                 else {
                       if (count >0) {currentByte=0x00; currentBit = 11; bitChecksum = 0;lastByte=0; count--;} 
@@ -1601,7 +1601,6 @@ void TZXProcess() {
             
             currentPeriod = 10;
             bitSet(currentPeriod, 15);
-            //bitSet(currentPeriod, 12); 
             bitSet(currentPeriod, 13);
             
           #elif defined(__arm__) && defined(__STM32F1__)
@@ -2205,7 +2204,7 @@ void OricDataBlock() {
       count =255;
   //    currentID = IDPAUSE;
       currentTask = GETID;
-      currentID=IDEOF;
+      //currentID=IDEOF;
       
       return;
     }
@@ -2344,8 +2343,22 @@ void OricBitWrite(){
   }
        if ((currentBit==0) && (lastByte)) {
         //currentTask = GETCHUNKID;
+      #ifdef MenuBLK2A 
+        count = 255; 
+        if(ReadByte(bytesRead)==1) { 
+          bytesRead += -1;                      //rewind a byte if we've not reached the end           
+          currentBlockTask = PAUSE;
+        }else {
+          //EndOfFile=true;
+          //temppause = pauseLength;
+          //currentID = IDPAUSE;
+          currentTask = GETID;
+          return;
+        }
+      #else
         count = 255;
         currentBlockTask = PAUSE;
+      #endif
       }    
 }
 
@@ -2798,7 +2811,7 @@ void DelayedStop() {
 void FlushBuffer(long newcount) {
     //currentPeriod = 100; // 100ms pause
     //bitSet(currentPeriod, 15);
-    if(!count==0) {
+/*    if(!count==0) {
 
     #if defined(__AVR__) || defined(__SAMD21__)
       currentPeriod = 32769;
@@ -2815,7 +2828,19 @@ void FlushBuffer(long newcount) {
       currentBlockTask=SYNC1;
       if (!skip2A) ForcePauseAfter0();
       return;
-    }  
+    }  */
+      if(count>0) {
+        currentPeriod = ORICONEPULSE;
+        count--;
+      } else {   
+        count= newcount;
+        currentBlockTask=SYNC1;
+        #ifdef MenuBLK2A
+          if (!skip2A) ForcePauseAfter0();
+        #endif
+      }             
+      return;
+    
 }
 void ForcePauseAfter0() {
     pauseOn=1;

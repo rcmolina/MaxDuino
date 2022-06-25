@@ -132,7 +132,7 @@ word currentPeriod=1;
 #define NAME                  7
 #define GAP                   8
 #define SYNCLAST              9
-#define NAMELAST              10
+#define NAME00                10
 
 
 //Spectrum Standards
