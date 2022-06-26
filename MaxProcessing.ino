@@ -1506,10 +1506,13 @@ void TZXProcess() {
                         if      (count == 5) bytesToRead = 256*outByte;
                         else if (count == 4) bytesToRead += (outByte +1) ;
                         else if (count == 3) bytesToRead -= (256 * outByte) ;
-                        else if (count == 2) bytesToRead -= outByte; 
+                        else if (count == 2) bytesToRead = (unsigned long)(unsigned int)(bytesToRead - outByte); 
                         count--;
                       }
-                      else currentBlockTask=NAME;
+                      else {currentBlockTask=NAME;
+                      //bytesToRead=(unsigned long)(unsigned int)bytesToRead;
+                      //ltoa(bytesRead,PlayBytes,16);printtext(PlayBytes,lineaxy);
+                      }
                 }
                 break;
                 

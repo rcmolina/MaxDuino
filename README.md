@@ -3,6 +3,7 @@
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
+26/06/2022 Oric: Fixed pointer bug when loading some tap programs (Pulsoid, @desUBIKado).
 24/06/2022 Assisted Oric tap multiblock loading with automatic pausing when setting Skip_BLK2A flag to off in menu.
 18/06/2022 SAMD21 Support (@David), tested Arduino Micro and new pin definitions (@Rafa)
 14/06/2022 SdFat much improved, now userconfig7.h with all options activated, and also until 10 subdirs and max filelength 256. David is your hero!
