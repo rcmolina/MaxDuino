@@ -334,7 +334,7 @@
     while(*stringH){      
       //setXY (Xh,Y+1);
       #if defined(Use_SoftI2CMaster)        
-        i2c_start((OLED_address<<1)|I2C_WRITE)
+        i2c_start((OLED_address<<1)|I2C_WRITE);
         i2c_write(0x40); 
       #else                 
         Wire.beginTransmission(OLED_address); // begin transmitting
