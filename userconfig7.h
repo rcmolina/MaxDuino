@@ -103,7 +103,7 @@ byte lineaxy=2;
 #define BLOCKTAP_IN
 #define OLEDPRINTBLOCK 
 #define BLOCK_EEPROM_START 512
-//#define LOAD_EEPROM_SETTINGS
+#define LOAD_EEPROM_SETTINGS
 #define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
 #define OSTATUSLINE
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ byte lineaxy=2;
 //#define EEPROM_LOGO_COMPRESS
 //#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-//#define LOAD_EEPROM_LOGO 
+#define LOAD_EEPROM_LOGO 
 
 #if defined(OLED1306_128_64) || defined(video64text32)
   //#define EmptyLogo               // to erase
