@@ -220,14 +220,6 @@ void setup() {
   #include "pinSetup.h"
   pinMode(chipSelect, OUTPUT);      //Setup SD card chipselect pin
 
-  #ifdef USB_STORAGE_ENABLED
-  if (sd.begin(chipSelect,SPI_FULL_SPEED)) {
-    // need to do this as early as possible, to ensure mass storage gets enumerated
-    // see https://github.com/adafruit/Adafruit_TinyUSB_ArduinoCore/issues/4
-    setup_usb_storage();
-  }
-  #endif
-
   #ifdef LCDSCREEN16x2
     lcd.init();                     //Initialise LCD (16x2 type)
     //lcd.begin();                     //Initialise LCD (16x2 type)    
@@ -296,14 +288,18 @@ void setup() {
       #endif
   #endif
   
-    while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
-     //Start SD card and check it's working
-      printtextF(PSTR("No SD Card"),0);
-    //lcd_clearline(0);
-    //lcd.print(F("No SD Card"));
-//    return;
-//    delay(250);
-    }    
+  while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
+    //Start SD card and check it's working
+    printtextF(PSTR("No SD Card"),0);
+    delay(50);
+  }    
+
+  #ifdef USB_STORAGE_ENABLED
+  usb_detach();
+  delay(500);
+  usb_retach();
+  setup_usb_storage();
+  #endif
 
   changeDirRoot();
   UniSetup();                       //Setup TZX specific options

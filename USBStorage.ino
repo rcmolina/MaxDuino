@@ -67,4 +67,16 @@ void msc_flush_cb (void)
   // nothing to do
 }
 
+void usb_detach()
+{
+  //usb_msc.detach();
+  USBDevice.detach();
+}
+
+void usb_retach()
+{
+  //usb_msc.retach();
+  USBDevice.attach();
+}
+
 #endif
