@@ -68,7 +68,6 @@ byte out=LOW;
 byte lastByte;
 byte currpct = 100;
 byte newpct = 0;
-//uint8_t SpecialChar [8]= { 0x00, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00, 0x00 };
 byte spinpos = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
@@ -147,11 +146,9 @@ word currentPeriod=1;
 
 //ZX81 Standards
 #define ZX80PULSE                 160
-//#define ZX80TURBOPULSE            150
 #define ZX80TURBOPULSE            120
 
 #define ZX80BITGAP                1442
-//#define ZX80TURBOBITGAP           1340
 #define ZX80TURBOBITGAP           500
 
 //ZX81 Pulse Patterns - Zero Bit  - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
@@ -164,7 +161,6 @@ PROGMEM const byte TAPcheck[7] = {'T','A','P','t','a','p','.'};
 PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
 PROGMEM const byte AYFile[8] = {'Z','X','A','Y','E','M','U','L'};           // added additional AY file header check
 PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','F','i','l','e',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
-//const char TAPHdr[24] = {0x13,0x0,0x0,0x3,' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x52,0x1C,0xB,0xFF};
 //Main Variables
 byte AYPASS = 0;
 byte hdrptr = 0;
@@ -197,10 +193,8 @@ byte passforOne=4;
 
 byte oneBitPulses = 4;
 byte zeroBitPulses = 2;
-//byte startBits = 1;
 byte startBitPulses = 2;
 byte startBitValue = 0;
-//byte stopBits = 2;
 byte stopBitPulses = 8;
 byte stopBitValue = 1;
 byte endianness = 0;      //0:LSb 1:MSb (default:0)
@@ -264,48 +258,33 @@ PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
 #define UEFZEROPULSE             416
 #define UEFONEPULSE              208
 
-#ifdef TURBOBAUD1500
-#define UEFTURBOPILOTPULSES       outWord<<2
-#define UEFTURBOPILOTLENGTH       156
-#define UEFTURBOZEROPULSE         332
-#define UEFTURBOONEPULSE          166
-#endif
-
-#ifdef TURBOBAUD1550
-#define UEFTURBOPILOTPULSES       320
-#define UEFTURBOPILOTLENGTH       161
-#define UEFTURBOZEROPULSE         322
-#define UEFTURBOONEPULSE          161
-#endif
-
-#ifdef TURBOBAUD1600
-#define UEFTURBOPILOTPULSES       320
-#define UEFTURBOPILOTLENGTH       156
-#define UEFTURBOZEROPULSE         313
-#define UEFTURBOONEPULSE          156
+#if defined(TURBOBAUD1500)
+  #define UEFTURBOPILOTPULSES       outWord<<2
+  #define UEFTURBOPILOTLENGTH       156
+  #define UEFTURBOZEROPULSE         332
+  #define UEFTURBOONEPULSE          166
+#elif defined(TURBOBAUD1550)
+  #define UEFTURBOPILOTPULSES       320
+  #define UEFTURBOPILOTLENGTH       161
+  #define UEFTURBOZEROPULSE         322
+  #define UEFTURBOONEPULSE          161
+#elif defined(TURBOBAUD1600)
+  #define UEFTURBOPILOTPULSES       320
+  #define UEFTURBOPILOTLENGTH       156
+  #define UEFTURBOZEROPULSE         313
+  #define UEFTURBOONEPULSE          156
 #endif
 
 #define DEBUG 0
-unsigned long debugCount=0;
 
 word chunkID = 0;
-// Set uefTurboMode to 0 if the default is 1200 baud. Set to 1 if the default is turbo speed. Holding doown 'ROOT' button on poweron, toggles this
-byte uefTurboMode=0;
 float outFloat;
 byte UEFPASS = 0;
 
-//#define ORICZEROPULSE     416
 #define ORICZEROLOWPULSE  208
 #define ORICZEROHIGHPULSE 416
 #define ORICONEPULSE      208
-//#define ORICONELOWPULSE   208
-//#define ORICONEHIGHPULSE  208
 
-//#define ORICTURBOZEROPULSE     416
 #define ORICTURBOZEROLOWPULSE  60
 #define ORICTURBOZEROHIGHPULSE 470
 #define ORICTURBOONEPULSE      60
-//#define ORICTURBOONELOWPULSE   208
-//#define ORICTURBOONEHIGHPULSE  208
-
-
