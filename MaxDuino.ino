@@ -165,7 +165,7 @@ char fline[17];
 SdFat sd;                           //Initialise Sd card 
 SdBaseFile entry, currentDir, tmpdir;                       //SD card file and directory
 
-#define filenameLength 217
+#define filenameLength 255
 
 char fileName[filenameLength + 1];    //Current filename
 #define nMaxPrevSubDirs 10
