@@ -338,9 +338,9 @@
 // The bands are intentionally set very wide, and far apart
 // Each button acts as a voltage divider between 10k and the following resistors:
 #define btnADCPlayLow 980 // 0 ohm
-#define btnADCStopLow 900 // 1k ohm
-#define btnADCRootLow 700 // 2.4k ohm
-#define btnADCDownLow 400 // 10k ohm
+#define btnADCStopLow 850 // 1k ohm
+#define btnADCRootLow 520 // 2.4k ohm
+#define btnADCDownLow 360 // 10k ohm
 #define btnADCUpLow 200 // 20k ohm
 #endif
 
