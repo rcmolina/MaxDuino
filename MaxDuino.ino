@@ -185,14 +185,15 @@ byte oldMotorState = 1;             //Last motor control state
 byte start = 0;                     //Currently playing flag
 
 byte pauseOn = 0;                   //Pause state
-uint16_t currentFile = 0;           //File index (per filesystem) of current file, relative to current directory (pointed to by currentDir)
-uint16_t maxFile = 0;                    //Total number of files in directory
+uint16_t currentFile;               //File index (per filesystem) of current file, relative to current directory (pointed to by currentDir)
+uint16_t maxFile;                   //Total number of files in directory
+bool dirEmpty;                      //flag if directory is completely empty
 uint16_t oldMinFile = 0;
 uint16_t oldMaxFile = 0;
 #define fnameLength  5
 char oldMinFileName[fnameLength];
 char oldMaxFileName[fnameLength];
-byte isDir = 0;                     //Is the current file a directory
+bool isDir;                         //Is the current file a directory
 unsigned long timeDiff = 0;         //button debounce
 
 #if (SPLASH_SCREEN && TIMEOUT_RESET)
@@ -789,7 +790,6 @@ void loop(void) {
              subdir=0;
              changeDirRoot();
              getMaxFile();
-             currentFile=0;
              seekFile();
           #endif         
        #endif
@@ -1146,6 +1146,7 @@ void loop(void) {
 void upFile() {    
   // move up a file in the directory.
   // find prior index, using currentFile.
+  if (dirEmpty) return;
   oldMinFile = 0;
   oldMaxFile = maxFile;
   while(currentFile!=0)
@@ -1173,6 +1174,7 @@ void upFile() {
 
 void downFile() {    
   //move down a file in the directory
+  if (dirEmpty) return;
   oldMinFile = 0;
   oldMaxFile = maxFile;
   currentFile++;
@@ -1182,6 +1184,7 @@ void downFile() {
 
 void upHalfSearchFile() {    
   //move up to half-pos between oldMinFile and currentFile
+  if (dirEmpty) return;
 
   if (currentFile >oldMinFile) {
     oldMaxFile = currentFile;
@@ -1197,6 +1200,7 @@ void upHalfSearchFile() {
 
 void downHalfSearchFile() {    
   //move down to half-pos between currentFile amd oldMaxFile
+  if (dirEmpty) return;
 
   if (currentFile <oldMaxFile) {
     oldMinFile = currentFile;
@@ -1213,25 +1217,31 @@ void downHalfSearchFile() {
 void seekFile() {    
   //move to a set position in the directory, store the filename, and display the name on screen.
   entry.close(); // precautionary, and seems harmless if entry is already closed
-  
-  while (!entry.open(&currentDir, currentFile, O_RDONLY))
+  if (dirEmpty)
   {
-    // if entry.open fails, when given an index, sdfat 2.1.2 automatically adjust curPosition to the next good entry
-    // (which means that we can just retry calling open, passing in curPosition)
-    // but sdfat 1.1.4 does not automatically adjust curPosition, so we cannot do that trick.
-    // We cannot call openNext, because (with sdfat 2.1.2) the position has ALREADY been adjusted, so you will actually
-    // miss a file.
-    // so need to do this manually (to support both library versions), via incrementing currentFile manually
-    currentFile++;
+    strcpy(fileName, PSTR("[EMPTY]"));
   }
+  else
+  {
+    while (!entry.open(&currentDir, currentFile, O_RDONLY) && currentFile<maxFile)
+    {
+      // if entry.open fails, when given an index, sdfat 2.1.2 automatically adjust curPosition to the next good entry
+      // (which means that we can just retry calling open, passing in curPosition)
+      // but sdfat 1.1.4 does not automatically adjust curPosition, so we cannot do that trick.
+      // We cannot call openNext, because (with sdfat 2.1.2) the position has ALREADY been adjusted, so you will actually
+      // miss a file.
+      // so need to do this manually (to support both library versions), via incrementing currentFile manually
+      currentFile++;
+    }
 
-  entry.getName(fileName,filenameLength);
-  filesize = entry.fileSize();
-  #ifdef AYPLAY
-  ayblklen = filesize + 3;  // add 3 file header, data byte and chksum byte to file length
-  #endif
-  if(entry.isDir() || !strcmp(fileName, "ROOT")) { isDir=1; } else { isDir=0; }
-  entry.close();
+    entry.getName(fileName,filenameLength);
+    filesize = entry.fileSize();
+    #ifdef AYPLAY
+    ayblklen = filesize + 3;  // add 3 file header, data byte and chksum byte to file length
+    #endif
+    if(entry.isDir() || !strcmp(fileName, "ROOT")) { isDir=1; } else { isDir=0; }
+    entry.close();
+  }
 
   PlayBytes[0]='\0'; 
   if (isDir==1) {
@@ -1276,45 +1286,25 @@ void stopFile() {
 }
 
 void playFile() {
-  //PlayBytes[0]='\0';
-  //strcat_P(PlayBytes,PSTR("Playing "));ltoa(filesize,PlayBytes+8,10);strcat_P(PlayBytes,PSTR("B"));  
   if(isDir==1) {
     //If selected file is a directory move into directory
     changeDir();
   }
-  else if (fileName[0] == '\0') 
+  else if (!dirEmpty) 
   {
-    #ifdef LCDSCREEN16x2
-      printtextF(PSTR("No File Selected"),1);
-    #endif      
-    #ifdef OLED1306
-      printtextF(PSTR("No File Selected"),lineaxy);
-    #endif
-    #ifdef P8544
-      printtextF(PSTR("No File Selected"),1);
-    #endif
-    
-    //lcd_clearline(1);
-    //lcd.print(F("No File Selected"));
-  }
-  else
-  {
-      printtextF(PSTR("Playing"),0);
-      //printtext(PlayBytes,0);
-      //lcd_clearline(0);
-      //lcd.print(PlayBytes);      
-      scrollPos=0;
-      pauseOn = 0;
-      scrollText(fileName);
-      currpct=100;
-      lcdsegs=0;
-      UniPlay();
-        #ifdef P8544
-          lcd.gotoRc(3,38);
-          lcd.bitmap(Play, 1, 6);
-        #endif      
-      start=1;       
-    }    
+    printtextF(PSTR("Playing"),0);
+    scrollPos=0;
+    pauseOn = 0;
+    scrollText(fileName);
+    currpct=100;
+    lcdsegs=0;
+    UniPlay();
+      #ifdef P8544
+        lcd.gotoRc(3,38);
+        lcd.bitmap(Play, 1, 6);
+      #endif      
+    start=1;       
+  }    
 }
 
 void getMaxFile() {    
@@ -1322,25 +1312,34 @@ void getMaxFile() {
   // and also gets the file index of the last file found in this directory
   currentDir.rewind();
   maxFile = 0;
+  dirEmpty=true;
   while(entry.openNext(&currentDir, O_RDONLY)) {
     maxFile = currentDir.curPosition()/32-1;
+    dirEmpty=false;
     entry.close();
   }
   currentDir.rewind(); // precautionary but I think might be unnecessary since we're using currentFile everywhere else now
+  oldMinFile = 0;
   oldMaxFile = maxFile;
+  currentFile = 0;
 }
 
 void changeDir() {    
   // change directory (to whatever is currently the selected fileName)
   // if fileName="ROOT" then return to the root directory
-                      
-  if(!strcmp(fileName, "ROOT"))
+  if (dirEmpty) {
+    // do nothing because you haven't selected a valid file yet and the directory is empty
+    return;
+  }
+  else if(!strcmp(fileName, "ROOT"))
   {
     subdir=0;    
     changeDirRoot();
-  } else {
-     //if (subdir >0) entry.cwd()->getName(prevSubDir[subdir-1],filenameLength); // Antes de cambiar
-     if (subdir < nMaxPrevSubDirs) {
+  }
+  else
+  {
+    //if (subdir >0) entry.cwd()->getName(prevSubDir[subdir-1],filenameLength); // Antes de cambiar
+    if (subdir < nMaxPrevSubDirs) {
       DirFilePos[subdir] = currentFile;
       subdir++;
       // but, also, stash the current filename as the parent (prevSubDir) for display
@@ -1353,8 +1352,6 @@ void changeDir() {
     tmpdir.close();
   }
   getMaxFile();
-  currentFile=0;
-  oldMinFile=0;
   seekFile();
 }
 
@@ -1385,7 +1382,6 @@ void changeDirParent()
    
   getMaxFile();
   currentFile = this_directory; // select the directory we were in, as the current file in the parent
-  oldMinFile=0;
   seekFile(); // don't forget that this will put the real filename back into fileName 
 }
 
