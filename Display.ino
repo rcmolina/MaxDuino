@@ -243,7 +243,13 @@
     not_used := 255 101..254
     */  
     sendcommand(0xAE);             //DISPLAYOFF
-      
+
+    // sendcommand(0xD5);  // SSD1306_SETDISPLAYCLOCKDIV
+    // sendcommand(0x80);  // the suggested ratio 0x80
+
+    // sendcommand(0xD3);  // SSD1306_SETDISPLAYOFFSET
+    // sendcommand(0x0);  // no offset
+
     #if defined(OLED1306_128_64) || defined(video64text32) 
       sendcommand(0xA8);            //SSD1306_SETMULTIPLEX      
       sendcommand(0x3f);            //--1/48 duty, NEW!!!  128x64 OLED: 0x3f
@@ -290,6 +296,16 @@
       sendcommand(0x20);            //Set Memory Addressing Mode
       sendcommand(0x02);            //Set Memory Addressing Mode ab Page addressing mode      
     #endif              
+
+    // sendcommand(0xd9); // SSD1306_SETPRECHARGE
+    // sendcommand(0xF1);
+
+    // sendcommand(0xDB); // SSD1306_SETVCOMDETECT
+    // sendcommand(0x40);
+
+    // sendcommand(0xA4); // SSD1306_DISPLAYALLON_RESUME
+    // sendcommand(0xA6); // SSD1306_NORMALDISPLAY
+    // sendcommand(0x2E); // SSD1306_DEACTIVATE_SCROLL
 
     #if defined(OLED1306_128_64) || defined(video64text32)
       for(int j=0;j<8;j++) {

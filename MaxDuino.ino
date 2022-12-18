@@ -148,6 +148,10 @@
   #include "userSTM32config.h"  
 #elif defined(SEEED_XIAO_M0)
   #include "userSEEEDUINO_XIAO_M0config.h"
+#elif defined(ARDUINO_XIAO_ESP32C3)
+#include "userSEEEDUINO_XIAO_ESP32C3.h"
+#elif defined(ARDUINO_ESP8266_WEMOS_D1MINI)
+  #include "userARDUINO_ESP8266_WEMOS_D1MINI.h"
 #else //__AVR_ATmega328P__
   #include "userconfig.h"
 #endif
@@ -234,7 +238,7 @@ void setup() {
   #endif
   
   #ifdef SERIALSCREEN
-    Serial.begin(115200);
+  Serial.begin(115200);
   #endif
   
   #ifdef OLED1306
@@ -254,6 +258,8 @@ void setup() {
     analogWrite (backlight_pin, 20);
     P8544_splash(); 
   #endif
+
+  setup_buttons();
  
   #ifdef SPLASH_SCREEN
       while (!button_any()){
@@ -263,8 +269,9 @@ void setup() {
           reset_display();           // Clear logo and load saved mode
       #endif
   #endif
-  
-  while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
+
+  //while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
+  while (!sd.begin(SdSpiConfig(chipSelect, DEDICATED_SPI, SD_SPI_CLOCK_SPEED))) {
     //Start SD card and check it's working
     printtextF(PSTR("No SD Card"),0);
     delay(50);

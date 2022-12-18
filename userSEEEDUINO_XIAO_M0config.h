@@ -1,4 +1,4 @@
-////////////////                 CONFIG FOR DAVE's SEEEDUINO XIAO (M0)
+////////////////                 CONFIG FOR DAVE's SEEEDUINO XIAO M0 (SAMD21)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 

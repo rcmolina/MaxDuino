@@ -10,6 +10,19 @@
   #define I2CCLOCK  100000L   //100000L for StandarMode, 400000L for FastMode and 1000000L for FastModePlus
 #endif
 
+// default SPI clock speed
+#ifndef SD_SPI_CLOCK_SPEED
+  #if defined(ESP32) || defined(ESP8266)
+    #ifndef SD_SPI_CLOCK_SPEED
+      #define SD_SPI_CLOCK_SPEED SD_SCK_MHZ(4)
+    #endif
+  #endif
+
+  #ifndef SD_SPI_CLOCK_SPEED
+    #define SD_SPI_CLOCK_SPEED SPI_FULL_SPEED
+  #endif
+#endif
+
 #if defined(__AVR_ATmega4809__) || defined (__AVR_ATmega4808__)
   #ifdef Use_SoftI2CMaster
     #undef Use_SoftI2CMaster
@@ -54,24 +67,26 @@
   #endif
      
   //#define TimerOne  
-#elif defined(__SAMD21__)
+#elif defined(__SAMD21__) || defined(ESP32) || defined(ESP8266)
   #ifdef Use_SoftI2CMaster
     #undef Use_SoftI2CMaster
-    //#error This chip does not support SoftI2CMaster. Please undefine Use_SoftI2CMaster
   #endif
   #ifdef Use_SoftWire
     #undef Use_SoftWire
-    //#error This chip does not support Softwire. Please undefine Use_SoftWire
-  #endif  
+  #endif
 
 #elif defined(__AVR_ATmega32U4__)
 //#undef Use_SoftI2CMaster
 //#undef Use_SoftWire
 //#undef I2CFAST
 
-#else  //__AVR_ATmega328P__
+#elif defined(__AVR_ATmega328P__)
   //#define TimerOne
+
+#else
+  #error I2C definitions (SoftI2CMaster/SoftWire/etc) not defined for board
 #endif
+
 
 #ifdef TimerOne
   #include <TimerOne.h>
@@ -80,6 +95,7 @@
   #include "TimerCounter.h"
 #endif
 
+
 #if defined(__arm__) && defined(__STM32F1__) 
   #include <itoa.h>  
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
@@ -87,8 +103,8 @@
   #define strcasecmp_P(a,b) strcasecmp((a), (b)) 
 #endif
 
-#include <SdFat.h>
 
+#include <SdFat.h>
 
 #define scrollSpeed   250           //text scroll delay
 #define scrollWait    3000          //Delay before scrolling starts
