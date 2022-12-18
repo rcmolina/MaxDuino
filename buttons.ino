@@ -5,7 +5,20 @@
 
 void setup_buttons(void)
 {
-  pinMode(btnADC, INPUT_PULLUP);
+  pinMode(btnADC, INPUT);
+  #if !defined(ESP8266)
+  // analogReadResolution is only defined on certain platforms (including SAMD21 and ESP32, but not including ESP8266)
+  // For some devices, the resolution is 10 bits by default (which is why we set other platforms to also use 10 bits
+  // so that all the same code works on all the devices)
+  // ESP8266 defaults to 10 bits anyway
+  analogReadResolution(10);
+  #endif
+
+  #if defined(ESP32)
+  // ESP32 has additional options for setting ADC range
+  analogSetAttenuation(ADC_11db);
+  analogSetClockDiv(255);
+  #endif
 }
 
   // todo - use isr to capture buttons?

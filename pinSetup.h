@@ -49,7 +49,7 @@
   #define WRITE_HIGH          PORTE |=  _BV(6)         // El pin PE6 es el bit6 del PORTE
   
 #elif defined(SEEED_XIAO_M0)
-  #define outputPin           0
+  #define outputPin           A0
   #define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
   //#define INIT_OUTPORT            pinMode(outputPin,OUTPUT); GPIOA->regs->CRH |=  0x00000030  
   #define WRITE_LOW               digitalWrite(outputPin,LOW)
@@ -58,6 +58,18 @@
   #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
   //#define WRITE_HIGH              GPIOA->regs->ODR |=  0b0000001000000000
   //#define WRITE_HIGH              gpio_write_bit(GPIOA, 9, HIGH)
+
+#elif defined(ARDUINO_XIAO_ESP32C3)
+  #define outputPin         D0
+  #define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
+  #define WRITE_LOW               digitalWrite(outputPin,LOW)
+  #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
+
+#elif defined(ARDUINO_ESP8266_WEMOS_D1MINI)
+  #define outputPin           16 // D0
+  #define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
+  #define WRITE_LOW               digitalWrite(outputPin,LOW)
+  #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
 
 #else  //__AVR_ATmega328P__
   //#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
@@ -140,6 +152,25 @@
 #define BUTTON_ADC
 #define btnADC        A3 // analog input pin for ADC buttons
 #define NO_MOTOR    // because no spare gpio
+
+#elif defined(ARDUINO_XIAO_ESP32C3)
+//
+// Pin definition for Seeeduino Xiao ESP32C3 boards
+//
+
+#define chipSelect    D7
+#define BUTTON_ADC
+#define btnADC        A3 // analog input pin for ADC buttons
+#define NO_MOTOR    // because no spare gpio
+
+#elif defined(ARDUINO_ESP8266_WEMOS_D1MINI)
+//
+// Pin definition for Wemos D1 Mini (ESP8266) boards
+//
+#define chipSelect    15
+#define BUTTON_ADC
+#define btnADC        A0 
+#define btnMotor      2
 
 #else
   const byte chipSelect = 10;          //Sd card chip select pin
@@ -302,7 +333,7 @@
   PORTD |= _BV(3);
 
    
-#elif defined (SEEED_XIAO_M0)
+#elif defined(SEEED_XIAO_M0) || defined(ARDUINO_XIAO_ESP32C3) || defined(ARDUINO_ESP8266_WEMOS_D1MINI)
 
   // BUTTON PIN CONFIGURATION
   // n.a.
@@ -334,14 +365,37 @@
 #endif
 
 #ifdef BUTTON_ADC
-// for a 10-bit ADC, each button is calibrated to the band between this value and the next value above (or 1023 for upper limit)
-// The bands are intentionally set very wide, and far apart
 // Each button acts as a voltage divider between 10k and the following resistors:
-#define btnADCPlayLow 980 // 0 ohm
-#define btnADCStopLow 850 // 1k ohm
-#define btnADCRootLow 520 // 2.4k ohm
-#define btnADCDownLow 360 // 10k ohm
-#define btnADCUpLow 200 // 20k ohm
+// 0 Ohm  i.e. 100%
+// 2.2k Ohm i.e. 82% (10 : 12.2)
+// 4.7k Ohm i.e. 68% (10 : 14.7)
+// 10k Ohm i.e. 50% (10 : 20)
+// 20k Ohm i.e. 33% (10 : 30)
+
+// For a 10-bit ADC, each button is calibrated to the band between this value and the next value above
+// (or 1023 for upper limit).
+// The bands are intentionally set very wide, and far apart
+// However note that ESP ADC is nonlinear and not full-scale, so the resistor
+// values must be chosen to avoid ranges at the extreme top (100%) end.
+// The resistor values and bands chosen here are compatible with ESP devices
+
+#if defined(ESP32) || defined(ESP8266)
+// ESP ADC is nonlinear, and also not full scale, so the values are different!
+// because not full scale, a 1k:10k voltage divider (i.e. 90%) is undetectable
+// and reads as 1023 still, so resistor values have been altered to create better spacing
+#define btnADCPlayLow 1020 // 0 ohm reading 1023 due to saturation
+#define btnADCStopLow 900 // 2.2k ohm reading around 960
+#define btnADCRootLow 700 // 4.7k ohm reading around 800
+#define btnADCDownLow 500 // 10k ohm reading around 590
+#define btnADCUpLow 200 // 20k ohm reading around 390
+#else
+#define btnADCPlayLow 950 // 0 ohm reading around 1000, ideally 1023
+#define btnADCStopLow 800 // 2.2k ohm reading around 840
+#define btnADCRootLow 600 // 4.7k ohm reading around 695
+#define btnADCDownLow 420 // 10k ohm reading around 510
+#define btnADCUpLow 200 // 20k ohm reading around 340
 #endif
+
+#endif // BUTTON_ADC
 
 #endif // #define PINSETUP_H_INCLUDED

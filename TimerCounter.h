@@ -623,6 +623,108 @@ class TimerCounter
     }
 };
 
+#elif defined(ESP32)
+
+typedef void (*timerCallback)  ();
+timerCallback ESPTimerCallback;
+
+void ARDUINO_ISR_ATTR onTimer(){
+  // just call the callback
+  if (ESPTimerCallback)
+    (*ESPTimerCallback)();
+}
+
+hw_timer_t * timer = NULL;
+
+class TimerCounter
+{
+  public:
+    TimerCounter()
+    {
+      ESPTimerCallback = NULL;
+    }
+
+    void initialize(unsigned long microseconds=1000000)
+    {
+      ESPTimerCallback = NULL;
+      if (timer==NULL)
+      {
+        // count microseconds - so divide CPU freq in Hz by 1e6
+        timer = timerBegin(0, F_CPU/1000000, true);
+        timerAttachInterrupt(timer, &onTimer, true);
+        timerAlarmWrite(timer, microseconds, true);
+      }
+    }
+    
+    void setPeriod(unsigned long microseconds)
+    {
+      timerAlarmWrite(timer, microseconds, true);
+    }
+
+    void stop()
+    {
+      if(timer!=NULL)
+        timerAlarmDisable(timer);
+    }
+
+    void attachInterrupt(void (*isr)())
+    {
+      ESPTimerCallback = isr;
+      timerAlarmEnable(timer);
+    }
+};
+
+#elif defined(ESP8266)
+
+typedef void (*timerCallback)  ();
+timerCallback ESPTimerCallback;
+
+void ICACHE_RAM_ATTR onTimer(){
+  // just call the callback
+  if (ESPTimerCallback)
+    (*ESPTimerCallback)();
+}
+
+class TimerCounter
+{
+  public:
+    TimerCounter()
+    {
+      ESPTimerCallback = NULL;
+    }
+
+    void initialize(unsigned long microseconds=1000000)
+    {
+      ESPTimerCallback = NULL;
+      // Divide CPU freq in Hz (e.g. 80000000) by 1e6 (=> 80) to determine how many ticks per microsecond
+      // DIV16 to reduce this by a factor of 16
+      // ESP8266 timer1 is only 23 bits
+      // So 1000000 us (=1 second) would need 1000000 * (80/16) ticks = 5000000 ticks
+      // (which is less than 2^23 i.e. 8338608)
+      timer1_isr_init();
+      timer1_attachInterrupt(onTimer);
+      timer1_write(microseconds*((F_CPU/1000000)/16));
+      timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
+    }
+    
+    void setPeriod(unsigned long microseconds)
+    {
+      timer1_write(microseconds*((F_CPU/1000000)/16));
+      // timer1_write also (re)enables edge interrupts
+    }
+
+    void stop()
+    {
+      timer1_disable();
+    }
+
+    void attachInterrupt(void (*isr)())
+    {
+      ESPTimerCallback = isr;
+      timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
+    }
+};
+
 #else
 #error Missing definition of TimerCounter / unsupported device
 #endif

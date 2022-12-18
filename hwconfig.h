@@ -54,24 +54,26 @@
   #endif
      
   //#define TimerOne  
-#elif defined(__SAMD21__)
+#elif defined(__SAMD21__) || defined(ESP32) || defined(ESP8266)
   #ifdef Use_SoftI2CMaster
     #undef Use_SoftI2CMaster
-    //#error This chip does not support SoftI2CMaster. Please undefine Use_SoftI2CMaster
   #endif
   #ifdef Use_SoftWire
     #undef Use_SoftWire
-    //#error This chip does not support Softwire. Please undefine Use_SoftWire
-  #endif  
+  #endif
 
 #elif defined(__AVR_ATmega32U4__)
 //#undef Use_SoftI2CMaster
 //#undef Use_SoftWire
 //#undef I2CFAST
 
-#else  //__AVR_ATmega328P__
+#elif defined(__AVR_ATmega328P__)
   //#define TimerOne
+
+#else
+  #error I2C definitions (SoftI2CMaster/SoftWire/etc) not defined for board
 #endif
+
 
 #ifdef TimerOne
   #include <TimerOne.h>
@@ -80,6 +82,7 @@
   #include "TimerCounter.h"
 #endif
 
+
 #if defined(__arm__) && defined(__STM32F1__) 
   #include <itoa.h>  
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
@@ -87,8 +90,8 @@
   #define strcasecmp_P(a,b) strcasecmp((a), (b)) 
 #endif
 
-#include <SdFat.h>
 
+#include <SdFat.h>
 
 #define scrollSpeed   250           //text scroll delay
 #define scrollWait    3000          //Delay before scrolling starts
