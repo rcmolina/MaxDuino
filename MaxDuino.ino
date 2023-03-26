@@ -157,7 +157,7 @@
 #include "buttons.h"
 
 #if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO) || defined(LOAD_EEPROM_SETTINGS)
-#include <EEPROM.h>
+#include "EEPROM.h"
 #endif
 
 char fline[17];
@@ -1457,15 +1457,10 @@ void GetAndPlayBlock()
     currentID=blockID[block%maxblock];   
   #endif
   #ifdef BLOCK_EEPROM_PUT
-    #if defined(__AVR__)
-      EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-      EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-    #elif defined(__arm__) && defined(__STM32F1__)
-      EEPROM_get(BLOCK_EEPROM_START+5*block, &bytesRead);
-      EEPROM_get(BLOCK_EEPROM_START+4+5*block, &currentID);
-    #endif      
- #endif
- #ifdef BLOCKID_NOMEM_SEARCH 
+    EEPROM_get(BLOCK_EEPROM_START+5*block, bytesRead);
+    EEPROM_get(BLOCK_EEPROM_START+4+5*block, currentID);
+  #endif
+  #ifdef BLOCKID_NOMEM_SEARCH 
     unsigned long oldbytesRead;           //TAP
     bytesRead=0;                          //TAP 
     if (currentID!=TAP) bytesRead=10;   //TZX with blocks skip TZXHeader

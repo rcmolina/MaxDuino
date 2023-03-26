@@ -354,13 +354,8 @@ void TZXProcess() {
               blockID[block%maxblock] = currentID;
             #endif
             #ifdef BLOCK_EEPROM_PUT
-              #if defined(__AVR__)
-                EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-                EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-              #elif defined(__arm__) && defined(__STM32F1__)
-                EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-                EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
-              #endif                
+              EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
             #endif
         
             #if defined(OLED1306) && defined(OLEDPRINTBLOCK) 
@@ -450,13 +445,8 @@ void TZXProcess() {
             #endif
         
             #ifdef BLOCK_EEPROM_PUT
-              #if defined(__AVR__)
-                EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-                EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-              #elif defined(__arm__) && defined(__STM32F1__)
-                EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-                EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
-              #endif                
+              EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
             #endif
             
             #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
@@ -673,13 +663,8 @@ void TZXProcess() {
                 blockID[block%maxblock] = currentID;
               #endif
               #ifdef BLOCK_EEPROM_PUT
-                #if defined(__AVR__)
-                  EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-                  EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-                #elif defined(__arm__) && defined(__STM32F1__)
-                  EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-                  EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
-                #endif                   
+                EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+                EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
               #endif
 
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
@@ -781,13 +766,8 @@ void TZXProcess() {
             blockID[block%maxblock] = currentID;
           #endif
           #if defined(BLOCK_EEPROM_PUT)
-            #if defined(__AVR__)
-              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-            #elif defined(__arm__) && defined(__STM32F1__)
-              EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-              EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID); 
-            #endif                
+            EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+            EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID); 
           #endif
           #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
             #ifdef XY
@@ -947,13 +927,8 @@ void TZXProcess() {
               blockID[block%maxblock] = currentID;
             #endif
             #ifdef BLOCK_EEPROM_PUT
-              #if defined(__AVR__)
-                EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-                EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-              #elif defined(__arm__) && defined(__STM32F1__)
-                EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-                EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
-              #endif                 
+              EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+              EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
             #endif
             
             #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
@@ -1101,13 +1076,8 @@ void TZXProcess() {
                 blockID[block%maxblock] = currentID;
               #endif
               #if defined(BLOCK_EEPROM_PUT)
-                #if defined(__AVR__)
-                  EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-                  EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-                #elif defined(__arm__) && defined(__STM32F1__)
-                  EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-                  EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID); 
-                #endif                 
+                EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+                EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID); 
               #endif
               
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
