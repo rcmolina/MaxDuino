@@ -223,7 +223,6 @@ void setup() {
 
   #ifdef LCDSCREEN16x2
     lcd.init();                     //Initialise LCD (16x2 type)
-    //lcd.begin();                     //Initialise LCD (16x2 type)    
     lcd.backlight();
     lcd.clear();
     #if (SPLASH_SCREEN)
@@ -232,7 +231,6 @@ void setup() {
         lcd.setCursor(0,1); 
         lcd.print(F("Maxduino")); // Set the text at the initilization for LCD Screen (Line 2)
     #endif   
-//    lcd.createChar(0, SpecialChar);
   #endif
   
   #ifdef SERIALSCREEN
@@ -240,43 +238,23 @@ void setup() {
   #endif
   
   #ifdef OLED1306 
-    //u8g.setRot180();  // Maybe you dont need this one, depends on how the display is mounted
-    //sendcommand(0xc0); //set COM output scan direction (vertical flip) - reset value is 0xc0 (or 0xc8)
-    /* sendcommand(0xa1);  //set segment re-map (horizontal flip) - reset value is 0xa0 (or 0xa1) */
-                      
-    //u8g.setFont(u8g_font_7x14); 
-    //u8g.setFont(u8g_font_unifont); 
-//    u8g.setFont(u8g_font_unifontr); // last from file u8g_font_data.c
-
-    //const int PWR_ON = 0;  //Using Pin 0 to power the oleds VCC
-    //const int RESET = 4;
-    //pinMode(PWR_ON, OUTPUT);
-    //digitalWrite(PWR_ON, HIGH);
-    //pinMode(RESET, OUTPUT);
-    //digitalWrite(RESET, HIGH); 
-//    delay(1000);  //Needed!
-    // Initialize I2C and OLED Display
-      // I2C Init
     #if defined(Use_SoftI2CMaster) 
-         i2c_init();
+      i2c_init();
     #else
-        Wire.begin();
+      Wire.begin();
     #endif    
     init_OLED();
-    //delay(1500);              // Show logo
-    //reset_display();           // Clear logo and load saved mode
     #if (!SPLASH_SCREEN)
       #if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
         delay(1500);              // Show logo
       #endif
-        reset_display();           // Clear logo and load saved mode
+      reset_display();           // Clear logo and load saved mode
     #endif
   #endif
 
   #ifdef P8544 
-    lcd.begin ();
+    lcd.begin();
     analogWrite (backlight_pin, 20);
-    //lcd.clear();
     P8544_splash(); 
   #endif
  
@@ -305,9 +283,6 @@ void setup() {
   changeDirRoot();
   UniSetup();                       //Setup TZX specific options
     
- //printtext(VERSION,0);
-  //lcd_clearline(0);
-  //lcd.print(F(VERSION));
   printtextF(PSTR("Reset.."),0);
   delay(500);
   
@@ -321,44 +296,16 @@ void setup() {
        
   getMaxFile();                     //get the total number of files in the directory
 
-/*
-  #ifdef SHOW_DIRNAMES
-    oldMaxFile=maxFile;
-    seekFile(oldMaxFile);
-    str4cpy(oldMaxFileName,fileName);
-  #endif
-*/  
   seekFile();            //move to the first file in the directory
-/*
-  #ifdef SHOW_DIRNAMES
-    str4cpy(oldMinFileName,fileName);
-  #endif
-*/
+
   #ifdef LOAD_EEPROM_SETTINGS
     loadEEPROM();
   #endif  
-  //delay(2000);  
-  //printtextF(PSTR("Ready.."),0);
-  //lcd_clearline(0);
-  //lcd.print(F("Ready.."));  
 
   #if defined(OLED1306) && defined(OSTATUSLINE)
     OledStatusLine();
   #endif
-  
 }
-
-/*void setup() {
-  
-
-    INIT_OUTPORT;
-    //WRITE_LOW;    
-      //timer.setCount(0);
-      timer.pause();
-      timer.setPeriod(500000);
-      timer.attachInterrupt(2,wave2); // channel 2
-      timer.resume();      
-} */
 
 void loop(void) {
   if(start==1)
@@ -366,7 +313,6 @@ void loop(void) {
     //TZXLoop only runs if a file is playing, and keeps the buffer full.
     uniLoop();
   } else {
-  //  digitalWrite(outputPin, LOW);    //Keep output LOW while no file is playing.
     WRITE_LOW;    
   }
   
@@ -382,764 +328,468 @@ void loop(void) {
       scrollText(fileName);
     }
   }
+
   #ifndef NO_MOTOR
-  motorState=digitalRead(btnMotor);
+    motorState=digitalRead(btnMotor);
   #endif
   
   #if (SPLASH_SCREEN && TIMEOUT_RESET)
-      if (millis() - timeDiff_reset > 1000) //check timeout reset every second
+    if (millis() - timeDiff_reset > 1000) //check timeout reset every second
+    {
+      timeDiff_reset = millis(); // get current millisecond count
+      if (start==0)
       {
-        timeDiff_reset = millis(); // get current millisecond count
-        if (start==0)
-        {
-          timeout_reset--;
-          if (timeout_reset==0)
-          {
-            timeout_reset = TIMEOUT_RESET;
-            resetFunc();
-          }
-        }
-        else
+        timeout_reset--;
+        if (timeout_reset==0)
         {
           timeout_reset = TIMEOUT_RESET;
-        }    
+          resetFunc();
+        }
       }
+      else
+      {
+        timeout_reset = TIMEOUT_RESET;
+      }    
+    }
   #endif
     
   if (millis() - timeDiff > 50) {   // check switch every 50ms 
-     timeDiff = millis();           // get current millisecond count
+    timeDiff = millis();           // get current millisecond count
       
-     if(button_play()) {
-        //Handle Play/Pause button
-        if(start==0) {
-          //If no file is play, start playback
-          playFile();
-          #ifndef NO_MOTOR
-          if (mselectMask == 1){  
-            //oldMotorState = !motorState;  //Start in pause if Motor Control is selected
-            oldMotorState = 0;
-          }
-          #endif
-          delay(50);
-          
-        } else {
-          //If a file is playing, pause or unpause the file                  
-          if (pauseOn == 0) {
-            printtext2F(PSTR("Paused  "),0);
-    /*        #ifdef LCDSCREEN16x2
-              lcd.setCursor(0,0); 
-              //lcd.print(F("Paused "));
-              char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Paused  ")+x)) {
-                lcd.print(ch);
-                x++;
-              }
-            #endif
-            #ifdef OLED1306
-              setXY(0,0); 
-              //sendStr("Paused ");
-              char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Paused  ")+x)) {
-                sendChar(ch);
-                x++;
-              }              
-            #endif
-            #ifdef P8544
-            #endif
-           */
-            jblks =1; 
-            firstBlockPause = true;
-          } else  {
-            printtext2F(PSTR("Playing      "),0);
-            currpct=100;
-       /*     #ifdef LCDSCREEN16x2
-              lcd.setCursor(0,0); 
-              //lcd.print(F("Playing"));
-              char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Playing ")+x)) {
-                lcd.print(ch);
-                x++;
-              }                         
-            #endif
-            #ifdef OLED1306
-              setXY(0,0); 
-              //sendStr("Playing");
-              char x = 0;
-              while (char ch=pgm_read_byte(PSTR("Playing ")+x)) {
-                sendChar(ch);
-                x++;
-              }                           
-            #endif
-            #ifdef P8544
-            #endif 
-           */            
-            firstBlockPause = false;      
-          }
-/*                         
-          #ifdef LCDSCREEN16x2            
-            //lcd_clearline(0);
-            //lcd.setCursor(0,0);
-            //lcd.print(F("Paused "));
-            //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000);lcd.setCursor(0,0);lcd.print(PlayBytes);               
-            //lcd.print(entry.curPosition()); 
-
-            //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000); sendStrXY(PlayBytes,0,0);
-            if (currpct <100) {              
-              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));lcd.setCursor(8,0);lcd.print(PlayBytes);
-            }
-            //sprintf(PlayBytes,"%03d",lcdsegs%1000);lcd.setCursor(13,0);lcd.print(PlayBytes);
-            //strcpy(PlayBytes,PSTR("000"));
-            
-            //PlayBytes[0]= 48+ (lcdsegs/CNTRBASE)%10;
-            //PlayBytes[1]= 48+ (lcdsegs%CNTRBASE)/10;
-            //PlayBytes[2]= 48+ (lcdsegs%CNTRBASE)%10;
-            //PlayBytes[3]= '\0'
-            
-            PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
-    //        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-    //        else 
-    //           if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
-    //           else
-    //              itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); 
-
-            #ifndef cntrMSS
-              if ((lcdsegs %1000) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-              else 
-                 if ((lcdsegs %1000) <100)itoa(lcdsegs%1000,PlayBytes+1,10);
-                 else 
-                    itoa(lcdsegs%1000,PlayBytes,10);
-            #endif
-            #ifdef cntrMSS
-              if ((lcdsegs %600) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-              else 
-                 if ((lcdsegs %600) <60)itoa(lcdsegs%600,PlayBytes+1,10);
-                 else 
-                    itoa(lcdsegs%600 /60 *100 + lcdsegs%60,PlayBytes,10);
-            #endif  
-                              
-            lcd.setCursor(13,0);lcd.print(PlayBytes); 
-            
-          #endif
-          #ifdef OLED1306
-            //sprintf(PlayBytes,"Paused % 3d%%  %03d",newpct,lcdsegs%1000); sendStrXY(PlayBytes,0,0);
-            if (currpct <100) {                         
-              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));setXY (8,0);sendStr(PlayBytes);
-            } else {                          // Block number must me printed after REW
-                setXY(14,2);
-                sendChar(48+(block)/10);
-              //setXY(15,2);
-                sendChar(48+(block)%10);                            
-            }
-            //sprintf(PlayBytes,"%03d",lcdsegs%1000);sendStrXY(PlayBytes,13,0);
-            //strcpy(PlayBytes,PSTR("000"));
-            
-            //PlayBytes[0]= 48+ (lcdsegs/CNTRBASE)%10;
-            //PlayBytes[1]= 48+ (lcdsegs%CNTRBASE)/10;
-            //PlayBytes[2]= 48+ (lcdsegs%CNTRBASE)%10;
-            //PlayBytes[3]= '\0'
-                        
-            PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
-    //        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-    //        else 
-    //           if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
-    //           else
-    //              itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10); 
-
-            #ifndef cntrMSS
-              if ((lcdsegs %1000) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-              else 
-                 if ((lcdsegs %1000) <100)itoa(lcdsegs%1000,PlayBytes+1,10);
-                 else 
-                    itoa(lcdsegs%1000,PlayBytes,10);
-            #endif
-            #ifdef cntrMSS
-              if ((lcdsegs %600) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-              else 
-                 if ((lcdsegs %600) <60)itoa(lcdsegs%600,PlayBytes+1,10);
-                 else 
-                    itoa(lcdsegs%600 /60 *100 + lcdsegs%60,PlayBytes,10);
-            #endif                 
-                              
-            setXY(13,0);
-            sendStr(PlayBytes);
-
-        //    if (currpct==100){
-        //      setXY(14,2);
-        //      sendChar(48+(block)/10);
-            //setXY(15,2);
-        //      sendChar(48+(block)%10);
-        //    }   
-          #endif
-
-         #ifdef P8544                                      
-       //     itoa(newpct,PlayBytes,10);
-       //     strcat_P(PlayBytes,PSTR("%"));
-       //     lcd.setCursor(0,3);
-       //     lcd.print(PlayBytes); 
-            //sprintf(PlayBytes,"%03d",lcdsegs%1000);lcd.setCursor(13,0);lcd.print(PlayBytes);strcpy(PlayBytes,"000");
-            if (currpct <100) {              
-              itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));lcd.setCursor(0,3);lcd.print(PlayBytes);
-            }
-            //sprintf(PlayBytes,"%03d",lcdsegs%1000);lcd.setCursor(13,0);lcd.print(PlayBytes);
-            //strcpy(PlayBytes,PSTR("000"));
-            PlayBytes[0]=PlayBytes[1]=PlayBytes[2]='0';
-    //        if ((lcdsegs %(CNTRBASE*10)) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-    //        else 
-    //           if ((lcdsegs %(CNTRBASE*10)) < CNTRBASE) itoa(lcdsegs%(CNTRBASE*10),PlayBytes+1,10);
-    //           else
-    //              itoa(lcdsegs%(CNTRBASE*10) /CNTRBASE *100 + lcdsegs%CNTRBASE ,PlayBytes,10);
-
-            #ifndef cntrMSS
-              if ((lcdsegs %1000) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-              else 
-                 if ((lcdsegs %1000) <100)itoa(lcdsegs%1000,PlayBytes+1,10);
-                 else 
-                    itoa(lcdsegs%1000,PlayBytes,10);
-            #endif
-            #ifdef cntrMSS
-              if ((lcdsegs %600) <10) itoa(lcdsegs%10,PlayBytes+2,10);
-              else 
-                 if ((lcdsegs %600) <60)itoa(lcdsegs%600,PlayBytes+1,10);
-                 else 
-                    itoa(lcdsegs%600 /60 *100 + lcdsegs%60,PlayBytes,10);
-            #endif  
-                              
-            //lcd.setCursor(13,3);lcd.print(PlayBytes); 
-            lcd.gotoRc(3,38);
-            lcd.bitmap(Paused, 1, 6);
-          #endif
-            
-          //scrollPos=0;
-          //scrollText(fileName);   
-*/                                              
-          pauseOn = !pauseOn;
-       }
-       
-       debounce(button_play);
-     }
-
-#ifdef ONPAUSE_POLCHG
-
-     if(button_root() && start==1 && pauseOn==1 
-                                                    #ifdef btnRoot_AS_PIVOT   
-                                                            && button_stop()
-                                                    #endif
-                                                            ){             // change polarity
-
-       // change tsx speed control/zx polarity/uefTurboMode
-       TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
-       #if defined(OLED1306) && defined(OSTATUSLINE) 
-          OledStatusLine();
-       #endif 
-       debounce(button_root);
-     }
-#endif
-
-#ifdef btnRoot_AS_PIVOT
-     lastbtn=false;     
-     if(button_root() && start==0 && !lastbtn) {                                          // show min-max dir
-       
-       #ifdef SHOW_DIRPOS
-        #if defined(LCDSCREEN16x2) && !defined(SHOW_STATUS_LCD) && !defined(SHOW_DIRNAMES)
-           char len=0;
-           lcd.setCursor(0,0); 
-    
-           lcd.print(itoa(oldMinFile,input,10)); lcd.print('<'); len += strlen(input) + 1;
-           lcd.print(itoa(currentFile,input,10)); lcd.print('<'); len += strlen(input) + 1;
-           lcd.print(itoa(oldMaxFile,input,10)); len += strlen(input); 
-           //lcd.print(oldMinFile);lcd.print('<');lcd.print(currentFile);lcd.print('<');lcd.print(oldMaxFile);
-           //const char len=strlen(itoa(oldMinFile,input,10)) + 1 + strlen(itoa(currentFile,input,10)) + 1 + strlen(itoa(oldMaxFile,input,10));
-           for(char x=len;x<16;x++) lcd.print(' '); 
-        #endif
-        #if defined(LCDSCREEN16x2) && defined(SHOW_STATUS_LCD)        
-           lcd.setCursor(0,0);
-           lcd.print(BAUDRATE);
-           lcd.print(' ');
-           if(mselectMask==1) lcd.print(F(" M:ON"));
-           else lcd.print(F("m:off"));
-           lcd.print(' ');
-           if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
-           else lcd.print(F("%^off"));         
-        #endif 
-        #if defined(LCDSCREEN16x2) && defined(SHOW_DIRNAMES)
-
-          str4cpy(input,fileName);
-          GetFileName(oldMinFile); str4cpy(oldMinFileName,fileName);
-          //GetFileName(currentFile); str4cpy(input,fileName); 
-          GetFileName(oldMaxFile); str4cpy(oldMaxFileName,fileName);
-          GetFileName(currentFile); 
-        
-          lcd.setCursor(0,0);
-          lcd.print(oldMinFileName);lcd.print(' ');lcd.print('<');
-          lcd.print((char *)input);lcd.print('<');lcd.print(' ');
-          lcd.print(oldMaxFileName);                  
-        #endif                
-        #if defined(OLED1306) && !defined(SHOW_DIRNAMES)
-          char len=0;
-          setXY(0,0);
-          //sendStr(itoa(oldMinFile,input,10));sendChar('<');
-          //itoa(oldMinFile,input,10); sendStr((char *)input);sendChar('<'); len += strlen(input) + 1;
-          sendStr(itoa(oldMinFile,input,10));sendChar('<');len += strlen(input) + 1;
-          
-          //sendStr(itoa(currentFile,input,10));sendChar('<');
-          //itoa(currentFile,input,10); sendStr((char *)input);sendChar('<'); len += strlen(input) + 1;
-          sendStr(itoa(currentFile,input,10));sendChar('<'); len += strlen(input) + 1;
-                
-          //sendStr(itoa(oldMaxFile,input,10));
-          //itoa(oldMaxFile,input,10); sendStr((char *)input);  len += strlen(input);
-          sendStr(itoa(oldMaxFile,input,10)); len += strlen(input);                   
-          //const char len=strlen(itoa(oldMinFile,input,10)) + 1 + strlen(itoa(currentFile,input,10)) + 1 + strlen(itoa(oldMaxFile,input,10));
-          for(char x=len;x<16;x++) sendChar(' ');                       
-        #endif
-        #if defined(OLED1306) && defined(SHOW_DIRNAMES)
-
-          str4cpy(input,fileName);
-          GetFileName(oldMinFile); str4cpy(oldMinFileName,fileName);
-          //GetFileName(currentFile); str4cpy(input,fileName); 
-          GetFileName(oldMaxFile); str4cpy(oldMaxFileName,fileName);
-          GetFileName(currentFile); 
-          
-          setXY(0,0);
-          sendStr(oldMinFileName);sendChar(' ');sendChar('<');
-          sendStr((char *)input);sendChar('<');sendChar(' ');
-          sendStr(oldMaxFileName);
-           
-        #endif
-      #endif        
-        while(button_root() && !lastbtn) {
-           //prevent button repeats by waiting until the button is released.
-           //delay(50);
-           lastbtn = 1;
-           checkLastButton();           
-        }        
-        printtext(PlayBytes,0);
-     }
-     
-     #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
-       if(button_root() && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
-        lcd.setCursor(11,0);
-         if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
-        else lcd.print(F("%^off"));  
-               
-        while(button_root() && start==1 && !lastbtn) {
-         //prevent button repeats by waiting until the button is released.
-         //delay(50);
-         lastbtn = 1;
-         checkLastButton();           
+    if(button_play()) {
+      //Handle Play/Pause button
+      if(start==0) {
+        //If no file is play, start playback
+        playFile();
+        #ifndef NO_MOTOR
+        if (mselectMask == 1){  
+          //Start in pause if Motor Control is selected
+          oldMotorState = 0;
         }
-        //printtextF(PSTR("Help"),0);       
-        //printtext(PlayBytes,0);
+        #endif
+        delay(50);
+        
+      } else {
+        //If a file is playing, pause or unpause the file                  
+        if (pauseOn == 0) {
+          printtext2F(PSTR("Paused  "),0);
+          jblks =1; 
+          firstBlockPause = true;
+        } else  {
+          printtext2F(PSTR("Playing      "),0);
+          currpct=100;
+          firstBlockPause = false;      
+        }
+        pauseOn = !pauseOn;
+      }
+      
+      debounce(button_play);
+    }
+
+  #ifdef ONPAUSE_POLCHG
+    if(button_root() && start==1 && pauseOn==1 
+                                        #ifdef btnRoot_AS_PIVOT   
+                                                && button_stop()
+                                        #endif
+                                                ){             // change polarity
+
+      // change tsx speed control/zx polarity/uefTurboMode
+      TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
+      #if defined(OLED1306) && defined(OSTATUSLINE) 
+        OledStatusLine();
+      #endif 
+      debounce(button_root);
+    }
+  #endif
+
+  #ifdef btnRoot_AS_PIVOT
+    lastbtn=false;     
+    if(button_root() && start==0 && !lastbtn) {                                          // show min-max dir
+      
+      #ifdef SHOW_DIRPOS
+        #if defined(LCDSCREEN16x2)
+          #if !defined(SHOW_STATUS_LCD) && !defined(SHOW_DIRNAMES)
+            char len=0;
+            lcd.setCursor(0,0); 
+      
+            lcd.print(itoa(oldMinFile,input,10));
+            lcd.print('<');
+            len += strlen(input) + 1;
+            lcd.print(itoa(currentFile,input,10));
+            lcd.print('<');
+            len += strlen(input) + 1;
+            lcd.print(itoa(oldMaxFile,input,10));
+            len += strlen(input); 
+            for(char x=len;x<16;x++) {
+              lcd.print(' '); 
+            }
+          #elif defined(SHOW_STATUS_LCD)        
+            lcd.setCursor(0,0);
+            lcd.print(BAUDRATE);
+            lcd.print(' ');
+            if(mselectMask==1) lcd.print(F(" M:ON"));
+            else lcd.print(F("m:off"));
+            lcd.print(' ');
+            if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
+            else lcd.print(F("%^off"));         
+          #elif defined(SHOW_DIRNAMES)
+            str4cpy(input,fileName);
+            GetFileName(oldMinFile);
+            str4cpy(oldMinFileName,fileName);
+            GetFileName(oldMaxFile);
+            str4cpy(oldMaxFileName,fileName);
+            GetFileName(currentFile); 
+          
+            lcd.setCursor(0,0);
+            lcd.print(oldMinFileName);
+            lcd.print(' ');
+            lcd.print('<');
+            lcd.print((char *)input);
+            lcd.print('<');
+            lcd.print(' ');
+            lcd.print(oldMaxFileName);                  
+          #endif
+        #endif // defined(LCDSCREEN16x2)
+
+        #if defined(OLED1306)
+          #if !defined(SHOW_DIRNAMES)
+            char len=0;
+            setXY(0,0);
+            sendStr(itoa(oldMinFile,input,10));
+            sendChar('<');
+            len += strlen(input) + 1;
+            sendStr(itoa(currentFile,input,10));
+            sendChar('<');
+            len += strlen(input) + 1;
+            sendStr(itoa(oldMaxFile,input,10));
+            len += strlen(input);
+            for(char x=len;x<16;x++) {
+              sendChar(' ');
+            }
+          #elif defined(SHOW_DIRNAMES)
+            str4cpy(input,fileName);
+            GetFileName(oldMinFile); str4cpy(oldMinFileName,fileName);
+            GetFileName(oldMaxFile); str4cpy(oldMaxFileName,fileName);
+            GetFileName(currentFile); 
+            
+            setXY(0,0);
+            sendStr(oldMinFileName);sendChar(' ');sendChar('<');
+            sendStr((char *)input);sendChar('<');sendChar(' ');
+            sendStr(oldMaxFileName);
+              
+          #endif
+        #endif // defined(OLED1306)
+      #endif // SHOW_DIRPOS
+        
+      while(button_root() && !lastbtn) {
+        //prevent button repeats by waiting until the button is released.
+        lastbtn = 1;
+        checkLastButton();           
+      }        
+      printtext(PlayBytes,0);
+    }
+      
+    #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
+      if(button_root() && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
+        lcd.setCursor(11,0);
+        if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+          lcd.print(F(" %^ON"));
+        } else {
+          lcd.print(F("%^off"));
+        }
+                
+        while(button_root() && start==1 && !lastbtn) {
+          //prevent button repeats by waiting until the button is released.
+          lastbtn = 1;
+          checkLastButton();           
+        }
+
         lcd.setCursor(11,0);
         lcd.print(' ');
         lcd.print(' ');
         lcd.print(PlayBytes);        
-       }
+      }
+    #endif
+  #endif // btnRoot_AS_PIVOT
+
+  if(button_root() && start==0
+                          #ifdef btnRoot_AS_PIVOT
+                                && button_stop()
+                          #endif        
+                                ){                   // go menu
+
+    #if (SPLASH_SCREEN && TIMEOUT_RESET)
+      timeout_reset = TIMEOUT_RESET;
+    #endif
+
+    #if defined(Use_MENU) && !defined(RECORD_EEPROM_LOGO)
+      menuMode();
+      printtext(PlayBytes,0);
+      #ifdef LCDSCREEN16x2
+        printtextF(PSTR(""),1);
+      #endif      
+      #ifdef OLED1306
+        printtextF(PSTR(""),lineaxy);
       #endif
-#endif
+      #ifdef P8544
+        printtextF(PSTR(""),1);
+      #endif      
+      
+      scrollPos=0;
+      scrollText(fileName);
+    #elif defined(RECORD_EEPROM_LOGO)
+      init_OLED();
+      delay(1500);              // Show logo
+      reset_display();           // Clear logo and load saved mode
+      printtextF(PSTR("Reset.."),0);
+      delay(500);
+      PlayBytes[0]='\0'; 
+      strcat_P(PlayBytes,PSTR(VERSION));
+      printtext(PlayBytes,0);
+      #if defined(OSTATUSLINE)
+        OledStatusLine();
+      #endif
+    #else             
+      subdir=0;
+      changeDirRoot();
+      getMaxFile();
+      seekFile();
+    #endif         
 
-     if(button_root() && start==0
-                                        #ifdef btnRoot_AS_PIVOT
-                                              && button_stop()
-                                        #endif        
-                                              ){                   // go menu
+    debounce(button_root);
+  }
 
-       #if (SPLASH_SCREEN && TIMEOUT_RESET)
-            timeout_reset = TIMEOUT_RESET;
-       #endif
-       //Return to root of the SD card.
-       //printtextF(PSTR(VERSION),0);
-       //lcd_clearline(0);
-       //lcd.print(F(VERSION));
+  if(button_stop() && start==1
+                        #ifdef btnRoot_AS_PIVOT
+                                && !button_root()
+                        #endif
+                              ){      
 
-        #if defined(Use_MENU) && !defined(RECORD_EEPROM_LOGO)
-           menuMode();
-           //setBaud();
-           //printtextF(PSTR(VERSION),0);
-           printtext(PlayBytes,0);
-           //lcd_clearline(1);
-          #ifdef LCDSCREEN16x2
-            printtextF(PSTR(""),1);
-          #endif      
-          #ifdef OLED1306
-            printtextF(PSTR(""),lineaxy);
-          #endif
-          #ifdef P8544
-            printtextF(PSTR(""),1);
-          #endif      
-         
-          scrollPos=0;
-          scrollText(fileName);
-     /*     #ifdef OLED1306 
-            OledStatusLine();
-          #endif */
-       #else
-          #ifdef RECORD_EEPROM_LOGO
-              init_OLED();
-              delay(1500);              // Show logo
-              reset_display();           // Clear logo and load saved mode
-              printtextF(PSTR("Reset.."),0);
-              delay(500);
-              PlayBytes[0]='\0'; 
-              strcat_P(PlayBytes,PSTR(VERSION));
-              printtext(PlayBytes,0);
-              #if defined(OSTATUSLINE)
-                OledStatusLine();
-              #endif
+    stopFile();
+    debounce(button_stop);
+  }
 
-          #else             
-             subdir=0;
-             changeDirRoot();
-             getMaxFile();
-             seekFile();
-          #endif         
-       #endif
+  if(button_stop() && start==0 && subdir >0) {               // back subdir
+    #if (SPLASH_SCREEN && TIMEOUT_RESET)
+        timeout_reset = TIMEOUT_RESET;
+    #endif     
+    changeDirParent();
 
-       debounce(button_root);
-     }
-
-     if(button_stop() && start==1
-                                        #ifdef btnRoot_AS_PIVOT
-                                                && !button_root()
-                                        #endif
-                                              ){      
-
-       stopFile();
-
-       debounce(button_stop);
-     }
-
-     if(button_stop() && start==0 && subdir >0) {               // back subdir
-       #if (SPLASH_SCREEN && TIMEOUT_RESET)
-            timeout_reset = TIMEOUT_RESET;
-       #endif     
-       changeDirParent();
-
-       debounce(button_stop);   
-     }
+    debounce(button_stop);   
+  }
      
-#ifdef BLOCKMODE
-     if(button_up() && start==1 && pauseOn==1
-                                                  #ifdef btnRoot_AS_PIVOT
-                                                            && !button_root()
-                                                  #endif
-                                                          ){             //  up block sequential search                                                                 
-/*
-       bytesRead=11;                     // for tzx skip header(10) + GETID(11)
-       currentTask=PROCESSID;
-*/
-/*
-       bytesRead=0;                       // for both tap and tzx, no header for tap
-       currentTask=GETFILEHEADER;         //First task (default): search for tzx header
-*/
-       firstBlockPause = false;
-       #ifdef BLOCKID_INTO_MEM
-         oldMinBlock = 0;
-         oldMaxBlock = maxblock;
-         if (block > 0) block--;
-         else block = maxblock;      
-       #endif
-       #if defined(BLOCK_EEPROM_PUT)
-         oldMinBlock = 0;
-         oldMaxBlock = 99;
-         if (block > 0) block--;
-         else block = 99;
-       #endif
-       #if defined(BLOCKID_NOMEM_SEARCH)
-         //oldMinBlock = 0;
-         //oldMaxBlock = 99;
-         if (block > jblks) block=block-jblks;
-         else block = 0;
-       #endif        
-/*    
-       EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-       EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-       currentTask=PROCESSID; 
-       
-       SetPlayBlock();
-*/
-       GetAndPlayBlock();       
-       debouncemax(button_up);
-     }
-#endif
-#if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-     if(button_up() && start==1 && pauseOn==1 && button_root()) {  // up block half-interval search
+  #ifdef BLOCKMODE
+    if(button_up() && start==1 && pauseOn==1
+                                  #ifdef btnRoot_AS_PIVOT
+                                            && !button_root()
+                                  #endif
+                                          ){             //  up block sequential search                                                                 
+      firstBlockPause = false;
+      #ifdef BLOCKID_INTO_MEM
+        oldMinBlock = 0;
+        oldMaxBlock = maxblock;
+        if (block > 0) block--;
+        else block = maxblock;      
+      #endif
+      #if defined(BLOCK_EEPROM_PUT)
+        oldMinBlock = 0;
+        oldMaxBlock = 99;
+        if (block > 0) block--;
+        else block = 99;
+      #endif
+      #if defined(BLOCKID_NOMEM_SEARCH)
+        if (block > jblks) block=block-jblks;
+        else block = 0;
+      #endif        
 
-/*
-       bytesRead=11;                     // for tzx skip header(10) + GETID(11)
-       currentTask=PROCESSID;
-*/
-/*
-       bytesRead=0;                       // for both tap and tzx, no header for tap
-       currentTask=GETFILEHEADER;         //First task (default): search for tzx header
-*/
+      GetAndPlayBlock();       
+      debouncemax(button_up);
+    }
 
+    #if defined(btnRoot_AS_PIVOT)
+      if(button_up() && start==1 && pauseOn==1 && button_root()) {  // up block half-interval search
         if (block >oldMinBlock) {
           oldMaxBlock = block;
           block = oldMinBlock + (oldMaxBlock - oldMinBlock)/2;
         }
-/*               
-       EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-       EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-       currentTask=PROCESSID; 
-       
-       SetPlayBlock();
-*/
-       GetAndPlayBlock();    
-       debounce(button_up);
-     }
-#endif
 
-     if(button_up() && start==0
-                                      #ifdef btnRoot_AS_PIVOT
-                                            && !button_root()
-                                      #endif
-                                            ){                         // up dir sequential search                                           
+        GetAndPlayBlock();    
+        debounce(button_up);
+      }
+    #endif
+  #endif // BLOCKMODE
 
-       #if (SPLASH_SCREEN && TIMEOUT_RESET)
-            timeout_reset = TIMEOUT_RESET;
-       #endif
-       //Move up a file in the directory
-       scrollTime=millis()+scrollWait;
-       scrollPos=0;
-       upFile();
-       debouncemax(button_up);
-     }
+  if(button_up() && start==0
+                        #ifdef btnRoot_AS_PIVOT
+                              && !button_root()
+                        #endif
+                              ){                         // up dir sequential search                                           
 
-#ifdef btnRoot_AS_PIVOT
-     if(button_up() && start==0 && button_root()) {      // up dir half-interval search
-       #if (SPLASH_SCREEN && TIMEOUT_RESET)
-            timeout_reset = TIMEOUT_RESET;
-       #endif
-       //Move up a file in the directory
-       scrollTime=millis()+scrollWait;
-       scrollPos=0;
-       upHalfSearchFile();
-       
-       debounce(button_up);
-     }
-#endif
-#if defined(BLOCKMODE) && defined(BLKSJUMPwithROOT)
-     if(button_root() && start==1 && pauseOn==1){      // change blocks to jump 
-      if (jblks==BM_BLKSJUMP) jblks=1; else jblks=BM_BLKSJUMP;
-       #ifdef LCDSCREEN16x2
-          lcd.setCursor(15,0); if (jblks==BM_BLKSJUMP) lcd.print(F("^")); else lcd.print(F("\'"));
-       #endif
-       #ifdef OLED1306
-          #ifdef XY2
-                if (jblks==BM_BLKSJUMP) sendStrXY("^",15,0); else sendStrXY("\'",15,0);  
-          #else
-                setXY(15,0);if (jblks==BM_BLKSJUMP) sendChar('^'); else sendChar('\'');  
-          #endif
-       #endif      
+    #if (SPLASH_SCREEN && TIMEOUT_RESET)
+      timeout_reset = TIMEOUT_RESET;
+    #endif
+    //Move up a file in the directory
+    scrollTime=millis()+scrollWait;
+    scrollPos=0;
+    upFile();
+    debouncemax(button_up);
+  }
+
+  #ifdef btnRoot_AS_PIVOT
+    if(button_up() && start==0 && button_root()) {      // up dir half-interval search
+      #if (SPLASH_SCREEN && TIMEOUT_RESET)
+        timeout_reset = TIMEOUT_RESET;
+      #endif
+      //Move up a file in the directory
+      scrollTime=millis()+scrollWait;
+      scrollPos=0;
+      upHalfSearchFile();
+      debounce(button_up);
+    }
+  #endif
+
+  #if defined(BLOCKMODE) && defined(BLKSJUMPwithROOT)
+    if(button_root() && start==1 && pauseOn==1) {      // change blocks to jump 
+
+      if (jblks==BM_BLKSJUMP) {
+        jblks=1;
+      } else {
+        jblks=BM_BLKSJUMP;
+      }
+
+      #ifdef LCDSCREEN16x2
+        lcd.setCursor(15,0);
+        if (jblks==BM_BLKSJUMP) {
+          lcd.print(F("^"));
+        } else {
+          lcd.print(F("\'"));
+        }
+      #endif
+
+      #ifdef OLED1306
+        #ifdef XY2
+          if (jblks==BM_BLKSJUMP) {
+            sendStrXY("^",15,0);
+          } else {
+            sendStrXY("\'",15,0);
+          }
+        #else
+          setXY(15,0);
+          if (jblks==BM_BLKSJUMP) {
+            sendChar('^');
+          } else {
+            sendChar('\'');
+          }
+        #endif
+      #endif      
       debounce(button_root);
-     }
-#endif
-#ifdef BLOCKMODE
-     if(button_down() && start==1 && pauseOn==1
-                                                      #ifdef btnRoot_AS_PIVOT
-                                                            && !button_root()
-                                                      #endif
-                                                            ){      // down block sequential search                                                           
+    }
+  #endif
 
-/*
-       bytesRead=11;                     // for tzx skip header(10) + GETID(11)
-       currentTask=PROCESSID;
-*/
-/*
-       bytesRead=0;                       // for both tap and tzx, no header for tap
-       currentTask=GETFILEHEADER;         //First task (default): search for tzx header
-*/
-       #ifdef BLOCKID_INTO_MEM
-         oldMinBlock = 0;
-         oldMaxBlock = maxblock;
-       /*  if (firstBlockPause) {           
-            if (block > 1) block = block -2;
-            else if (block == 1) block = maxblock;
-            else block = maxblock -1;  // block == 0
-            firstBlockPause = false;
-         }           
-         if (block < maxblock) block++;
-         else block = 0;   */
-         if (firstBlockPause) {
-            firstBlockPause = false;
-            if (block > 0) block--;
-            else block = maxblock;
-         } else {
-            if (block < maxblock) block++;
-            else block = 0;       
-         }             
-       #endif
-       #if defined(BLOCK_EEPROM_PUT)
-         oldMinBlock = 0;
-         oldMaxBlock = 99;
-         /* if (firstBlockPause) {
-            if (block > 1) block = block -2;
-            else if (block == 1) block = 99;
-            else block = 98;  // block == 0
-            firstBlockPause = false;
-         }          
-         if (block < 99) block++;
-         else block = 0; */
-         if (firstBlockPause) {
-            firstBlockPause = false;
-            if (block > 0) block--;
-            else block = 99;
-         } else {
-            if (block < 99) block++;
-            else block = 0;       
-         }         
-       #endif
-       #if defined(BLOCKID_NOMEM_SEARCH)
-        // oldMinBlock = 0;
-        // oldMaxBlock = 99;
-         /* if (firstBlockPause) {
-            if (block > 1) block = block -2;
-            else if (block == 1) block = 99;
-            else block = 98;  // block == 0
-            firstBlockPause = false;
-         }          
-         if (block < 99) block++;
-         else block = 0; */
-         if (firstBlockPause) {
-            firstBlockPause = false;
-            if (block > 0) block--;
-            //else block = 0;
-         } else {
-            //if (block < 99) block++;
-            //else block = 0;
-            //if ((block +jblks) <256) block=block+jblks;               
-            block = block + jblks;
-    
-         }         
-       #endif
-/*
-       EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-       EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-       currentTask=PROCESSID;
-       
-       SetPlayBlock();
-*/
-       GetAndPlayBlock();    
-       debouncemax(button_down);
-     }
-#endif
-#if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-     if(button_down() && start==1 && pauseOn==1 && button_root()) {     // down block half-interval search
-
-/*
-       bytesRead=11;                     // for tzx skip header(10) + GETID(11)
-       currentTask=PROCESSID;
-*/
-/*
-       bytesRead=0;                       // for both tap and tzx, no header for tap
-       currentTask=GETFILEHEADER;         //First task (default): search for tzx header
-*/
-        if (block <oldMaxBlock) {
-          oldMinBlock = block;
-          block = oldMinBlock + 1+ (oldMaxBlock - oldMinBlock)/2;
-        } 
-/*      
-       EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-       EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-       currentTask=PROCESSID;
-       
-       SetPlayBlock();
-*/
-       GetAndPlayBlock();    
-       debounce(button_down);
-     }
-#endif
-
-     if(button_down() && start==0
-                                        #ifdef btnRoot_AS_PIVOT
+  #ifdef BLOCKMODE
+    if(button_down() && start==1 && pauseOn==1
+                                          #ifdef btnRoot_AS_PIVOT
                                                 && !button_root()
-                                        #endif
-                                              ){                    // down dir sequential search                                             
+                                          #endif
+                                                ){      // down block sequential search                                                           
 
-       #if (SPLASH_SCREEN && TIMEOUT_RESET)
-            timeout_reset = TIMEOUT_RESET;
-       #endif
-       //Move down a file in the directory
-       scrollTime=millis()+scrollWait;
-       scrollPos=0;
-       downFile();
-       debouncemax(button_down);
-     }
+      #ifdef BLOCKID_INTO_MEM
+        oldMinBlock = 0;
+        oldMaxBlock = maxblock;
+        if (firstBlockPause) {
+          firstBlockPause = false;
+          if (block > 0) block--;
+          else block = maxblock;
+        } else {
+          if (block < maxblock) block++;
+          else block = 0;       
+        }             
+      #endif
+      #if defined(BLOCK_EEPROM_PUT)
+        oldMinBlock = 0;
+        oldMaxBlock = 99;
+        if (firstBlockPause) {
+          firstBlockPause = false;
+          if (block > 0) block--;
+          else block = 99;
+        } else {
+          if (block < 99) block++;
+          else block = 0;       
+        }         
+      #endif
+      #if defined(BLOCKID_NOMEM_SEARCH)
+        if (firstBlockPause) {
+          firstBlockPause = false;
+          if (block > 0) block--;
+        } else {
+          block = block + jblks;
+        }         
+      #endif
 
-#ifdef btnRoot_AS_PIVOT
-     if(button_down() && start==0 && button_root()) {              // down dir half-interval search
-       #if (SPLASH_SCREEN && TIMEOUT_RESET)
-            timeout_reset = TIMEOUT_RESET;
-       #endif
-       //Move down a file in the directory
-       scrollTime=millis()+scrollWait;
-       scrollPos=0;
-       downHalfSearchFile();
-       
-       debounce(button_down);
-     }
-#endif
+      GetAndPlayBlock();    
+      debouncemax(button_down);
+    }
+  #endif
 
-     #ifndef NO_MOTOR
-     if(start==1 && (oldMotorState!=motorState) && mselectMask==1 ) {  
-       //if file is playing and motor control is on then handle current motor state
-       //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
-       if(motorState==1 && pauseOn==0) {
-         printtext2F(PSTR("PAUSED  "),0);
-   /*      #ifdef LCDSCREEN16x2
-              lcd.setCursor(0,0);
-              lcd.print(F("PAUSED "));    
-         #endif 
-         #ifdef OLED1306
-              #ifdef XY
-                setXY(0,0);
-                sendStr("PAUSED ");
-              #endif
-              #ifdef XY2
-                sendStrXY("PAUSED ",0,0);
-              #endif
-         #endif 
-         #ifdef P8544
-              lcd.setCursor(0,0);
-              lcd.print(F("PAUSED "));                       
-         #endif 
-        */                
-         scrollPos=0;
-         scrollText(fileName);
-         //lcd_clearline(0);
-         //lcd.print(F("Paused "));         
-         pauseOn = 1;
-       } 
-       if(motorState==0 && pauseOn==1) {
-         printtext2F(PSTR("PLAYing "),0);
-    /*     #ifdef LCDSCREEN16x2
-              lcd.setCursor(0,0);
-              lcd.print(F("PLAYing"));    
-         #endif 
-         #ifdef OLED1306
-              #ifdef XY
-                setXY(0,0);
-                sendStr("PLAYing");
-              #endif
-              #ifdef XY2
-                sendStrXY("PLAYing",0,0);
-              #endif
-         #endif 
-         #ifdef P8544
-              lcd.setCursor(0,0);
-              lcd.print(F("PLAYing"));                       
-         #endif
-        */            
-         scrollPos=0;
-         scrollText(fileName);
-         //lcd_clearline(0);
-         //lcd.print(F("Playing"));   
-         //delay(2250);
-         pauseOn = 0;
-       }
-       oldMotorState=motorState;
-     }
-     #endif
+  #if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
+    if(button_down() && start==1 && pauseOn==1 && button_root()) {     // down block half-interval search
+      if (block <oldMaxBlock) {
+        oldMinBlock = block;
+        block = oldMinBlock + 1+ (oldMaxBlock - oldMinBlock)/2;
+      } 
+      GetAndPlayBlock();    
+      debounce(button_down);
+    }
+  #endif
+
+  if(button_down() && start==0
+                        #ifdef btnRoot_AS_PIVOT
+                                && !button_root()
+                        #endif
+                              ){                    // down dir sequential search                                             
+    #if (SPLASH_SCREEN && TIMEOUT_RESET)
+      timeout_reset = TIMEOUT_RESET;
+    #endif
+    //Move down a file in the directory
+    scrollTime=millis()+scrollWait;
+    scrollPos=0;
+    downFile();
+    debouncemax(button_down);
+  }
+
+  #ifdef btnRoot_AS_PIVOT
+    if(button_down() && start==0 && button_root()) {              // down dir half-interval search
+      #if (SPLASH_SCREEN && TIMEOUT_RESET)
+        timeout_reset = TIMEOUT_RESET;
+      #endif
+      //Move down a file in the directory
+      scrollTime=millis()+scrollWait;
+      scrollPos=0;
+      downHalfSearchFile();
+      
+      debounce(button_down);
+    }
+  #endif
+
+  #ifndef NO_MOTOR
+    if(start==1 && (oldMotorState!=motorState) && mselectMask==1 ) {  
+      //if file is playing and motor control is on then handle current motor state
+      //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
+      if(motorState==1 && pauseOn==0) {
+        printtext2F(PSTR("PAUSED  "),0);
+        scrollPos=0;
+        scrollText(fileName);
+        pauseOn = 1;
+      } 
+      if(motorState==0 && pauseOn==1) {
+        printtext2F(PSTR("PLAYing "),0);
+        scrollPos=0;
+        scrollText(fileName);
+        pauseOn = 0;
+      }
+      oldMotorState=motorState;
+    }
+  #endif
   }
 }
 
@@ -1188,11 +838,6 @@ void upHalfSearchFile() {
 
   if (currentFile >oldMinFile) {
     oldMaxFile = currentFile;
-/*
-    #ifdef SHOW_DIRNAMES
-      str4cpy(oldMaxFileName,fileName);
-    #endif
-*/
     currentFile = oldMinFile + (oldMaxFile - oldMinFile)/2;
     seekFile();
   }
@@ -1204,11 +849,6 @@ void downHalfSearchFile() {
 
   if (currentFile <oldMaxFile) {
     oldMinFile = currentFile;
-/*    
-    #ifdef SHOW_DIRNAMES
-      str4cpy(oldMinFileName,fileName);
-    #endif
-*/    
     currentFile = oldMinFile + 1+ (oldMaxFile - oldMinFile)/2;
     seekFile();
   } 
@@ -1247,11 +887,6 @@ void seekFile() {
   if (isDir==1) {
     if (subdir >0)strcpy(PlayBytes,prevSubDir);
     else strcat_P(PlayBytes,PSTR(VERSION));
-/*
-       else { itoa(oldMinFile,input,10); strcpy(PlayBytes,input);strcat(PlayBytes,"-");
-       itoa(currentFile,input,10); strcat(PlayBytes,input);strcat(PlayBytes,"-");
-       itoa(oldMaxFile,input,10); strcat(PlayBytes,input);}
-*/
     #ifdef P8544
       printtext("                 ",3);
     #endif
@@ -1263,7 +898,6 @@ void seekFile() {
     #endif
   }
 
-  //PlayBytes[0]='\0'; itoa(DirFilePos[0],PlayBytes,10); 
   printtext(PlayBytes,0);
   
   scrollPos=0;
@@ -1271,12 +905,9 @@ void seekFile() {
 }
 
 void stopFile() {
-  //TZXStop();
   TZXStop();
   if(start==1){
     printtextF(PSTR("Stopped"),0);
-    //lcd_clearline(0);
-    //lcd.print(F("Stopped"));
     #ifdef P8544
       lcd.gotoRc(3,38);
       lcd.bitmap(Stop, 1, 6);
@@ -1338,7 +969,6 @@ void changeDir() {
   }
   else
   {
-    //if (subdir >0) entry.cwd()->getName(prevSubDir[subdir-1],filenameLength); // Antes de cambiar
     if (subdir < nMaxPrevSubDirs) {
       DirFilePos[subdir] = currentFile;
       subdir++;
@@ -1421,8 +1051,6 @@ void scrollText(char* text){
   }
   outtext[16]='\0';
   printtext(outtext,1);
-  //lcd_clearline(1);
-  //lcd.print(outtext);
   #endif
 
   #ifdef OLED1306
@@ -1454,15 +1082,16 @@ void scrollText(char* text){
   }
   outtext[16]='\0';
   printtext(outtext,lineaxy);
-  //lcd_clearline(1);
-  //lcd.print(outtext);
   #endif
 
   #ifdef P8544
   //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
-  if(scrollPos<0) scrollPos=0;
+  if(scrollPos<0) {
+    scrollPos=0;
+  }
   char outtext[15];
-  if(isDir) { outtext[0]= 0x3E; 
+  if(isDir) {
+    outtext[0]= 0x3E; 
     for(int i=1;i<14;i++)
     {
       int p=i+scrollPos-1;
@@ -1487,20 +1116,8 @@ void scrollText(char* text){
   }
   outtext[14]='\0';
   printtext(outtext,1);
-  //lcd_clearline(1);
-  //lcd.print(outtext);
   #endif
 }
-
-/*
-void lcd_clearline(int l) {    
-  //clear a single line on the LCD
-  
-  lcd.setCursor(0,l);
-  lcd.print(F("                    "));
-  lcd.setCursor(0,l);
-}
-*/
 
 void printtext2F(const char* text, int l) {  //Print text to screen. 
   
@@ -1509,68 +1126,34 @@ void printtext2F(const char* text, int l) {  //Print text to screen.
   #endif
   
   #ifdef LCDSCREEN16x2
-  /*  strncpy_P(fline, text, 16);
-    for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
-    //lcd.setCursor(0,l);
-    //lcd.print(F("                    "));
     lcd.setCursor(0,l);
-    lcd.print(fline); */
-    //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
-    lcd.setCursor(0,l);
-
     char x = 0;
     while (char ch=pgm_read_byte(text+x)) {
       lcd.print(ch);
       x++;
     }
- //   for(x; x<16; x++) lcd.print(' ');  
-    
   #endif
 
- #ifdef OLED1306
-     #ifdef XY2
+  #ifdef OLED1306
+    #ifdef XY2
       strncpy_P(fline, text, 16);
-    //  for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
       sendStrXY(fline,0,l);
-     #endif
+    #endif
      
-     #ifdef XY 
+    #ifdef XY 
       setXY(0,l);
-      
       char x = 0;
       while (char ch=pgm_read_byte(text+x)) {
         sendChar(ch);
         x++;
       }
-   //   for(x; x<16; x++) sendChar(' ');
-     #endif
-/*
-      for(int i=0;i<16;i++)
-      {
-        int j;
-        if(i<strlen(text))  j=pgm_read_byte(text);
-        else  j=0x20;
-        sendChar(j);
-      }  
-*/       
-   
-  /*    u8g.firstPage();
-      do {  
-         u8g.drawStr( 0, 15, line0);   
-         u8g.drawStr( 0, 30, line1);    
-      } while( u8g.nextPage() ); */
-      //sendStrXY(line0,0,0);
-      //sendStrXY(line1,0,1);
+    #endif
   #endif
 
   #ifdef P8544
     strncpy_P(fline, text, 14);
-  //  for(int i=strlen(fline);i<14;i++) fline[i]=0x20;
-    //lcd.setCursor(0,l);
-    //lcd.print(F("              "));
     lcd.setCursor(0,l);
     lcd.print(fline);
-    //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
   #endif 
    
 }
@@ -1578,72 +1161,50 @@ void printtext2F(const char* text, int l) {  //Print text to screen.
 void printtextF(const char* text, int l) {  //Print text to screen. 
   
   #ifdef SERIALSCREEN
-  Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
+    Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
   #endif
   
   #ifdef LCDSCREEN16x2
-  /*  strncpy_P(fline, text, 16);
-    for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
-    //lcd.setCursor(0,l);
-    //lcd.print(F("                    "));
     lcd.setCursor(0,l);
-    lcd.print(fline); */
-    //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
-    lcd.setCursor(0,l);
-
     char x = 0;
     while (char ch=pgm_read_byte(text+x)) {
       lcd.print(ch);
       x++;
     }
-    for(x; x<16; x++) lcd.print(' ');  
-    
+    for(x; x<16; x++) {
+      lcd.print(' ');
+    }
   #endif
 
- #ifdef OLED1306
-     #ifdef XY2
+  #ifdef OLED1306
+    #ifdef XY2
       strncpy_P(fline, text, 16);
-      for(int i=strlen(fline);i<16;i++) fline[i]=0x20;
+      for(int i=strlen(fline);i<16;i++) {
+        fline[i]=0x20;
+      }
       sendStrXY(fline,0,l);
-     #endif
+    #endif
      
-     #ifdef XY 
+    #ifdef XY 
       setXY(0,l);
-      
       char x = 0;
       while (char ch=pgm_read_byte(text+x)) {
         sendChar(ch);
         x++;
       }
-      for(x; x<16; x++) sendChar(' ');
+      for(x; x<16; x++) {
+        sendChar(' ');
+      }
      #endif
-/*
-      for(int i=0;i<16;i++)
-      {
-        int j;
-        if(i<strlen(text))  j=pgm_read_byte(text);
-        else  j=0x20;
-        sendChar(j);
-      }  
-*/       
-   
-  /*    u8g.firstPage();
-      do {  
-         u8g.drawStr( 0, 15, line0);   
-         u8g.drawStr( 0, 30, line1);    
-      } while( u8g.nextPage() ); */
-      //sendStrXY(line0,0,0);
-      //sendStrXY(line1,0,1);
   #endif
 
   #ifdef P8544
     strncpy_P(fline, text, 14);
-    for(int i=strlen(fline);i<14;i++) fline[i]=0x20;
-    //lcd.setCursor(0,l);
-    //lcd.print(F("              "));
+    for(int i=strlen(fline);i<14;i++) {
+      fline[i]=0x20;
+    }
     lcd.setCursor(0,l);
     lcd.print(fline);
-    //lcd.print(reinterpret_cast <const __FlashStringHelper *> (text));
   #endif 
    
 }
@@ -1651,38 +1212,33 @@ void printtextF(const char* text, int l) {  //Print text to screen.
 void printtext(char* text, int l) {  //Print text to screen. 
   
   #ifdef SERIALSCREEN
-  Serial.println(text);
+    Serial.println(text);
   #endif
   
   #ifdef LCDSCREEN16x2
-/*    for(int i=0;i<16;i++)
-    {
-      if(i<strlen(text))  fline[i]=text[i];
-      else  fline[i]=0x20;
-    }    
-
-    //lcd.setCursor(0,l);
-    //lcd.print(F("                    "));
     lcd.setCursor(0,l);
-    lcd.print(fline); */
-    lcd.setCursor(0,l);
-        
     char ch;
     const char len = strlen(text);
     for(char x=0;x<16;x++) {
-        if(x<len)  ch=text[x];
-        else  ch=0x20;
-        lcd.print(ch); 
+      if(x<len) {
+        ch=text[x];
+      } else {
+        ch=0x20;
+      }
+      lcd.print(ch); 
     }
-    
   #endif
 
   #ifdef OLED1306
     #ifdef XY2
       for(int i=0;i<16;i++)
       {
-        if(i<strlen(text))  fline[i]=text[i];
-        else  fline[i]=0x20;
+        if(i<strlen(text)) {
+          fline[i]=text[i];
+        }
+        else {
+          fline[i]=0x20;
+        }
       }    
       sendStrXY(fline,0,l);
     #endif
@@ -1692,366 +1248,351 @@ void printtext(char* text, int l) {  //Print text to screen.
 
       char ch;
       const char len = strlen(text);
-       for(char x=0;x<16;x++)
+      for(char x=0;x<16;x++)
       {
-        if(x<len)  ch=text[x];
-        else  ch=0x20;
+        if(x<len) {
+          ch=text[x];
+        }
+        else {
+          ch=0x20;
+        }
         sendChar(ch);
       }       
     #endif
-/*
-      char x = 0;
-       while ((*text) && (x<16)) 
-      {
-        sendChar(*text);
-        *text++;
-        x++;
-      }
-      for(x; x<16; x++) sendChar(' ');      
-*/              
-      //setXY(0,l);
-      //sendStr("                    ");
-      //setXY(0,l);
-      //sendStr(text);
   #endif
 
   #ifdef P8544
     for(int i=0;i<14;i++)
-      {
-        if(i<strlen(text))  fline[i]=text[i];
-        else  fline[i]=0x20;
-      }  
-    //lcd.setCursor(0,l);
-    //lcd.print(F("              "));
+    {
+      if(i<strlen(text)) {
+        fline[i]=text[i];
+      }
+      else {
+        fline[i]=0x20;
+      }
+    }  
     lcd.setCursor(0,l);
     lcd.print(fline);
   #endif 
    
 }
-#ifdef OLED1306
+
+#if defined(OLED1306)
 void OledStatusLine() {
   #ifdef XY
     setXY(4,2);
     sendStr("ID:   BLK:");
- //   setXY(11,2);
- //   sendStr("BLK:");
     #ifdef OLED1306_128_64
       setXY(0,7);
-      //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
-      itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
+      itoa(BAUDRATE,(char *)input,10);
+      sendStr((char *)input);
+
       #ifndef NO_MOTOR       
         setXY(5,7);
-        if(mselectMask==1) sendStr(" M:ON");
-        else sendStr("m:off");
+        if(mselectMask==1) {
+          sendStr(" M:ON");
+        } else {
+          sendStr("m:off");
+        }
       #endif    
+
       setXY(11,7); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
-      else sendStr("%^off");    
-    #else
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+        sendStr(" %^ON");
+      } else {
+        sendStr("%^off");
+      }
+
+    #else // OLED1306_128_64 not defined
+
       setXY(0,3);
-      //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
       itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       #ifndef NO_MOTOR        
         setXY(5,3);
-        if(mselectMask==1) sendStr(" M:ON");
-        else sendStr("m:off");
+        if(mselectMask==1) {
+          sendStr(" M:ON");
+        } else {
+          sendStr("m:off");
+        }
       #endif    
       setXY(11,3); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStr(" %^ON");
-      else sendStr("%^off");
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+        sendStr(" %^ON");
+      } else {
+        sendStr("%^off");
+      }
     #endif
   #endif
+  
   #ifdef XY2                        // Y with double value
     #ifdef OLED1306_128_64          // 8 rows supported
-        sendStrXY("ID:   BLK:",4,4);        
-        //sendChar(48+BAUDRATE/1000); sendChar(48+(BAUDRATE/100)%10);sendChar(48+(BAUDRATE/10)%10);sendChar(48+BAUDRATE%10);
-        itoa(BAUDRATE,(char *)input,10);sendStrXY((char *)input,0,6);
-        #ifndef NO_MOTOR       
-          if(mselectMask==1) sendStrXY(" M:ON",5,6);
-          else sendStrXY("m:off",5,6);  
-        #endif      
-        if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) sendStrXY(" %^ON",11,6);
-        else sendStrXY("%^off",11,6);           
-    #else
-    
+      sendStrXY("ID:   BLK:",4,4);        
+      itoa(BAUDRATE,(char *)input,10);
+      sendStrXY((char *)input,0,6);
+      #ifndef NO_MOTOR       
+        if(mselectMask==1) {
+          sendStrXY(" M:ON",5,6);
+        } else {
+          sendStrXY("m:off",5,6);
+        }
+      #endif      
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+        sendStrXY(" %^ON",11,6);
+      } else {
+        sendStrXY("%^off",11,6);
+      }
     #endif      
   #endif  
+
 }
-#endif
+#endif // defined(OLED1306)
 
 void SetPlayBlock()
 {
-       printtextF(PSTR(" "),0);
-       #ifdef LCDSCREEN16x2
-    //     lcd.setCursor(11,0);lcd.print(" <<>>");
-    //     lcd.setCursor(11,0);lcd.print(" Paus");
-         lcd.setCursor(0,0);
-         lcd.print(F("BLK:"));
-       //  lcd.print(block%100);lcd.print(' ');
-         lcd.print(block);lcd.print(' ');
-         //if (bytesRead > 0){
-           lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
-    //       lcd.print(' ');lcd.print(bytesRead,HEX);
+  printtextF(PSTR(" "),0);
+  #ifdef LCDSCREEN16x2
+    lcd.setCursor(0,0);
+    lcd.print(F("BLK:"));
+    lcd.print(block);lcd.print(' ');
+    lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
+  #endif
 
-         //}
-       #endif
-       #ifdef OLED1306
-          #ifdef XY2
-              utoa(block, (char *)input, 10);
-            #if defined(OLEDBLKMATCH)              
-              if (block <10) {input[1]=input[0];input[0]='0';input[2]=0;}
-              if (block < 100) sendStrXY((char *)input,14,4);
-              else sendStrXY((char *)(input+1),14,4);
-            #endif                         
-              sendStrXY("BLK:",0,0);
-            //  input[0]=48+(block/10)%10;input[1]=48+block%10;input[2]=0;sendStrXY((char *)input,4,0);
-              sendStrXY((char *)input,4,0);//sendChar(' ');
-              
-              //if (bytesRead > 0){              
-                if (block < 100) sendStrXY(" ID:", 6,0);
-                else sendStrXY(" ID:", 7,0);
-                
-                if (currentID/16 < 10) input[0]=48+currentID/16;
-                else input[0]=55+currentID/16;
-                if (currentID%16 < 10) input[1]=48+currentID%16;
-                else input[1]=55+currentID%16;
-                                
-                input[2]=0;
-                if (block < 100) sendStrXY((char *)input,10,0);
-                else sendStrXY((char *)input,11,0);
-                
-                //utoa(currentID,(char *)input,16);sendStrXY(strupr((char *)input),10,0); // Block ID en hex
-                //sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));
-         
-              //}          
-          #else
-        //      setXY(11,0);sendStr(" <<>>");
-        //      setXY(11,0);sendStr(" Paus"); 
-              utoa(block, (char *)input, 10);
-            #if defined(OLEDBLKMATCH)              
-              setXY(14,2);
-              if (block <10) sendChar('0');
-              if (block < 100) sendStr((char *)input);
-              else sendStr((char *)(input+1));
-            #endif                           
-              setXY(0,0);
-              sendStr("BLK:");
-              //input[0]=48+(block/10)%10;input[1]=48+block%10;input[2]=0;sendStr((char *)input);
+  #if defined(OLED1306)
+    #if defined(XY2)
+      utoa(block, (char *)input, 10);
+      #if defined(OLEDBLKMATCH)              
+        if (block<10) {
+          input[1]=input[0];
+          input[0]='0';
+          input[2]=0;
+        }
+        if (block < 100) {
+          sendStrXY((char *)input,14,4);
+        } else {
+          sendStrXY((char *)(input+1),14,4);
+        }
+      #endif                         
 
-              sendStr((char *)input);//sendChar(' ');
-              //if (bytesRead > 0){
-            //    setXY(11,0);
-                sendStr(" ID:");
+      sendStrXY("BLK:",0,0);
+      sendStrXY((char *)input,4,0);
+        
+      if (block < 100) {
+        sendStrXY(" ID:", 6,0);
+      } else {
+        sendStrXY(" ID:", 7,0);
+      }
+          
+      if (currentID/16 < 10) {
+        input[0]=48+currentID/16;
+      } else {
+        input[0]=55+currentID/16;
+      }
 
-                if (currentID/16 < 10) input[0]=48+currentID/16;
-                else input[0]=55+currentID/16;
-                if (currentID%16 < 10) input[1]=48+currentID%16;
-                else input[1]=55+currentID%16;
-                                
-                input[2]=0;sendStr((char *)input);
-                
-                //utoa(currentID,(char *)input,16);sendStr(strupr((char *)input)); // Block ID en hex
-         //       sendChar(' ');utoa(bytesRead,input,16);sendStr(strupr(input));
-           
-              //}
-          #endif
-       #endif      
-       #ifdef P8544
-          lcd.setCursor(12,3);lcd.print('B'+block);
-       #endif
+      if (currentID%16 < 10) {
+        input[1]=48+currentID%16;
+      } else {
+        input[1]=55+currentID%16;
+      }
+                      
+      input[2]=0;
+      if (block < 100) {
+        sendStrXY((char *)input,10,0);
+      } else {
+        sendStrXY((char *)input,11,0);
+      }
+          
+    #else // defined(XY2)
 
-//       printtextF(PSTR("REWind ALL..    "),0);
+      utoa(block, (char *)input, 10);
+      #if defined(OLEDBLKMATCH)              
+        setXY(14,2);
+        if (block <10) {
+          sendChar('0');
+        }
+        if (block < 100) {
+          sendStr((char *)input);
+        } else {
+          sendStr((char *)(input+1));
+        }
+      #endif                           
+      setXY(0,0);
+      sendStr("BLK:");
+      sendStr((char *)input);//sendChar(' ');
+      sendStr(" ID:");
 
-   //    delay(1000);       
-   //    printtextF(PSTR("Paused"),0);
-       //block--;
-       //currentID=BlockCurrentID[block];
-       //pos=Fpos[block];
-       //entry.seekSet(Fpos[block]);
-       //entry.seekSet(0);
-       //pos=0;       
-       //lcd.println(pos); lcd.print(" ");
-       //stopFile();
-       //playFile(); 
-       //TZXPlay();
+      if (currentID/16 < 10) {
+        input[0]=48+currentID/16;
+      } else {
+        input[0]=55+currentID/16;
+      }
+      if (currentID%16 < 10) {
+        input[1]=48+currentID%16;
+      } else {
+        input[1]=55+currentID%16;
+      }
+      input[2]=0;
+      sendStr((char *)input);
+    #endif
+  #endif // defined(OLED1306)
 
-       //reset data block values
-       //clearBuffer();
-       currpct=100; 
-//       newpct=(100 * bytesRead)/filesize;
+  #ifdef P8544
+    lcd.setCursor(12,3);lcd.print('B'+block);
+  #endif
 
-       lcdsegs=0;       
-       currentBit=0;                               // fallo reproducción de .tap tras .tzx
-       pass=0;
-              
-
-/*
-       currentBlockTask = READPARAM;               //First block task is to read in parameters
-       //currentTask=PROCESSID;
-       //currentID=TAP;
-       currentTask=GETFILEHEADER;                  //First task: search for header
-*/
-
-
-//  Timer1.stop();                              //Stop timer interrupt
-
-//  bytesRead=0;                                //start of file
+  currpct=100; 
+  lcdsegs=0;       
+  currentBit=0;                               // fallo reproducción de .tap tras .tzx
+  pass=0;
 
   if (!casduino) {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
-//    clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
-//    isStopped=false;
-//    pinState=LOW;                               //Always Start on a LOW output for simplicity
-//    count = 255;                                //End of file buffer flush
-//    EndOfFile=false;
-//    digitalWrite(outputPin, pinState);
-  #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
-  #elif defined(__arm__) && defined(__STM32F1__) 
-    timer.setSTM32Period(1000);
-  #else
-    #error unknown timer
-  #endif
+    Timer.setPeriod(1000);
   }
-
-
-   
-/*
-       isStopped=false;
-       pinState=LOW;                               //Always Start on a LOW output for simplicity
-       count = 255;                                //End of file buffer flush
-       EndOfFile=false;
-       digitalWrite(outputPin, pinState);
-*/   
 }
 
 void GetAndPlayBlock()
 {
-   #ifdef BLOCKID_INTO_MEM
-      bytesRead=blockOffset[block%maxblock];
-      currentID=blockID[block%maxblock];   
-   #endif
-   #ifdef BLOCK_EEPROM_PUT
-      #if defined(__AVR__)
-        EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-        EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-      #elif defined(__arm__) && defined(__STM32F1__)
-        EEPROM_get(BLOCK_EEPROM_START+5*block, &bytesRead);
-        EEPROM_get(BLOCK_EEPROM_START+4+5*block, &currentID);
-      #endif      
-   #endif
-   #ifdef BLOCKID_NOMEM_SEARCH 
-      //block=1; //forcing block number for debugging
-      
-      unsigned long oldbytesRead;           //TAP
-      bytesRead=0;                          //TAP 
-      if (currentID!=TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
+  #ifdef BLOCKID_INTO_MEM
+    bytesRead=blockOffset[block%maxblock];
+    currentID=blockID[block%maxblock];   
+  #endif
+  #ifdef BLOCK_EEPROM_PUT
+    #if defined(__AVR__)
+      EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
+      EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      EEPROM_get(BLOCK_EEPROM_START+5*block, &bytesRead);
+      EEPROM_get(BLOCK_EEPROM_START+4+5*block, &currentID);
+    #endif      
+ #endif
+ #ifdef BLOCKID_NOMEM_SEARCH 
+    unsigned long oldbytesRead;           //TAP
+    bytesRead=0;                          //TAP 
+    if (currentID!=TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
 
-      //int i=0;
-      #ifdef BLKBIGSIZE
-        int i = 0;
-      #else
-        byte i = 0;
-      #endif      
-      while (i<= block) {
+    #ifdef BLKBIGSIZE
+      int i = 0;
+    #else
+      byte i = 0;
+    #endif      
 
-        //if (currentID!=TAP) if(ReadByte(bytesRead)==1) currentID = outByte;  //TZX with blocks GETID
-        if(ReadByte(bytesRead)==1){
-          oldbytesRead = bytesRead-1;
-          if (currentID!=TAP) currentID = outByte;  //TZX with blocks GETID
-          if (currentID==TAP) bytesRead--;
-        }
-        else {block = i-1;break;}
-        
-        switch(currentID) {
-          case ID10:  bytesRead+=2;     //Pause                
-                      if(ReadWord(bytesRead)==2) bytesRead += outWord; //Length of data that follow
-                      #if defined(OLEDBLKMATCH)
-                        i++;
-                      #endif
-                      break;
-          case ID11:  bytesRead+=15; //lPilot,lSynch1,lSynch2,lZ,lO,lP,LB,Pause
-                      if(ReadLong(bytesRead)==3) bytesRead += outLong;
-                      #if defined(OLEDBLKMATCH)
-                        i++;
-                      #endif                      
-                      break;
-          case ID12:  bytesRead+=4;
-                      break;
-          case ID13: if(ReadByte(bytesRead)==1) bytesRead += (long(outByte) * 2);
-                      break;
-          case ID14:  bytesRead+=7;
-                      if(ReadLong(bytesRead)==3) bytesRead += outLong;
-                      break;
-          case ID15:  bytesRead+=5;
-                      if(ReadLong(bytesRead)==3) bytesRead += outLong; 
-                      break;
-          case ID19:  if(ReadDword(bytesRead)==4) bytesRead += outLong;
-                      #if defined(OLEDBLKMATCH) //&& defined(BLOCKID19_IN)
-                        i++;
-                      #endif          
-                      break;                      
-          case ID20:  bytesRead+=2;
-                      break;
-          case ID21:  if(ReadByte(bytesRead)==1) bytesRead += outByte;
-                      #if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
-                        i++;
-                      #endif          
-                      break;
-          case ID22:  
-                      //#if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
-                      //  i++;
-                      //#endif          
-                      break;
-          case ID24:  bytesRead+=2;
-                      break;                                                                                
-          case ID25:
-                      break;
-          case ID2A:  bytesRead+=4;
-                      break;
-          case ID2B:  bytesRead+=5;
-                      break;
-          case ID30:  if (ReadByte(bytesRead)==1) bytesRead += outByte;                                            
-                      break;
-          case ID31:  bytesRead+=1;         
-                      if(ReadByte(bytesRead)==1) bytesRead += outByte; 
-                      break;
-          case ID32:  if(ReadWord(bytesRead)==2) bytesRead += outWord;
-                      break;
-          case ID33:  if(ReadByte(bytesRead)==1) bytesRead += (long(outByte) * 3);
-                      break;
-          case ID35:  bytesRead += 0x10;
-                      if(ReadDword(bytesRead)==4) bytesRead += outLong;
-                      break;
-          case ID4B:  if(ReadDword(bytesRead)==4) bytesRead += outLong;
-                      #if defined(OLEDBLKMATCH)
-                        i++;
-                      #endif          
-                      break;
-          case TAP:   if(ReadWord(bytesRead)==2) bytesRead += outWord;
-                      #if defined(OLEDBLKMATCH) && defined(BLOCKTAP_IN)
-                        i++;
-                      #endif           
-                      break;
-        }
-        #if not defined(OLEDBLKMATCH)
-          i++;
-        #endif  
+    while (i<= block) {
+      if(ReadByte(bytesRead)==1) {
+        oldbytesRead = bytesRead-1;
+        if (currentID!=TAP) currentID = outByte;  //TZX with blocks GETID
+        if (currentID==TAP) bytesRead--;
       }
+      else {
+        block = i-1;
+        break;
+      }
+        
+      switch(currentID) {
+        case ID10:  bytesRead+=2;     //Pause                
+                    if(ReadWord(bytesRead)==2) bytesRead += outWord; //Length of data that follow
+                    #if defined(OLEDBLKMATCH)
+                      i++;
+                    #endif
+                    break;
 
-      //bytesRead=142; //forcing bytesRead for debugging      
-      //ltoa(bytesRead,PlayBytes,16);printtext(PlayBytes,lineaxy);
-              
-   #endif   
+        case ID11:  bytesRead+=15; //lPilot,lSynch1,lSynch2,lZ,lO,lP,LB,Pause
+                    if(ReadLong(bytesRead)==3) bytesRead += outLong;
+                    #if defined(OLEDBLKMATCH)
+                      i++;
+                    #endif                      
+                    break;
 
-   bytesRead= oldbytesRead;
-   if (currentID==TAP) currentTask=PROCESSID;
-   else {
+        case ID12:  bytesRead+=4;
+                    break;
+
+        case ID13:  if(ReadByte(bytesRead)==1) bytesRead += (long(outByte) * 2);
+                    break;
+
+        case ID14:  bytesRead+=7;
+                    if(ReadLong(bytesRead)==3) bytesRead += outLong;
+                    break;
+
+        case ID15:  bytesRead+=5;
+                    if(ReadLong(bytesRead)==3) bytesRead += outLong; 
+                    break;
+
+        case ID19:  if(ReadDword(bytesRead)==4) bytesRead += outLong;
+                    #if defined(OLEDBLKMATCH) //&& defined(BLOCKID19_IN)
+                      i++;
+                    #endif          
+                    break;
+
+        case ID20:  bytesRead+=2;
+                    break;
+
+        case ID21:  if(ReadByte(bytesRead)==1) bytesRead += outByte;
+                    #if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
+                      i++;
+                    #endif          
+                    break;
+
+        case ID22:  break;
+
+        case ID24:  bytesRead+=2;
+                    break;
+
+        case ID25:  break;
+
+        case ID2A:  bytesRead+=4;
+                    break;
+
+        case ID2B:  bytesRead+=5;
+                    break;
+
+        case ID30:  if (ReadByte(bytesRead)==1) bytesRead += outByte;                                            
+                    break;
+
+        case ID31:  bytesRead+=1;         
+                    if(ReadByte(bytesRead)==1) bytesRead += outByte; 
+                    break;
+
+        case ID32:  if(ReadWord(bytesRead)==2) bytesRead += outWord;
+                    break;
+
+        case ID33:  if(ReadByte(bytesRead)==1) bytesRead += (long(outByte) * 3);
+                    break;
+
+        case ID35:  bytesRead += 0x10;
+                    if(ReadDword(bytesRead)==4) bytesRead += outLong;
+                    break;
+
+        case ID4B:  if(ReadDword(bytesRead)==4) bytesRead += outLong;
+                    #if defined(OLEDBLKMATCH)
+                      i++;
+                    #endif          
+                    break;
+
+        case TAP:   if(ReadWord(bytesRead)==2) bytesRead += outWord;
+                    #if defined(OLEDBLKMATCH) && defined(BLOCKTAP_IN)
+                      i++;
+                    #endif           
+                    break;
+      }
+      #if not defined(OLEDBLKMATCH)
+        i++;
+      #endif  
+    }
+
+  #endif   
+
+  bytesRead=oldbytesRead;
+  if (currentID==TAP) {
+    currentTask=PROCESSID;
+  }else {
     currentTask=GETID;    //Get new TZX Block
-    if(ReadByte(bytesRead)==1) {currentID = outByte;currentTask=PROCESSID;}  //TZX with blocks GETID
-   }
+    if(ReadByte(bytesRead)==1) {
+      //TZX with blocks GETID
+      currentID = outByte;
+      currentTask=PROCESSID;
+    }
+  }
    
-   SetPlayBlock(); 
+  SetPlayBlock(); 
 }
 
 void str4cpy (char *dest, char *src)

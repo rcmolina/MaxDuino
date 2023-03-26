@@ -7,25 +7,15 @@ void casPause()
 
 void casStop()
 {
-  #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.stop();
-  #elif defined(__arm__) && defined(__STM32F1__)
-    timer.pause();
-  #else
-    #error unknown timer
-  #endif
-  //noInterrupts();
+  Timer.stop();
+
   isStopped=true;
   start=0;
-  //interrupts();
   entry.close();
   seekFile();
   bytesRead=0;
   dragonMode=0;
   casduino=0;
-/*  Timer1.initialize(100000);                //100ms pause prevents anything bad happening before we're ready
-  Timer1.attachInterrupt(wave2);
-  Timer1.stop();     */                       //Stop the timer until we're ready   
 }
 
 
@@ -34,43 +24,33 @@ void wave()
   if(isStopped==0)
   {
     switch(wbuffer[pos][working]) {
-    case 0:
-      if(pass == 0 | pass == 1)
-      {
-       // digitalWrite(outputPin, out);
-          if (out == LOW)     WRITE_LOW;    
-          else  WRITE_HIGH;
-      } else
-      {
-       // digitalWrite(outputPin, !out);
-          if (out == LOW)     WRITE_HIGH;    
-          else  WRITE_LOW; 
-      }
-      break;
+      case 0:
+        if(pass == 0 || pass == 1) {
+          if (out == LOW) WRITE_LOW;    
+          else WRITE_HIGH;
+        } else {
+          if (out == LOW) WRITE_HIGH;    
+          else WRITE_LOW; 
+        }
+        break;
 
-    case 1:
-      if(pass==0 | pass==2)
-      {
-       // digitalWrite(outputPin, out);
-          if (out == LOW)     WRITE_LOW;    
-          else  WRITE_HIGH;
-      } else
-      {
-       // digitalWrite(outputPin, !out);
-          if (out == LOW)     WRITE_HIGH;    
-          else  WRITE_LOW;
-      }
-      if(dragonMode==1 && pass == 1) {
-        pass=3;
-      }
-      break;
+      case 1:
+        if(pass==0 || pass==2) {
+          if (out == LOW) WRITE_LOW;    
+          else WRITE_HIGH;
+        } else {
+          if (out == LOW) WRITE_HIGH;    
+          else WRITE_LOW;
+        }
+        if(dragonMode==1 && pass == 1) {
+          pass=3;
+        }
+        break;
 
-    case 2:
-    //  digitalWrite(outputPin, LOW);
-      //WRITE_LOW;
-      if (out == LOW)     WRITE_LOW;    
-      else  WRITE_HIGH;
-      break;
+      case 2:
+        if (out == LOW) WRITE_LOW;
+        else WRITE_HIGH;
+        break;
     }
   
     pass = pass + 1;
@@ -85,17 +65,15 @@ void wave()
         morebuff = HIGH;
       }
     }
-  } else 
-      // digitalWrite(outputPin, LOW);
-      WRITE_LOW;
-
+  } else {
+    WRITE_LOW;
+  }
 }
-
 
 void writeByte(byte b)
 {
 #if defined(Use_CAS) && defined(Use_DRAGON)
-if(dragonMode==1) {
+  if(dragonMode==1) {
     for(int i=0;i<8;i++)
     {
       if(b&1)
@@ -141,7 +119,6 @@ void writeHeader()
   }
 }
 
-
 void process()
 {
   byte r=0;
@@ -153,10 +130,10 @@ void process()
     } else stopFile();    
     return;
   }
-   if(currentTask==lookHeader || currentTask==wData)
-   {
-     if((r=readfile(8,bytesRead))==8) 
-     {
+  if(currentTask==lookHeader || currentTask==wData)
+  {
+    if((r=readfile(8,bytesRead))==8) 
+    {
       if(!memcmp_P(input,HEADER,8)) {
         if(fileStage==0) 
         {
@@ -170,16 +147,16 @@ void process()
         bytesRead+=8;
       }
       
-     } else if(r==0) 
-     {
+    } else if(r==0) 
+    {
       currentType=typeEOF;
       currentTask=wClose;
       count=LONG_SILENCE*scale;
-     }
+    }
      
-   }
-   if(currentTask==lookType)
-   {
+  }
+  if(currentTask==lookType)
+  {
     if((r=readfile(10,bytesRead))==10)
     {
       if(!memcmp_P(input,ASCII,10))
@@ -213,9 +190,9 @@ void process()
         count = LONG_SILENCE*scale;
         fileStage=1;       
     }
-   }
-   if(currentTask==wSilence)
-   {
+  }
+  if(currentTask==wSilence)
+  {
     if(!count==0)
     {
       writeSilence();
@@ -239,9 +216,9 @@ void process()
         }
       }
     }
-   }
-   if(currentTask==wHeader)
-   {
+  }
+  if(currentTask==wHeader)
+  {
     if(!count==0)
     {
       writeHeader();
@@ -251,17 +228,16 @@ void process()
       currentTask=wData;
       return;
     }
-   }
-   if(currentTask==wData)
-   {
+  }
+  if(currentTask==wData)
+  {
     writeByte(input[0]);
     if(input[0]==0x1a && currentType==typeAscii) 
     {
       fileStage=0;
     }
-   }
-   if(currentTask==lookHeader || currentTask==lookType || currentTask==wData) bytesRead+=1; 
-   
+  }
+  if(currentTask==lookHeader || currentTask==lookType || currentTask==wData) bytesRead+=1; 
 }
 
 #if defined(Use_CAS) && defined(Use_DRAGON)
@@ -271,7 +247,7 @@ void processDragon()
   byte r=0;
   if((r=readfile(1,bytesRead))==1) {
 
-#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader) && not defined(Expand_All)
+  #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
     if(currentTask==lookHeader) {      
       if(input[0] == 0x55) {
        writeByte(0x55); 
@@ -303,9 +279,9 @@ void processDragon()
             count=255;
         }
     } else {        
-#endif
+  #endif
     
-#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader) && defined(Expand_All)
+  #if defined(Use_Dragon_sLeader) && defined(Expand_All)
      
     if(currentTask==lookHeader) {      
       if(input[0] == 0x55) {
@@ -317,78 +293,70 @@ void processDragon()
       }
         
     } else if(currentTask==wHeader) {      
-        if(count>=0) {
-          writeByte(0x55);
-          count--;
-        } else {
-          //count= 119;
-          count = 2;      
-          currentTask=wSync;
-        }
+      if(count>=0) {
+        writeByte(0x55);
+        count--;
+      } else {
+        //count= 119;
+        count = 2;      
+        currentTask=wSync;
+      }
 
     } else if(currentTask==wSync) { 
-      
-          if(!count==0) {
-            writeByte(input[0]);
-            bytesRead+=1;
-            count--;
-          } else {
-            writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
-            bytesRead+=1;
-            currentTask=wNameFileBlk;
-            count=input[0]++;                   
-            //currentTask==lookLeader;             
-            //count=255;                 
-          }
- 
+      if(!count==0) {
+        writeByte(input[0]);
+        bytesRead+=1;
+        count--;
+      } else {
+        writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
+        bytesRead+=1;
+        currentTask=wNameFileBlk;
+        count=input[0]++;                   
+      }
  
     } else if(currentTask==wNameFileBlk) { 
-          if(!count==0) {
-            writeByte(input[0]);
-            bytesRead+=1;
-            count--;
-          } else {
-            writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
-            bytesRead+=1;            
-            currentTask=lookLeader;
-            count=255;                 
-          }
-
+      if(!count==0) {
+        writeByte(input[0]);
+        bytesRead+=1;
+        count--;
+      } else {
+        writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
+        bytesRead+=1;            
+        currentTask=lookLeader;
+        count=255;                 
+      }
           
     } else if(currentTask==lookLeader) { 
-          if(input[0] == 0x55) {
-            writeByte(0x55); 
-            bytesRead+=1;
-            count--;
-          } else {
-            currentTask=wNewLeader; 
-          }
+      if(input[0] == 0x55) {
+        writeByte(0x55); 
+        bytesRead+=1;
+        count--;
+      } else {
+        currentTask=wNewLeader; 
+      }
 
     } else if(currentTask==wNewLeader) {      
-        if(count>=0) {
-          writeByte(0x55);
-          count--;
-        } else {   
-          currentTask=wData;
-        }
+      if(count>=0) {
+        writeByte(0x55);
+        count--;
+      } else {   
+        currentTask=wData;
+      }
                   
     } else {
 
-#endif
-          currentTask=wData;
-          writeByte(input[0]);
-          bytesRead+=1; 
-#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
+  #endif
+      currentTask=wData;
+      writeByte(input[0]);
+      bytesRead+=1; 
+  #if defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
     }
-#endif             
+  #endif
+  
     } else {
       if(currentTask==wData) {
        if(lastByte != 0x55) {
           writeByte(0x55);
-          //lcd.print(lastByte);
-          //Serial.println(lastByte);
-          //printtext(lastByte,0);
-          //delay(200);
       }      
       count = 54;
       currentTask=wSilence;
@@ -407,7 +375,6 @@ void processDragon()
 
 int readfile(byte bytes, unsigned long p)
 {
-  
   int i=0;
   int t=0;
   if(entry.seekSet(p)) {
@@ -415,7 +382,6 @@ int readfile(byte bytes, unsigned long p)
   } 
   return i;
 }
-
 
 void clearBuffer()
 {
@@ -425,7 +391,6 @@ void clearBuffer()
     wbuffer[i][1]=2;
   }
 }
-
 
 void casduinoLoop()
 {
@@ -439,12 +404,12 @@ void casduinoLoop()
     btemppos=0;
     copybuff=LOW;
   }
+
   if(btemppos<=buffsize - (dragonBuff * dragonMode))
   { 
 #if defined(Use_CAS) && defined(Use_DRAGON)
     if(dragonMode==1) {
       processDragon();
-//      noInterrupts();
       for(int t=0;t<8;t++)
       {
         if(btemppos<=buffsize)
@@ -453,11 +418,9 @@ void casduinoLoop()
           btemppos+=1;         
         }        
       }
-//      interrupts();
     } else {
 #endif
       process();      
-//      noInterrupts();
       for(int t=0;t<11;t++)
       {
         if(btemppos<=buffsize)
@@ -466,19 +429,17 @@ void casduinoLoop()
           btemppos+=1;         
         }        
       }
-//      interrupts();
 #if defined(Use_CAS) && defined(Use_DRAGON)
     }
 #endif
-    } else {
-         //lcdSpinner();
-         if (pauseOn == 0) {      
-          #if defined(SHOW_CNTR)
-            lcdTime();          
-          #endif
-          #if defined(SHOW_PCT)          
-            lcdPercent();
-          #endif        
-         }
-    } 
+  } else {
+    if (pauseOn == 0) {      
+    #if defined(SHOW_CNTR)
+      lcdTime();          
+    #endif
+    #if defined(SHOW_PCT)          
+      lcdPercent();
+    #endif        
+    }
+  } 
 }

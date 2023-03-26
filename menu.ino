@@ -1,17 +1,6 @@
-/*
-void menuMode()
- {
-      //Return to root of the SD card.
-      changeDirRoot();
-      while(digitalRead(btnMselect)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50);
-       }
-}
-*/
 /**************************************************************
  *                  Casduino Menu Code:
- *  Menu Button (was motor controll button) opens menu
+ *  Menu Button (was motor control button) opens menu
  *  up/down move through menu, play select, stop back
  *  Menu Options:
  *  Baud:
@@ -26,8 +15,6 @@ void menuMode()
  *  
  *  Save settings to eeprom on exit. 
  */
-// byte lastbtn=true;
-
 #include "buttons.h"
 
 #if defined(__arm__) && defined(__STM32F1__)
@@ -62,8 +49,8 @@ enum MenuItems{
   _Num_Menu_Items
 };
 
- void menuMode()
- { 
+void menuMode()
+{ 
   byte menuItem=0;
   byte subItem=0;
   byte updateScreen=true;
@@ -194,13 +181,13 @@ enum MenuItems{
           updateScreen=true;
         break;
 
-   #ifndef NO_MOTOR
-        case MenuItems::MOTOR_CTL:
-          doOnOffSubmenu(PSTR("Motor Ctrl"), mselectMask);
-          lastbtn=true;
-          updateScreen=true;
-          break;
-   #endif
+        #ifndef NO_MOTOR
+          case MenuItems::MOTOR_CTL:
+            doOnOffSubmenu(PSTR("Motor Ctrl"), mselectMask);
+            lastbtn=true;
+            updateScreen=true;
+            break;
+        #endif
 
         case MenuItems::TSX_POL_UEFSW:
           doOnOffSubmenu(PSTR("TSXCzxpolUEFSW"), TSXCONTROLzxpolarityUEFSWITCHPARITY);
@@ -208,23 +195,23 @@ enum MenuItems{
           updateScreen=true;
           break;
           
-   #ifdef MenuBLK2A
-        case MenuItems::BLK2A:
-          doOnOffSubmenu(PSTR("Skip BLK:2A"), skip2A);
-          lastbtn=true;
-          updateScreen=true;
-          break;
-   #endif     
+        #ifdef MenuBLK2A
+          case MenuItems::BLK2A:
+            doOnOffSubmenu(PSTR("Skip BLK:2A"), skip2A);
+            lastbtn=true;
+            updateScreen=true;
+            break;
+        #endif     
       }
     }
     checkLastButton();
   }
   #ifdef LOAD_EEPROM_SETTINGS
-  updateEEPROM();
+    updateEEPROM();
   #endif
 
   debounce(button_stop);
- }
+}
 
 void doOnOffSubmenu(const char * title, byte& refVar)
 {
@@ -251,105 +238,103 @@ void doOnOffSubmenu(const char * title, byte& refVar)
 }
 
 #ifdef LOAD_EEPROM_SETTINGS
- void updateEEPROM()
- {
-  /* Setting Byte: 
-   *  bit 0: 1200
-   *  bit 1: 2400
-   *  bit 2: 3600
-   *  bit 3: 3850
-   *  bit 4: n/a
-   *  bit 5: BLK_2A control
-   *  bit 6: TSXCONTROLzxpolarityUEFSWITCHPARITY
-   *  bit 7: Motor control
-   */
-  byte settings=0;
+  void updateEEPROM()
+  {
+    /* Setting Byte: 
+    *  bit 0: 1200
+    *  bit 1: 2400
+    *  bit 2: 3600
+    *  bit 3: 3850
+    *  bit 4: n/a
+    *  bit 5: BLK_2A control
+    *  bit 6: TSXCONTROLzxpolarityUEFSWITCHPARITY
+    *  bit 7: Motor control
+    */
+    byte settings=0;
 
-  switch(BAUDRATE) {
-    case 1200:
-    settings |=1;
-    break;
-    case 2400:
-    settings |=2;
-    break;
-    case 3600:
-    settings |=4;  
-    break;      
-    case 3850:
-    settings |=8;
-    break;
+    switch(BAUDRATE) {
+      case 1200:
+      settings |=1;
+      break;
+      case 2400:
+      settings |=2;
+      break;
+      case 3600:
+      settings |=4;  
+      break;      
+      case 3850:
+      settings |=8;
+      break;
+    }
+
+    #ifndef NO_MOTOR
+      if(mselectMask) settings |=128;
+    #endif
+
+    if(TSXCONTROLzxpolarityUEFSWITCHPARITY) settings |=64;
+    
+    #ifdef MenuBLK2A
+      if(skip2A) settings |=32;
+    #endif
+
+    #if defined(__AVR__)
+      EEPROM.put(EEPROM_CONFIG_BYTEPOS,settings);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      EEPROM_put(EEPROM_CONFIG_BYTEPOS,settings);
+    #endif      
+    setBaud();
   }
 
-  #ifndef NO_MOTOR
-  if(mselectMask) settings |=128;
-  #endif
+  void loadEEPROM()
+  {
+    byte settings=0;
+    #if defined(__AVR__)
+      EEPROM.get(EEPROM_CONFIG_BYTEPOS,settings);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      EEPROM_get(EEPROM_CONFIG_BYTEPOS,&settings);
+    #endif
+        
+    if(!settings) return;
+    
+    #ifndef NO_MOTOR
+      if(bitRead(settings,7)) {
+        mselectMask=1;
+      } else {
+        mselectMask=0;
+      }
+    #endif
 
-  if(TSXCONTROLzxpolarityUEFSWITCHPARITY) settings |=64;
-  
-  #ifdef MenuBLK2A
-  if(skip2A) settings |=32;
-  #endif
-
-  #if defined(__AVR__)
-    EEPROM.put(EEPROM_CONFIG_BYTEPOS,settings);
-  #elif defined(__arm__) && defined(__STM32F1__)
-    EEPROM_put(EEPROM_CONFIG_BYTEPOS,settings);
-  #endif      
-  setBaud();
- }
-
- void loadEEPROM()
- {
-  byte settings=0;
-  #if defined(__AVR__)
-    EEPROM.get(EEPROM_CONFIG_BYTEPOS,settings);
-  #elif defined(__arm__) && defined(__STM32F1__)
-    EEPROM_get(EEPROM_CONFIG_BYTEPOS,&settings);
-  #endif
-      
-  if(!settings) return;
-  
-  #ifndef NO_MOTOR
-  if(bitRead(settings,7)) {
-    mselectMask=1;
-  } else {
-    mselectMask=0;
+    if(bitRead(settings,6)) {
+      TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
+    } else {
+      TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
+    }
+    
+    #ifdef MenuBLK2A
+      if(bitRead(settings,5)) {
+        skip2A=1;
+      } else {
+        skip2A=0;
+      }   
+    #endif
+    
+    if(bitRead(settings,0)) {
+      BAUDRATE=1200;
+    }
+    if(bitRead(settings,1)) {
+      BAUDRATE=2400;
+    }
+    if(bitRead(settings,2)) {
+      BAUDRATE=3600;  
+    }
+    if(bitRead(settings,3)) {
+      BAUDRATE=3850;  
+    }
   }
-  #endif
-
-  if(bitRead(settings,6)) {
-    TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
-  } else {
-    TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
-  }
-  
-  #ifdef MenuBLK2A
-  if(bitRead(settings,5)) {
-    skip2A=1;
-  } else {
-    skip2A=0;
-  }   
-  #endif
-  
-  if(bitRead(settings,0)) {
-    BAUDRATE=1200;
-  }
-  if(bitRead(settings,1)) {
-    BAUDRATE=2400;
-  }
-  if(bitRead(settings,2)) {
-    BAUDRATE=3600;  
-  }
-  if(bitRead(settings,3)) {
-    BAUDRATE=3850;  
-  }
- }
 #endif
 
 void checkLastButton()
 {
   if(!button_down() && !button_up() && !button_play() && !button_stop()) lastbtn=false; 
-        //    setXY(0,0);
-        //  sendChar(lastbtn+'0');
   delay(50);
 }
