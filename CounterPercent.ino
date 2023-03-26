@@ -25,7 +25,9 @@ void lcdTime() {
       else {
         // es 000,1000,2000,...
         lcd.setCursor(13,0);
-        lcd.print('0');lcd.print('0');lcd.print('0');
+        lcd.print('0');
+        lcd.print('0');
+        lcd.print('0');
       }
 
       lcdsegs++;
@@ -136,13 +138,25 @@ void lcdPercent() {
     #ifdef OLED1306
       #ifdef XY2force
         if (newpct <10) {
-          input[0]=48+(newpct%10);input[1]='%';input[2]=0;sendStrXY((char *)input,8,0);
+          input[0]=48+(newpct%10);
+          input[1]='%';
+          input[2]=0;
+          sendStrXY((char *)input,8,0);
         }
         else if (newpct <100) {
-          input[0]=48+(newpct/10);input[1]=48+(newpct%10);input[2]='%';input[3]=0;sendStrXY((char *)input,8,0);
+          input[0]=48+(newpct/10);
+          input[1]=48+(newpct%10);
+          input[2]='%';
+          input[3]=0;
+          sendStrXY((char *)input,8,0);
         }
         else {
-          input[0]='1';input[1]='0';input[2]='0'; input[3]='%';input[4]=0;sendStrXY((char *)input,8,0);
+          input[0]='1';
+          input[1]='0';
+          input[2]='0';
+          input[3]='%';
+          input[4]=0;
+          sendStrXY((char *)input,8,0);
         }
                                           
       #else // XY2force
