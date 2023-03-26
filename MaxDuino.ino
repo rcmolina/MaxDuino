@@ -237,12 +237,9 @@ void setup() {
     Serial.begin(115200);
   #endif
   
-  #ifdef OLED1306 
-    #if defined(Use_SoftI2CMaster) 
-      i2c_init();
-    #else
-      Wire.begin();
-    #endif    
+  #ifdef OLED1306
+    #include "i2c.h"
+    mx_i2c_init();
     init_OLED();
     #if (!SPLASH_SCREEN)
       #if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
