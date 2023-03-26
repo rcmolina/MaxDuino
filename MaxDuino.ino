@@ -1446,13 +1446,7 @@ void SetPlayBlock()
 
   if (!casduino) {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
-    #if defined(__AVR__) || defined(__SAMD21__)
-      Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
-    #elif defined(__arm__) && defined(__STM32F1__) 
-      timer.setSTM32Period(1000);
-    #else
-      #error unknown timer
-    #endif
+    Timer.setPeriod(1000);
   }
 }
 

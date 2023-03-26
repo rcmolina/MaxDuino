@@ -75,49 +75,17 @@
 
 #ifdef TimerOne
   #include <TimerOne.h>
-#elif defined(__arm__) && defined(__STM32F1__) 
-  //HardwareTimer timer(2); // channel 2
+  const TimerOne &Timer = Timerl;
+#else
   #include "TimerCounter.h"
- 
-/* class TimerCounter: public HardwareTimer
-{
-  public:
-    TimerCounter(uint8 timerNum) : HardwareTimer(timerNum) {};
-    void setSTM32Period(unsigned long microseconds) __attribute__((always_inline)) {}
-};*/
-TimerCounter timer(2);
+#endif
 
+#if defined(__arm__) && defined(__STM32F1__) 
   #include <itoa.h>  
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
   #define memcmp_P(a, b, n) memcmp((a), (b), (n)) 
   #define strcasecmp_P(a,b) strcasecmp((a), (b)) 
-#elif defined(__SAMD21__)
-  #include "TimerCounter.h"
-  TimerCounter Timer1;
-#else
-  #include "TimerCounter.h"
-  TimerCounter Timer1;              // preinstatiate
-  
-  unsigned short TimerCounter::pwmPeriod = 0;
-  unsigned char TimerCounter::clockSelectBits = 0;
-  void (*TimerCounter::isrCallback)() = NULL;
-  
-  // interrupt service routine that wraps a user defined function supplied by attachInterrupt
-  #if defined(__AVR_ATmega4809__) || defined (__AVR_ATmega4808__)
-    ISR(TCA0_OVF_vect)
-    {
-      Timer1.isrCallback();
-    /* The interrupt flag has to be cleared manually */
-    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
-    }  
-  #else //__AVR_ATmega328P__
-    ISR(TIMER1_OVF_vect)
-    {
-      Timer1.isrCallback();
-    }
-  #endif
 #endif
-
 
 #include <SdFat.h>
 

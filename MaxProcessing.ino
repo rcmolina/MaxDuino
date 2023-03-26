@@ -34,32 +34,15 @@ void UniPlay(){
     passforZero=2;
     passforOne=4;
     WRITE_LOW;
-    #if defined(__AVR__) || defined(__SAMD21__)
-      Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
-      Timer1.attachInterrupt(wave2);
-    #elif defined(__arm__) && defined(__STM32F1__)
-      //timer.setCount(0);
-      timer.setPeriod(1000);
-      timer.attachInterrupt(2,wave2); // channel 2
-      timer.resume();    
-    #else
-      #error unknown timer  
-    #endif
+    Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
+    Timer.attachInterrupt(wave2);
   }
   else {
     bytesRead=0;currentType=typeNothing;currentTask=lookHeader;fileStage=0;
     clearBuffer();
     isStopped=false;
-    #if defined(__AVR__) || defined(__SAMD21__)
-      Timer1.initialize(period);
-      Timer1.attachInterrupt(wave);
-    #elif defined(__arm__) && defined(__STM32F1__)
-      timer.setPeriod(period);
-      timer.attachInterrupt(2,wave); // channel 2
-      timer.resume();   
-    #else
-      #error unknown timer
-    #endif        
+    Timer.initialize(period);
+    Timer.attachInterrupt(wave);
   }
 #else
   currentBlockTask = READPARAM;               //First block task is to read in parameters
@@ -70,28 +53,13 @@ void UniPlay(){
   passforZero=2;
   passforOne=4;
   WRITE_LOW;
-  #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
-    Timer1.attachInterrupt(wave2);
-  #elif defined(__arm__) && defined(__STM32F1__)
-    //timer.setCount(0);
-    timer.setPeriod(1000);
-    timer.attachInterrupt(2,wave2); // channel 2
-    timer.resume();      
-  #else
-    #error unknown timer
-  #endif
+  Timer.initialize(1000); // 100ms pause prevents anything bad happening before we're ready
+  Timer.attachInterrupt(wave2);
 #endif
 }
 
 void TZXStop() {
-  #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.stop();                              //Stop timer
-  #elif defined(__arm__) && defined(__STM32F1__)
-    timer.pause();
-  #else
-    #error unknown timer
-  #endif
+  Timer.stop();
   isStopped=true;
   start=0;
   entry.close();                              //Close file
@@ -2162,15 +2130,8 @@ void wave2() {
     newTime = 50000;                         //Just in case we have a 0 in the buffer    
   }
   
-  #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.setPeriod(newTime +6);    //Finally set the next pulse length
-  #elif defined(__arm__) && defined(__STM32F1__)    
-    newTime += 2;
-    timer.setSTM32Period(newTime);
-  #else
-    #error unknown timer
-  #endif
-
+  newTime += 6; // why 6? STM32F1 code used to do newTime += 2.  Why 2?
+  Timer.setPeriod(newTime); //Finally set the next pulse length
 }
 
 void writeHeader2() {
@@ -2260,16 +2221,7 @@ void setBaud()
       period = 68; //3675 baudios con period=68, 3760 con period=66.5
       break;
   }
-//  scale=BAUDRATE/1200;
-//  period=208/scale;
-  //Timer1.setPeriod(period);
-  #if defined(__AVR__) || defined(__SAMD21__)
-    Timer1.stop();
-  #elif defined(__arm__) && defined(__STM32F1__)
-    timer.pause();
-  #else
-    #error unknown timer
-  #endif
+  Timer.stop();
 }
 
 
