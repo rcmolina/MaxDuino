@@ -281,6 +281,7 @@ class TimerCounter
 unsigned short TimerCounter::pwmPeriod = 0;
 unsigned char TimerCounter::clockSelectBits = 0;
 timerCallback TimerCounter::isrCallback = NULL;
+extern TimerCounter Timer;
 ISR(TCA0_OVF_vect)
 {
   Timer.isrCallback();

@@ -17,25 +17,9 @@
  */
 #include "buttons.h"
 
-#if defined(__arm__) && defined(__STM32F1__)
-
-  uint8_t EEPROM_get(uint16_t address, byte *data) {
-    if (EEPROM.init()==EEPROM_OK) {
-      *data = (byte)(EEPROM.read(address) & 0xff);  
-      return true;  
-    } else 
-      return false;
-  }
-  
-
-  uint8_t EEPROM_put(uint16_t address, byte data) {
-    if (EEPROM.init()==EEPROM_OK) {
-      EEPROM.write(address, (uint16_t) data); 
-      return true;    
-    } else
-      return false;
-  }
-  #endif
+#if defined(LOAD_EEPROM_SETTINGS)
+#include "EEPROM.h"
+#endif
 
 enum MenuItems{
   BAUD_RATE,
@@ -277,22 +261,14 @@ void doOnOffSubmenu(const char * title, byte& refVar)
       if(skip2A) settings |=32;
     #endif
 
-    #if defined(__AVR__)
-      EEPROM.put(EEPROM_CONFIG_BYTEPOS,settings);
-    #elif defined(__arm__) && defined(__STM32F1__)
-      EEPROM_put(EEPROM_CONFIG_BYTEPOS,settings);
-    #endif      
+    EEPROM_put(EEPROM_CONFIG_BYTEPOS, settings);
     setBaud();
   }
 
   void loadEEPROM()
   {
     byte settings=0;
-    #if defined(__AVR__)
-      EEPROM.get(EEPROM_CONFIG_BYTEPOS,settings);
-    #elif defined(__arm__) && defined(__STM32F1__)
-      EEPROM_get(EEPROM_CONFIG_BYTEPOS,&settings);
-    #endif
+    EEPROM_get(EEPROM_CONFIG_BYTEPOS, settings);
         
     if(!settings) return;
     
