@@ -270,8 +270,8 @@ void setup() {
       #endif
   #endif
 
-  //while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
-  while (!sd.begin(SdSpiConfig(chipSelect, DEDICATED_SPI, SD_SPI_CLOCK_SPEED))) {
+  while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
+  //while (!sd.begin(SdSpiConfig(chipSelect, DEDICATED_SPI, SD_SPI_CLOCK_SPEED))) {
     //Start SD card and check it's working
     printtextF(PSTR("No SD Card"),0);
     delay(50);
