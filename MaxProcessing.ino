@@ -6,29 +6,38 @@ word TickToUs(word ticks) {
 
 void UniPlay(){
   setBaud();
+
   // on entry, currentFile is already pointing to the file entry you want to play
   // and fileName is already set
   if(!entry.open(&currentDir, currentFile, O_RDONLY)) {
   //  printtextF(PSTR("Error Opening File"),0);
   }
 
+#ifdef ID11CDTspeedup
+  AMScdt = 0;
+#endif
   block=0;                                    // Initial block when starting
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
   bytesRead=0;                                //start of file
   currentTask=GETFILEHEADER;                  //First task: search for header
-  char *lastdotptr= strrchr(fileName,'.');
-  checkForEXT (lastdotptr);
+  const char * filenameExt = strrchr(fileName,'.') + 1;
+  checkForEXT(filenameExt);
+  isStopped=false;
   
-#ifdef ID11CDTspeedup  
-  if (!strcasecmp_P(lastdotptr, PSTR(".cdt"))) AMScdt = 1;  
-  else  AMScdt = 0;
-#endif   
-
 #ifdef Use_CAS 
-  if (!casduino) {
+  if (casduino) {
+    currentType=typeNothing;
+    currentTask=lookHeader;
+    fileStage=0;
+    clearBuffer();
+    Timer.initialize(period);
+    Timer.attachInterrupt(wave);
+  }
+  else 
+#endif
+  {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
     clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
-    isStopped=false;
     count = 255;                                //End of file buffer flush 
     EndOfFile=false;
     passforZero=2;
@@ -37,25 +46,6 @@ void UniPlay(){
     Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
     Timer.attachInterrupt(wave2);
   }
-  else {
-    bytesRead=0;currentType=typeNothing;currentTask=lookHeader;fileStage=0;
-    clearBuffer();
-    isStopped=false;
-    Timer.initialize(period);
-    Timer.attachInterrupt(wave);
-  }
-#else
-  currentBlockTask = READPARAM;               //First block task is to read in parameters
-  clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
-  isStopped=false;
-  count = 255;                                //End of file buffer flush 
-  EndOfFile=false;
-  passforZero=2;
-  passforOne=4;
-  WRITE_LOW;
-  Timer.initialize(1000); // 100ms pause prevents anything bad happening before we're ready
-  Timer.attachInterrupt(wave2);
-#endif
 }
 
 void TZXStop() {
@@ -67,7 +57,9 @@ void TZXStop() {
   bytesRead=0;                                // reset read bytes PlayBytes
   blkchksum = 0;                              // reset block chksum byte for AY loading routine
   AYPASS = 0;                                 // reset AY flag
+#ifdef Use_CAS
   casduino=0;
+#endif
 }
 
 void TZXPause() {
@@ -1765,6 +1757,7 @@ void writeData() {
       }
       blkchksum = blkchksum ^ currentByte;    // keep calculating checksum
       #endif
+
       if(bytesToRead == 0) {                  //Check for end of data block
         bytesRead += -1;                      //rewind a byte if we've reached the end
         

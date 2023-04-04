@@ -167,7 +167,9 @@ byte hdrptr = 0;
 byte blkchksum = 0;
 byte EndOfFile=false;
 word ayblklen = 0;
+#ifdef Use_CAS
 byte casduino = 0;
+#endif
 #ifdef ID11CDTspeedup
 byte AMScdt = 0;
 #endif
