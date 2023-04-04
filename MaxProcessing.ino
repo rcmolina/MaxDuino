@@ -2196,65 +2196,58 @@ void uniLoop() {
  #endif
 }
 
+byte tmpbuffer[10];
+
 int ReadByte(unsigned long pos) {
   //Read a byte from the file, and move file position on one if successful
-  byte out[1];
   int i=0;
-
   if(entry.seekSet(pos)) {
-    i = entry.read(out,1);
+    i = entry.read(tmpbuffer,1);
     if(i==1) bytesRead += 1;
   }
-  outByte = out[0];
+  outByte = tmpbuffer[0];
   return i;
 }
 
 int ReadWord(unsigned long pos) {
   //Read 2 bytes from the file, and move file position on two if successful
-  byte out[2];
   int i=0;
-
   if(entry.seekSet(pos)) {
-    i = entry.read(out,2);
+    i = entry.read(tmpbuffer,2);
     if(i==2) bytesRead += 2;
   }
-  outWord = word(out[1],out[0]);
+  outWord = word(tmpbuffer[1],tmpbuffer[0]);
   return i;
 }
 
 int ReadLong(unsigned long pos) {
   //Read 3 bytes from the file, and move file position on three if successful
-  byte out[3];
   int i=0;
   if(entry.seekSet(pos)) {
-    i = entry.read(out,3);
+    i = entry.read(tmpbuffer,3);
     if(i==3) bytesRead += 3;
   }
-  outLong = ((unsigned long) word(out[2],out[1]) << 8) | out[0];
+  outLong = ((unsigned long) word(tmpbuffer[2],tmpbuffer[1]) << 8) | tmpbuffer[0];
   return i;
 }
 
 int ReadDword(unsigned long pos) {
   //Read 4 bytes from the file, and move file position on four if successful  
-  byte out[4];
   int i=0;
-  
   if(entry.seekSet(pos)) {
-    i = entry.read(out,4);
+    i = entry.read(tmpbuffer,4);
     if(i==4) bytesRead += 4;
   }
-  outLong = ((unsigned long)word(out[3],out[2]) << 16) | word(out[1],out[0]);
+  outLong = ((unsigned long)word(tmpbuffer[3],tmpbuffer[2]) << 16) | word(tmpbuffer[1],tmpbuffer[0]);
   return i;
 }
 
 void ReadTZXHeader() {
   //Read and check first 10 bytes for a TZX header
-  char tzxHeader[11];
   int i=0;
-  
   if(entry.seekSet(0)) {
-    i = entry.read(tzxHeader,10);
-    if(memcmp_P(tzxHeader,TZXTape,7)!=0) {
+    i = entry.read(tmpbuffer,10);
+    if(memcmp_P(tmpbuffer,TZXTape,7)!=0) {
       printtextF(PSTR("NOT RECOGNISED"),0);
       delay(300);     
       TZXStop();
@@ -2269,12 +2262,10 @@ void ReadTZXHeader() {
 #ifdef AYPLAY
 void ReadAYHeader() {
   //Read and check first 8 bytes for a TZX header
-  char ayHeader[9];
   int i=0;
-  
   if(entry.seekSet(0)) {
-    i = entry.read(ayHeader,8);
-    if(memcmp_P(ayHeader,AYFile,8)!=0) {
+    i = entry.read(tmpbuffer,8);
+    if(memcmp_P(tmpbuffer,AYFile,8)!=0) {
       printtextF(PSTR("Not AY File"),0);
       delay(300);    
       TZXStop();
@@ -2289,25 +2280,22 @@ void ReadAYHeader() {
 
 
 #ifdef Use_UEF
-
 void ReadUEFHeader() {
   //Read and check first 12 bytes for a UEF header
-  char uefHeader[9];
   int i=0;
-  
   if(entry.seekSet(0)) {
-    i = entry.read(uefHeader,9);
-    if(memcmp_P(uefHeader,UEFFile,9)!=0) {
+    i = entry.read(tmpbuffer,9);
+    if(memcmp_P(tmpbuffer,UEFFile,9)!=0) {
       printtextF(PSTR("Not UEF File"),1);
       TZXStop();
     }
   } else {
     //printtextF(PSTR("Error Reading File"),0);
   }
-  bytesRead =12;
+  bytesRead = 12;
 }
-
 #endif
+
 void DelayedStop() {
   if(!count==0) {
     currentPeriod = 10;
