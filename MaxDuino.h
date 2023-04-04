@@ -154,19 +154,24 @@ word currentPeriod=1;
 //ZX81 Pulse Patterns - Zero Bit  - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
 //                    - One Bit   - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
 
+PROGMEM const byte TZXTape[7] = {'Z','X','T','a','p','e','!'};
+PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
+
+//Main Variables
+
+#ifdef AYPLAY
 // AY Header offset start
 #define HDRSTART              0
-PROGMEM const byte TZXTape[7] = {'Z','X','T','a','p','e','!'};
-PROGMEM const byte TAPcheck[7] = {'T','A','P','t','a','p','.'};
-PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
 PROGMEM const byte AYFile[8] = {'Z','X','A','Y','E','M','U','L'};           // added additional AY file header check
 PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','F','i','l','e',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
-//Main Variables
 byte AYPASS = 0;
-byte hdrptr = 0;
 byte blkchksum = 0;
-byte EndOfFile=false;
 word ayblklen = 0;
+byte hdrptr = 0;
+#endif
+
+byte EndOfFile=false;
+
 #ifdef Use_CAS
 byte casduino = 0;
 #endif

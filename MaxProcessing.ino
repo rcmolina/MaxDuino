@@ -55,8 +55,10 @@ void TZXStop() {
   entry.close();                              //Close file
   seekFile(); 
   bytesRead=0;                                // reset read bytes PlayBytes
+#ifdef AYPLAY
   blkchksum = 0;                              // reset block chksum byte for AY loading routine
   AYPASS = 0;                                 // reset AY flag
+#endif
 #ifdef Use_CAS
   casduino=0;
 #endif
@@ -1423,11 +1425,19 @@ void StandardBlock() {
       break;
     
     case DATA:  
-      //Data Playback    
-      if ((AYPASS==0)|(AYPASS==4)|(AYPASS==5)) writeData();   // Check if we are playing from file or Vector String and we need to send first 0xFF byte or checksum byte at EOF
-      else {
+      //Data Playback
+#ifdef AYPLAY
+      if ((AYPASS==0)||(AYPASS==4)||(AYPASS==5))
+      {
+        writeData();   // Check if we are playing from file or Vector String and we need to send first 0xFF byte or checksum byte at EOF
+      }
+      else
+      {
         writeHeader2();            // write TAP Header data from String Vector (AYPASS=1)
       }
+#else
+      writeData();
+#endif
       break;
     
     case PAUSE:
@@ -1757,6 +1767,7 @@ void writeData() {
       }
       blkchksum = blkchksum ^ currentByte;    // keep calculating checksum
       #endif
+      
 
       if(bytesToRead == 0) {                  //Check for end of data block
         bytesRead += -1;                      //rewind a byte if we've reached the end
@@ -1772,7 +1783,17 @@ void writeData() {
       }
     } else if(r==0) {                         // If we reached the EOF
       
-      if (AYPASS!=4) {                   // Check if need to send checksum
+    #ifdef AYPLAY
+      // Check if need to send checksum
+      if (AYPASS==4)
+      {
+        currentByte = blkchksum;            // send calculated chksum
+        bytesToRead += 1;                   // add one byte to read
+        AYPASS = 0;                         // Reset flag to end block
+      }
+      else
+    #endif
+      {
         EndOfFile=true;  
     
         if(pauseLength==0) {
@@ -1781,13 +1802,6 @@ void writeData() {
           currentBlockTask = PAUSE;
         }
         return;                           // return here if normal TAP or TZX  
-      }
-      else {
-        #ifdef AYPLAY  
-          currentByte = blkchksum;            // else send calculated chksum
-          bytesToRead += 1;                   // add one byte to read
-          AYPASS = 0;                         // Reset flag to end block
-        #endif
       }
     }
 
@@ -2080,6 +2094,7 @@ void wave2() {
   Timer.setPeriod(newTime); //Finally set the next pulse length
 }
 
+#ifdef AYPLAY
 void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
   if(currentBit==0) {                         //Check for byte end/new byte                         
@@ -2127,6 +2142,7 @@ void writeHeader2() {
     pass=0;  
   }    
 }  // End writeHeader2()
+#endif
 
 void clearBuffer2()
 {
@@ -2250,6 +2266,7 @@ void ReadTZXHeader() {
   bytesRead = 10;
 }
 
+#ifdef AYPLAY
 void ReadAYHeader() {
   //Read and check first 8 bytes for a TZX header
   char ayHeader[9];
@@ -2268,6 +2285,8 @@ void ReadAYHeader() {
   }
   bytesRead = 0;
 }
+#endif
+
 
 #ifdef Use_UEF
 
