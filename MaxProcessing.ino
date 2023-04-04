@@ -2247,16 +2247,19 @@ void ReadTZXHeader() {
   int i=0;
   if(entry.seekSet(0)) {
     i = entry.read(tmpbuffer,10);
-    if(memcmp_P(tmpbuffer,TZXTape,7)!=0) {
-      printtextF(PSTR("NOT RECOGNISED"),0);
-      delay(300);     
-      TZXStop();
+    if(i == 10 && memcmp_P(tmpbuffer,TZXTape,7)==0) {
+      bytesRead = 10;
+      return;
     }
-  } else {
-    //printtextF(PSTR("Error Reading File"),0);  
-    //delay(300);      
   }
-  bytesRead = 10;
+
+  HeaderFail();
+}
+
+void HeaderFail() {
+  printtextF(PSTR("Not Valid File"), 0);
+  delay(300);     
+  TZXStop();
 }
 
 #ifdef AYPLAY
@@ -2265,16 +2268,13 @@ void ReadAYHeader() {
   int i=0;
   if(entry.seekSet(0)) {
     i = entry.read(tmpbuffer,8);
-    if(memcmp_P(tmpbuffer,AYFile,8)!=0) {
-      printtextF(PSTR("Not AY File"),0);
-      delay(300);    
-      TZXStop();
+    if(i == 8 && memcmp_P(tmpbuffer,AYFile,8)==0) {
+      bytesRead = 0;
+      return;
     }
-  } else {
-    //printtextF(PSTR("Error Reading File"),0);
-    //delay(300);    
   }
-  bytesRead = 0;
+
+  HeaderFail();
 }
 #endif
 
@@ -2285,14 +2285,13 @@ void ReadUEFHeader() {
   int i=0;
   if(entry.seekSet(0)) {
     i = entry.read(tmpbuffer,9);
-    if(memcmp_P(tmpbuffer,UEFFile,9)!=0) {
-      printtextF(PSTR("Not UEF File"),1);
-      TZXStop();
+    if(i == 9 && memcmp_P(tmpbuffer,UEFFile,9)==0) {
+      bytesRead = 12;
+      return;
     }
-  } else {
-    //printtextF(PSTR("Error Reading File"),0);
   }
-  bytesRead = 12;
+
+  HeaderFail();
 }
 #endif
 
