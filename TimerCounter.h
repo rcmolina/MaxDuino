@@ -679,7 +679,7 @@ class TimerCounter
 typedef void (*timerCallback)  ();
 timerCallback ESPTimerCallback;
 
-void ICACHE_RAM_ATTR onTimer(){
+void IRAM_ATTR onTimer(){
   // just call the callback
   if (ESPTimerCallback)
     (*ESPTimerCallback)();
