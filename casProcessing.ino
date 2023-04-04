@@ -5,20 +5,6 @@ void casPause()
   interrupts();
 }
 
-void casStop()
-{
-  Timer.stop();
-
-  isStopped=true;
-  start=0;
-  entry.close();
-  seekFile();
-  bytesRead=0;
-  dragonMode=0;
-  casduino=0;
-}
-
-
 void wave()
 {
   if(isStopped==0)
