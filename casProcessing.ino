@@ -1,3 +1,5 @@
+#ifdef Use_CAS
+
 void casPause()
 {
   noInterrupts();
@@ -359,16 +361,6 @@ void processDragon()
 }
 #endif
 
-int readfile(byte bytes, unsigned long p)
-{
-  int i=0;
-  int t=0;
-  if(entry.seekSet(p)) {
-    i=entry.read(input,bytes);
-  } 
-  return i;
-}
-
 void clearBuffer()
 {
   for(int i=0;i<buffsize+1;i++)
@@ -428,4 +420,17 @@ void casduinoLoop()
     #endif        
     }
   } 
+}
+
+#endif
+
+// TODO:  move this some other place
+int readfile(byte bytes, unsigned long p)
+{
+  int i=0;
+  int t=0;
+  if(entry.seekSet(p)) {
+    i=entry.read(input,bytes);
+  } 
+  return i;
 }

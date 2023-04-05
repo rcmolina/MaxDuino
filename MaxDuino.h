@@ -4,18 +4,25 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-//#define buffsize            219
-//#define dragonBuff          4
 /* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
 #define buffsize            175  // Impar para CoCo
-#define dragonBuff          0     // Ajuste para que wbuffer sea divisible entre 8: (175+1-0)/8
 
+#ifdef Use_CAS
 /* Header Definitions */
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
 //PROGMEM const byte DRAGON[8] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55 };
 PROGMEM const byte ASCII[10] = { 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA };
 PROGMEM const byte BINF[10]  =  { 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0 };
 PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 };
+
+#define dragonBuff          0     // Ajuste para que wbuffer sea divisible entre 8: (175+1-0)/8
+byte bits[11];
+byte dragonMode=0;
+byte fileStage=0;
+byte casduino = 0;
+byte out=LOW;
+#endif // Use_CAS
+
 /*
 #define lookNothing   0     //look for nothing
 #define lookHeader    1     //looking for header/data
@@ -46,8 +53,6 @@ PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
 byte currentTask=lookHeader;
 byte currentType=typeNothing;
 
-byte bits[11];
-
 //ISR Variables
 volatile byte pass = 0;
 volatile byte pos = 0;
@@ -62,13 +67,9 @@ byte btemppos = 0;
 byte copybuff = LOW;
 byte input[11];
 unsigned long bytesRead=0;
-byte fileStage=0;
-byte dragonMode=0;
-byte out=LOW;
 byte lastByte;
 byte currpct = 100;
 byte newpct = 0;
-byte spinpos = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
 unsigned int offset =2;
@@ -172,9 +173,6 @@ byte hdrptr = 0;
 
 byte EndOfFile=false;
 
-#ifdef Use_CAS
-byte casduino = 0;
-#endif
 #ifdef ID11CDTspeedup
 byte AMScdt = 0;
 #endif
