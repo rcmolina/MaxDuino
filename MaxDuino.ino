@@ -862,7 +862,7 @@ void seekFile() {
   entry.close(); // precautionary, and seems harmless if entry is already closed
   if (dirEmpty)
   {
-    strcpy(fileName, PSTR("[EMPTY]"));
+    strcpy_P(fileName, PSTR("[EMPTY]"));
   }
   else
   {
