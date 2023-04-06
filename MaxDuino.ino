@@ -1,4 +1,6 @@
-#define VERSION "new MaxDuino"
+#include "version.h"
+const char P_VERSION[] PROGMEM = _VERSION ;
+
 // ---------------------------------------------------------------------------------
 // DO NOT USE CLASS-10 CARDS on this project - they're too fast to operate using SPI
 // ---------------------------------------------------------------------------------
@@ -270,8 +272,7 @@ void setup() {
       #endif
   #endif
 
-  while (!sd.begin(chipSelect,SPI_FULL_SPEED)) {
-  //while (!sd.begin(SdSpiConfig(chipSelect, DEDICATED_SPI, SD_SPI_CLOCK_SPEED))) {
+  while (!sd.begin(chipSelect, SD_SPI_CLOCK_SPEED)) {
     //Start SD card and check it's working
     printtextF(PSTR("No SD Card"),0);
     delay(50);
@@ -547,9 +548,8 @@ void loop(void) {
       reset_display();           // Clear logo and load saved mode
       printtextF(PSTR("Reset.."),0);
       delay(500);
-      PlayBytes[0]='\0'; 
-      strcat_P(PlayBytes,PSTR(VERSION));
-      printtext(PlayBytes,0);
+      strcpy_P(PlayBytes, P_VERSION);
+      printtextF(P_VERSION, 0);
       #if defined(OSTATUSLINE)
         OledStatusLine();
       #endif
@@ -863,7 +863,7 @@ void seekFile() {
   entry.close(); // precautionary, and seems harmless if entry is already closed
   if (dirEmpty)
   {
-    strcpy(fileName, PSTR("[EMPTY]"));
+    strcpy_P(fileName, PSTR("[EMPTY]"));
   }
   else
   {
@@ -887,10 +887,9 @@ void seekFile() {
     entry.close();
   }
 
-  PlayBytes[0]='\0'; 
   if (isDir==1) {
     if (subdir >0)strcpy(PlayBytes,prevSubDir);
-    else strcat_P(PlayBytes,PSTR(VERSION));
+    else strcpy_P(PlayBytes, P_VERSION);
     #ifdef P8544
       printtext("                 ",3);
     #endif
