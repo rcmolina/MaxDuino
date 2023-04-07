@@ -46,7 +46,7 @@ void wave()
     {
       pass=0;
       pos += 1;
-      if(pos > buffsize - (dragonBuff * dragonMode)) 
+      if(pos >= buffsize) 
       {
         pos = 0;
         working ^=1;
@@ -363,7 +363,7 @@ void processDragon()
 
 void clearBuffer()
 {
-  for(int i=0;i<buffsize+1;i++)
+  for(int i=0;i<buffsize;i++)
   {
     wbuffer[i][0]=2;
     wbuffer[i][1]=2;
@@ -383,14 +383,14 @@ void casduinoLoop()
     copybuff=LOW;
   }
 
-  if(btemppos<=buffsize - (dragonBuff * dragonMode))
+  if(btemppos<buffsize)
   { 
 #if defined(Use_CAS) && defined(Use_DRAGON)
     if(dragonMode==1) {
       processDragon();
       for(int t=0;t<8;t++)
       {
-        if(btemppos<=buffsize)
+        if(btemppos<buffsize)
         {
           wbuffer[btemppos][working ^ 1] = bits[t];
           btemppos+=1;         
@@ -401,7 +401,7 @@ void casduinoLoop()
       process();      
       for(int t=0;t<11;t++)
       {
-        if(btemppos<=buffsize)
+        if(btemppos<buffsize)
         {
           wbuffer[btemppos][working ^ 1] = bits[t];
           btemppos+=1;         

@@ -5,7 +5,7 @@
 #define LONG_HEADER         800
 
 /* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
-#define buffsize            175  // Impar para CoCo
+#define buffsize            176  // Impar para CoCo
 
 #ifdef Use_CAS
 /* Header Definitions */
@@ -15,7 +15,6 @@ PROGMEM const byte ASCII[10] = { 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
 PROGMEM const byte BINF[10]  =  { 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0 };
 PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 };
 
-#define dragonBuff          0     // Ajuste para que wbuffer sea divisible entre 8: (175+1-0)/8
 byte bits[11];
 byte dragonMode=0;
 byte fileStage=0;
@@ -56,7 +55,7 @@ byte currentType=typeNothing;
 //ISR Variables
 volatile byte pass = 0;
 volatile byte pos = 0;
-volatile byte wbuffer[buffsize+1][2];
+volatile byte wbuffer[buffsize][2];
 volatile byte morebuff = HIGH;
 volatile byte working=0;
 volatile byte isStopped=false;

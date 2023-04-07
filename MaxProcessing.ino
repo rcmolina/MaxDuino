@@ -79,7 +79,7 @@ void TZXLoop() {
     copybuff=LOW;
   }
 
-  if(btemppos<=buffsize){                    // Keep filling until full
+  if(btemppos<buffsize){                    // Keep filling until full
     TZXProcess();                           //generate the next period to add to the buffer
     if(currentPeriod>0) {
       noInterrupts();                       //Pause interrupts while we add a period to the buffer
@@ -2070,7 +2070,7 @@ void wave2() {
       }
       //pos += 1;
       pos += 2;
-      if(pos > buffsize)                  //Swap buffer pages if we've reached the end
+      if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
       {
         pos = 0;
         workingBuffer^=1;
@@ -2081,7 +2081,7 @@ void wave2() {
   } else if (isStopped==0) {  
     newTime = 1000;                         //Just in case we have a 0 in the buffer
     pos += 2;
-    if(pos > buffsize) {
+    if(pos >= buffsize) {
       pos = 0;
       workingBuffer ^= 1;
       morebuff = HIGH;
@@ -2146,7 +2146,7 @@ void writeHeader2() {
 
 void clearBuffer2()
 {
-  for(int i=0;i<buffsize+1;i++)
+  for(int i=0;i<buffsize;i++)
   {
     wbuffer[i][0]=0;
     wbuffer[i][1]=0;
