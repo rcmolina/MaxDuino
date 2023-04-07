@@ -905,6 +905,9 @@ void seekFile() {
   
   scrollPos=0;
   scrollText(fileName);
+  #ifdef SERIALSCREEN
+    Serial.println(fileName);
+  #endif
 }
 
 void stopFile() {
