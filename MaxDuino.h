@@ -16,11 +16,13 @@ PROGMEM const byte BINF[10]  =  { 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0
 PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 };
 
 byte bits[11];
-#if defined(Use_DRAGON)
-byte dragonMode=0;
-#endif
 byte fileStage=0;
-byte casduino = 0;
+enum CASDUINO_FILETYPE{
+  NONE = 0,
+  CASDUINO,
+  DRAGONMODE,
+};
+byte casduino = CASDUINO_FILETYPE::NONE;
 byte out=LOW;
 #endif // Use_CAS
 

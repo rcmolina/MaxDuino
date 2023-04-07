@@ -25,7 +25,7 @@ void UniPlay(){
   isStopped=false;
   
 #ifdef Use_CAS 
-  if (casduino) {
+  if (casduino) { // CAS or DRAGON
     currentType=typeNothing;
     currentTask=lookHeader;
     fileStage=0;
@@ -60,7 +60,7 @@ void TZXStop() {
   AYPASS = 0;                                 // reset AY flag
 #endif
 #ifdef Use_CAS
-  casduino=0;
+  casduino = CASDUINO_FILETYPE::NONE;
 #endif
 }
 
@@ -2189,11 +2189,15 @@ void setBaud()
 
 void uniLoop() {
  #ifdef Use_CAS
-    if (!casduino) TZXLoop();
-    else casduinoLoop();  
- #else
-    TZXLoop();
+    if (casduino)
+    {
+      casduinoLoop();  
+    }
+    else
  #endif
+    {
+      TZXLoop();
+    }
 }
 
 byte tmpbuffer[10];

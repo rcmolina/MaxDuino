@@ -31,7 +31,7 @@ void wave()
           else WRITE_LOW;
         }
         #if defined(Use_DRAGON)
-        if(dragonMode==1 && pass == 1) {
+        if(casduino == CASDUINO_FILETYPE::DRAGONMODE && pass == 1) {
           pass=3;
         }
         #endif
@@ -63,7 +63,7 @@ void wave()
 void writeByte(byte b)
 {
 #if defined(Use_DRAGON)
-  if(dragonMode==1) {
+  if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
     for(int i=0;i<8;i++)
     {
       if(b&1)
@@ -389,7 +389,7 @@ void casduinoLoop()
   if(btemppos<buffsize)
   { 
 #if defined(Use_DRAGON)
-    if(dragonMode==1) {
+    if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
       processDragon();
       for(int t=0;t<8;t++)
       {

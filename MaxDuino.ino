@@ -1448,7 +1448,7 @@ void SetPlayBlock()
   pass=0;
 
 #ifdef Use_CAS
-  if (!casduino)
+  if (!casduino) // not a CAS / DRAGON file
 #endif
   {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
