@@ -1359,8 +1359,9 @@ void SetPlayBlock()
   #ifdef LCDSCREEN16x2
     lcd.setCursor(0,0);
     lcd.print(F("BLK:"));
-    lcd.print(block);lcd.print(' ');
-    lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
+    lcd.print(block);
+    lcd.print(F(" ID:"));
+    lcd.print(currentID,HEX); // Block ID en hex
   #endif
 
   #ifdef SERIALSCREEN
