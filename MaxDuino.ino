@@ -1363,6 +1363,13 @@ void SetPlayBlock()
     lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
   #endif
 
+  #ifdef SERIALSCREEN
+    Serial.print(F("BLK:"));
+    Serial.print(block, DEC);
+    Serial.print(F(" ID:"));
+    Serial.println(currentID, HEX);
+  #endif
+
   #if defined(OLED1306)
     #if defined(XY2)
       utoa(block, (char *)input, 10);
