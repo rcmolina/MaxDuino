@@ -30,9 +30,11 @@ void wave()
           if (out == LOW) WRITE_HIGH;    
           else WRITE_LOW;
         }
+        #if defined(Use_DRAGON)
         if(dragonMode==1 && pass == 1) {
           pass=3;
         }
+        #endif
         break;
 
       case 2:
@@ -60,7 +62,7 @@ void wave()
 
 void writeByte(byte b)
 {
-#if defined(Use_CAS) && defined(Use_DRAGON)
+#if defined(Use_DRAGON)
   if(dragonMode==1) {
     for(int i=0;i<8;i++)
     {
@@ -86,7 +88,7 @@ void writeByte(byte b)
     }
     bits[9]=1;
     bits[10]=1;
-#if defined(Use_CAS) && defined(Use_DRAGON)
+#if defined(Use_DRAGON)
   }
 #endif
 }
@@ -228,7 +230,8 @@ void process()
   if(currentTask==lookHeader || currentTask==lookType || currentTask==wData) bytesRead+=1; 
 }
 
-#if defined(Use_CAS) && defined(Use_DRAGON)
+
+#if defined(Use_DRAGON)
 void processDragon()
 {
   lastByte=input[0];
@@ -385,7 +388,7 @@ void casduinoLoop()
 
   if(btemppos<buffsize)
   { 
-#if defined(Use_CAS) && defined(Use_DRAGON)
+#if defined(Use_DRAGON)
     if(dragonMode==1) {
       processDragon();
       for(int t=0;t<8;t++)
@@ -407,7 +410,7 @@ void casduinoLoop()
           btemppos+=1;         
         }        
       }
-#if defined(Use_CAS) && defined(Use_DRAGON)
+#if defined(Use_DRAGON)
     }
 #endif
   } else {

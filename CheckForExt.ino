@@ -42,8 +42,8 @@ void checkForEXT(const char * const filenameExt) {
   else if (!strcasecmp_P(filenameExt, PSTR("cas"))) {
     casduino=1;
     out=LOW;
-    dragonMode=0;
-    #if defined(Use_CAS) && defined(Use_DRAGON)
+    #if defined(Use_DRAGON)
+      dragonMode=0;
       readfile(1,bytesRead);
       if (input[0] == 0x55) {
         out=HIGH;
