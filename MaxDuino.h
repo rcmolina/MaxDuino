@@ -74,6 +74,7 @@ volatile long count = 0;
 byte btemppos = 0;
 byte copybuff = LOW;
 byte input[11];
+byte filebuffer[11];
 unsigned long bytesRead=0;
 byte lastByte;
 byte currpct = 100;

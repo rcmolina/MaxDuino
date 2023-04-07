@@ -2200,61 +2200,52 @@ void uniLoop() {
     }
 }
 
-byte tmpbuffer[10];
-
-int ReadByte(unsigned long pos) {
+byte ReadByte(unsigned long pos) {
   //Read a byte from the file, and move file position on one if successful
-  int i=0;
-  if(entry.seekSet(pos)) {
-    i = entry.read(tmpbuffer,1);
-    if(i==1) bytesRead += 1;
-  }
-  outByte = tmpbuffer[0];
+  byte i=readfile(1, pos);
+  if(i==1) bytesRead += 1;
+  outByte = filebuffer[0];
   return i;
 }
 
-int ReadWord(unsigned long pos) {
+byte ReadWord(unsigned long pos) {
   //Read 2 bytes from the file, and move file position on two if successful
-  int i=0;
-  if(entry.seekSet(pos)) {
-    i = entry.read(tmpbuffer,2);
-    if(i==2) bytesRead += 2;
-  }
-  outWord = word(tmpbuffer[1],tmpbuffer[0]);
+  byte i=readfile(2, pos);
+  if(i==2) bytesRead += 2;
+  outWord = word(filebuffer[1], filebuffer[0]);
   return i;
 }
 
-int ReadLong(unsigned long pos) {
+byte ReadLong(unsigned long pos) {
   //Read 3 bytes from the file, and move file position on three if successful
-  int i=0;
-  if(entry.seekSet(pos)) {
-    i = entry.read(tmpbuffer,3);
-    if(i==3) bytesRead += 3;
-  }
-  outLong = ((unsigned long) word(tmpbuffer[2],tmpbuffer[1]) << 8) | tmpbuffer[0];
+  byte i=readfile(3, pos);
+  if(i==3) bytesRead += 3;
+  outLong = ((unsigned long) word(filebuffer[2], filebuffer[1]) << 8) | filebuffer[0];
   return i;
 }
 
-int ReadDword(unsigned long pos) {
+byte ReadDword(unsigned long pos) {
   //Read 4 bytes from the file, and move file position on four if successful  
-  int i=0;
-  if(entry.seekSet(pos)) {
-    i = entry.read(tmpbuffer,4);
-    if(i==4) bytesRead += 4;
-  }
-  outLong = ((unsigned long)word(tmpbuffer[3],tmpbuffer[2]) << 16) | word(tmpbuffer[1],tmpbuffer[0]);
+  byte i=readfile(4, pos);
+  if(i==4) bytesRead += 4;
+  outLong = ((unsigned long)word(filebuffer[3], filebuffer[2]) << 16) | word(filebuffer[1], filebuffer[0]);
+  return i;
+}
+
+byte readfile(byte bytes, unsigned long p)
+{
+  byte i=0;
+  if(entry.seekSet(p)) {
+    i=entry.read(filebuffer, bytes);
+  } 
   return i;
 }
 
 void ReadTZXHeader() {
   //Read and check first 10 bytes for a TZX header
-  int i=0;
-  if(entry.seekSet(0)) {
-    i = entry.read(tmpbuffer,10);
-    if(i == 10 && memcmp_P(tmpbuffer,TZXTape,7)==0) {
-      bytesRead = 10;
-      return;
-    }
+  if(readfile(10, 0)==10 && memcmp_P(filebuffer, TZXTape, 7)==0) {
+    bytesRead = 10;
+    return;
   }
 
   HeaderFail();
@@ -2269,13 +2260,9 @@ void HeaderFail() {
 #ifdef AYPLAY
 void ReadAYHeader() {
   //Read and check first 8 bytes for a TZX header
-  int i=0;
-  if(entry.seekSet(0)) {
-    i = entry.read(tmpbuffer,8);
-    if(i == 8 && memcmp_P(tmpbuffer,AYFile,8)==0) {
-      bytesRead = 0;
-      return;
-    }
+  if(readfile(8, 0)==8 && memcmp_P(filebuffer, AYFile, 8)==0) {
+    bytesRead = 0;
+    return;
   }
 
   HeaderFail();
@@ -2286,13 +2273,9 @@ void ReadAYHeader() {
 #ifdef Use_UEF
 void ReadUEFHeader() {
   //Read and check first 12 bytes for a UEF header
-  int i=0;
-  if(entry.seekSet(0)) {
-    i = entry.read(tmpbuffer,9);
-    if(i == 9 && memcmp_P(tmpbuffer,UEFFile,9)==0) {
-      bytesRead = 12;
-      return;
-    }
+  if(readfile(9, 0)==9 && memcmp_P(filebuffer, UEFFile, 9)==0) {
+    bytesRead = 12;
+    return;
   }
 
   HeaderFail();

@@ -11,7 +11,7 @@ void checkForEXT(const char * const filenameExt) {
     currentID=TAP;
     #ifdef tapORIC
       readfile(1,bytesRead);
-      if (input[0] == 0x16) {
+      if (filebuffer[0] == 0x16) {
         currentID=ORIC;
       }
     #endif
@@ -44,7 +44,7 @@ void checkForEXT(const char * const filenameExt) {
     out=LOW;
     #if defined(Use_DRAGON)
       readfile(1,bytesRead);
-      if (input[0] == 0x55) {
+      if (filebuffer[0] == 0x55) {
         out=HIGH;
         casduino == CASDUINO_FILETYPE::DRAGONMODE;
         period=249;
