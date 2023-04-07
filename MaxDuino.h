@@ -4,8 +4,13 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-/* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
-#define buffsize            176  // Impar para CoCo
+/* Buffer overflow detected by David Hooper
+   buffsize must be both a multiple of 11 (for MSX processing) and a multiple of 8 (for Dragon processing)
+   it also needs to be a mutiple of 2 (for TZX processing) but being a multiple of 8, it will already be a multple of 2.
+   We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
+   as a buffersize because it is a multiple of 8 and a multiple of 11...
+*/
+#define buffsize 176  // Impar para CoCo
 
 #ifdef Use_CAS
 /* Header Definitions */
