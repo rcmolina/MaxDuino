@@ -356,8 +356,8 @@
         #endif   
 
         #if defined(LOAD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
-          EEPROM_get(j*128+i, hdrptr);
-          SendByte(hdrptr);
+          EEPROM_get(j*128+i, outByte);
+          SendByte(outByte);
         #endif
 
         #if defined(LOAD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
@@ -377,7 +377,7 @@
                     #endif
                   }
                 }
-                hdrptr = il;
+                outByte = il;
               } else {
                 byte ih=0;
                 byte rih=0;
@@ -392,13 +392,13 @@
                     #endif
                   }
                 }
-                hdrptr = ih;                           
+                outByte = ih;                           
               }
             #else
-              EEPROM_get(j*64+i/2, hdrptr);
+              EEPROM_get(j*64+i/2, outByte);
             #endif
           }
-          SendByte(hdrptr);
+          SendByte(outByte);
         #endif   
     
       }  

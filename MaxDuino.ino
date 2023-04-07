@@ -1447,7 +1447,10 @@ void SetPlayBlock()
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
   pass=0;
 
-  if (!casduino) {
+#ifdef Use_CAS
+  if (!casduino) // not a CAS / DRAGON file
+#endif
+  {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
     Timer.setPeriod(1000);
   }

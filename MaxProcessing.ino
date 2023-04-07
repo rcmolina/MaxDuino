@@ -6,29 +6,38 @@ word TickToUs(word ticks) {
 
 void UniPlay(){
   setBaud();
+
   // on entry, currentFile is already pointing to the file entry you want to play
   // and fileName is already set
   if(!entry.open(&currentDir, currentFile, O_RDONLY)) {
   //  printtextF(PSTR("Error Opening File"),0);
   }
 
+#ifdef ID11CDTspeedup
+  AMScdt = 0;
+#endif
   block=0;                                    // Initial block when starting
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
   bytesRead=0;                                //start of file
   currentTask=GETFILEHEADER;                  //First task: search for header
-  char *lastdotptr= strrchr(fileName,'.');
-  checkForEXT (lastdotptr);
+  const char * filenameExt = strrchr(fileName,'.') + 1;
+  checkForEXT(filenameExt);
+  isStopped=false;
   
-#ifdef ID11CDTspeedup  
-  if (!strcasecmp_P(lastdotptr, PSTR(".cdt"))) AMScdt = 1;  
-  else  AMScdt = 0;
-#endif   
-
 #ifdef Use_CAS 
-  if (!casduino) {
+  if (casduino) { // CAS or DRAGON
+    currentType=typeNothing;
+    currentTask=lookHeader;
+    fileStage=0;
+    clearBuffer();
+    Timer.initialize(period);
+    Timer.attachInterrupt(wave);
+  }
+  else 
+#endif
+  {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
     clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
-    isStopped=false;
     count = 255;                                //End of file buffer flush 
     EndOfFile=false;
     passforZero=2;
@@ -37,25 +46,6 @@ void UniPlay(){
     Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
     Timer.attachInterrupt(wave2);
   }
-  else {
-    bytesRead=0;currentType=typeNothing;currentTask=lookHeader;fileStage=0;
-    clearBuffer();
-    isStopped=false;
-    Timer.initialize(period);
-    Timer.attachInterrupt(wave);
-  }
-#else
-  currentBlockTask = READPARAM;               //First block task is to read in parameters
-  clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
-  isStopped=false;
-  count = 255;                                //End of file buffer flush 
-  EndOfFile=false;
-  passforZero=2;
-  passforOne=4;
-  WRITE_LOW;
-  Timer.initialize(1000); // 100ms pause prevents anything bad happening before we're ready
-  Timer.attachInterrupt(wave2);
-#endif
 }
 
 void TZXStop() {
@@ -65,9 +55,13 @@ void TZXStop() {
   entry.close();                              //Close file
   seekFile(); 
   bytesRead=0;                                // reset read bytes PlayBytes
+#ifdef AYPLAY
   blkchksum = 0;                              // reset block chksum byte for AY loading routine
   AYPASS = 0;                                 // reset AY flag
-  casduino=0;
+#endif
+#ifdef Use_CAS
+  casduino = CASDUINO_FILETYPE::NONE;
+#endif
 }
 
 void TZXPause() {
@@ -85,7 +79,7 @@ void TZXLoop() {
     copybuff=LOW;
   }
 
-  if(btemppos<=buffsize){                    // Keep filling until full
+  if(btemppos<buffsize){                    // Keep filling until full
     TZXProcess();                           //generate the next period to add to the buffer
     if(currentPeriod>0) {
       noInterrupts();                       //Pause interrupts while we add a period to the buffer
@@ -1431,11 +1425,19 @@ void StandardBlock() {
       break;
     
     case DATA:  
-      //Data Playback    
-      if ((AYPASS==0)|(AYPASS==4)|(AYPASS==5)) writeData();   // Check if we are playing from file or Vector String and we need to send first 0xFF byte or checksum byte at EOF
-      else {
+      //Data Playback
+#ifdef AYPLAY
+      if ((AYPASS==0)||(AYPASS==4)||(AYPASS==5))
+      {
+        writeData();   // Check if we are playing from file or Vector String and we need to send first 0xFF byte or checksum byte at EOF
+      }
+      else
+      {
         writeHeader2();            // write TAP Header data from String Vector (AYPASS=1)
       }
+#else
+      writeData();
+#endif
       break;
     
     case PAUSE:
@@ -1765,6 +1767,8 @@ void writeData() {
       }
       blkchksum = blkchksum ^ currentByte;    // keep calculating checksum
       #endif
+      
+
       if(bytesToRead == 0) {                  //Check for end of data block
         bytesRead += -1;                      //rewind a byte if we've reached the end
         
@@ -1779,7 +1783,17 @@ void writeData() {
       }
     } else if(r==0) {                         // If we reached the EOF
       
-      if (AYPASS!=4) {                   // Check if need to send checksum
+    #ifdef AYPLAY
+      // Check if need to send checksum
+      if (AYPASS==4)
+      {
+        currentByte = blkchksum;            // send calculated chksum
+        bytesToRead += 1;                   // add one byte to read
+        AYPASS = 0;                         // Reset flag to end block
+      }
+      else
+    #endif
+      {
         EndOfFile=true;  
     
         if(pauseLength==0) {
@@ -1788,13 +1802,6 @@ void writeData() {
           currentBlockTask = PAUSE;
         }
         return;                           // return here if normal TAP or TZX  
-      }
-      else {
-        #ifdef AYPLAY  
-          currentByte = blkchksum;            // else send calculated chksum
-          bytesToRead += 1;                   // add one byte to read
-          AYPASS = 0;                         // Reset flag to end block
-        #endif
       }
     }
 
@@ -2063,7 +2070,7 @@ void wave2() {
       }
       //pos += 1;
       pos += 2;
-      if(pos > buffsize)                  //Swap buffer pages if we've reached the end
+      if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
       {
         pos = 0;
         workingBuffer^=1;
@@ -2074,7 +2081,7 @@ void wave2() {
   } else if (isStopped==0) {  
     newTime = 1000;                         //Just in case we have a 0 in the buffer
     pos += 2;
-    if(pos > buffsize) {
+    if(pos >= buffsize) {
       pos = 0;
       workingBuffer ^= 1;
       morebuff = HIGH;
@@ -2087,6 +2094,7 @@ void wave2() {
   Timer.setPeriod(newTime); //Finally set the next pulse length
 }
 
+#ifdef AYPLAY
 void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
   if(currentBit==0) {                         //Check for byte end/new byte                         
@@ -2134,10 +2142,11 @@ void writeHeader2() {
     pass=0;  
   }    
 }  // End writeHeader2()
+#endif
 
 void clearBuffer2()
 {
-  for(int i=0;i<buffsize+1;i++)
+  for(int i=0;i<buffsize;i++)
   {
     wbuffer[i][0]=0;
     wbuffer[i][1]=0;
@@ -2180,122 +2189,116 @@ void setBaud()
 
 void uniLoop() {
  #ifdef Use_CAS
-    if (!casduino) TZXLoop();
-    else casduinoLoop();  
- #else
-    TZXLoop();
+    if (casduino)
+    {
+      casduinoLoop();  
+    }
+    else
  #endif
+    {
+      TZXLoop();
+    }
 }
+
+byte tmpbuffer[10];
 
 int ReadByte(unsigned long pos) {
   //Read a byte from the file, and move file position on one if successful
-  byte out[1];
   int i=0;
-
   if(entry.seekSet(pos)) {
-    i = entry.read(out,1);
+    i = entry.read(tmpbuffer,1);
     if(i==1) bytesRead += 1;
   }
-  outByte = out[0];
+  outByte = tmpbuffer[0];
   return i;
 }
 
 int ReadWord(unsigned long pos) {
   //Read 2 bytes from the file, and move file position on two if successful
-  byte out[2];
   int i=0;
-
   if(entry.seekSet(pos)) {
-    i = entry.read(out,2);
+    i = entry.read(tmpbuffer,2);
     if(i==2) bytesRead += 2;
   }
-  outWord = word(out[1],out[0]);
+  outWord = word(tmpbuffer[1],tmpbuffer[0]);
   return i;
 }
 
 int ReadLong(unsigned long pos) {
   //Read 3 bytes from the file, and move file position on three if successful
-  byte out[3];
   int i=0;
   if(entry.seekSet(pos)) {
-    i = entry.read(out,3);
+    i = entry.read(tmpbuffer,3);
     if(i==3) bytesRead += 3;
   }
-  outLong = ((unsigned long) word(out[2],out[1]) << 8) | out[0];
+  outLong = ((unsigned long) word(tmpbuffer[2],tmpbuffer[1]) << 8) | tmpbuffer[0];
   return i;
 }
 
 int ReadDword(unsigned long pos) {
   //Read 4 bytes from the file, and move file position on four if successful  
-  byte out[4];
   int i=0;
-  
   if(entry.seekSet(pos)) {
-    i = entry.read(out,4);
+    i = entry.read(tmpbuffer,4);
     if(i==4) bytesRead += 4;
   }
-  outLong = ((unsigned long)word(out[3],out[2]) << 16) | word(out[1],out[0]);
+  outLong = ((unsigned long)word(tmpbuffer[3],tmpbuffer[2]) << 16) | word(tmpbuffer[1],tmpbuffer[0]);
   return i;
 }
 
 void ReadTZXHeader() {
   //Read and check first 10 bytes for a TZX header
-  char tzxHeader[11];
   int i=0;
-  
   if(entry.seekSet(0)) {
-    i = entry.read(tzxHeader,10);
-    if(memcmp_P(tzxHeader,TZXTape,7)!=0) {
-      printtextF(PSTR("NOT RECOGNISED"),0);
-      delay(300);     
-      TZXStop();
+    i = entry.read(tmpbuffer,10);
+    if(i == 10 && memcmp_P(tmpbuffer,TZXTape,7)==0) {
+      bytesRead = 10;
+      return;
     }
-  } else {
-    //printtextF(PSTR("Error Reading File"),0);  
-    //delay(300);      
   }
-  bytesRead = 10;
+
+  HeaderFail();
 }
 
+void HeaderFail() {
+  printtextF(PSTR("Not Valid File"), 0);
+  delay(300);     
+  TZXStop();
+}
+
+#ifdef AYPLAY
 void ReadAYHeader() {
   //Read and check first 8 bytes for a TZX header
-  char ayHeader[9];
   int i=0;
-  
   if(entry.seekSet(0)) {
-    i = entry.read(ayHeader,8);
-    if(memcmp_P(ayHeader,AYFile,8)!=0) {
-      printtextF(PSTR("Not AY File"),0);
-      delay(300);    
-      TZXStop();
+    i = entry.read(tmpbuffer,8);
+    if(i == 8 && memcmp_P(tmpbuffer,AYFile,8)==0) {
+      bytesRead = 0;
+      return;
     }
-  } else {
-    //printtextF(PSTR("Error Reading File"),0);
-    //delay(300);    
   }
-  bytesRead = 0;
+
+  HeaderFail();
 }
+#endif
+
 
 #ifdef Use_UEF
-
 void ReadUEFHeader() {
   //Read and check first 12 bytes for a UEF header
-  char uefHeader[9];
   int i=0;
-  
   if(entry.seekSet(0)) {
-    i = entry.read(uefHeader,9);
-    if(memcmp_P(uefHeader,UEFFile,9)!=0) {
-      printtextF(PSTR("Not UEF File"),1);
-      TZXStop();
+    i = entry.read(tmpbuffer,9);
+    if(i == 9 && memcmp_P(tmpbuffer,UEFFile,9)==0) {
+      bytesRead = 12;
+      return;
     }
-  } else {
-    //printtextF(PSTR("Error Reading File"),0);
   }
-  bytesRead =12;
-}
 
+  HeaderFail();
+}
 #endif
+
 void DelayedStop() {
   if(!count==0) {
     currentPeriod = 10;

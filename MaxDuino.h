@@ -4,18 +4,33 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-//#define buffsize            219
-//#define dragonBuff          4
-/* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
-#define buffsize            175  // Impar para CoCo
-#define dragonBuff          0     // Ajuste para que wbuffer sea divisible entre 8: (175+1-0)/8
+/* Buffer overflow detected by David Hooper
+   buffsize must be both a multiple of 11 (for MSX processing) and a multiple of 8 (for Dragon processing)
+   it also needs to be a mutiple of 2 (for TZX processing) but being a multiple of 8, it will already be a multple of 2.
+   We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
+   as a buffersize because it is a multiple of 8 and a multiple of 11...
+*/
+#define buffsize 176  // Impar para CoCo
 
+#ifdef Use_CAS
 /* Header Definitions */
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
 //PROGMEM const byte DRAGON[8] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55 };
 PROGMEM const byte ASCII[10] = { 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA };
 PROGMEM const byte BINF[10]  =  { 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0 };
 PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 };
+
+byte bits[11];
+byte fileStage=0;
+enum CASDUINO_FILETYPE{
+  NONE = 0,
+  CASDUINO = 11, // number of bits
+  DRAGONMODE = 8, // number of bits
+};
+byte casduino = CASDUINO_FILETYPE::NONE;
+byte out=LOW;
+#endif // Use_CAS
+
 /*
 #define lookNothing   0     //look for nothing
 #define lookHeader    1     //looking for header/data
@@ -46,12 +61,10 @@ PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
 byte currentTask=lookHeader;
 byte currentType=typeNothing;
 
-byte bits[11];
-
 //ISR Variables
 volatile byte pass = 0;
 volatile byte pos = 0;
-volatile byte wbuffer[buffsize+1][2];
+volatile byte wbuffer[buffsize][2];
 volatile byte morebuff = HIGH;
 volatile byte working=0;
 volatile byte isStopped=false;
@@ -62,13 +75,9 @@ byte btemppos = 0;
 byte copybuff = LOW;
 byte input[11];
 unsigned long bytesRead=0;
-byte fileStage=0;
-byte dragonMode=0;
-byte out=LOW;
 byte lastByte;
 byte currpct = 100;
 byte newpct = 0;
-byte spinpos = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
 unsigned int offset =2;
@@ -154,20 +163,24 @@ word currentPeriod=1;
 //ZX81 Pulse Patterns - Zero Bit  - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
 //                    - One Bit   - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
 
+PROGMEM const byte TZXTape[7] = {'Z','X','T','a','p','e','!'};
+PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
+
+//Main Variables
+
+#ifdef AYPLAY
 // AY Header offset start
 #define HDRSTART              0
-PROGMEM const byte TZXTape[7] = {'Z','X','T','a','p','e','!'};
-PROGMEM const byte TAPcheck[7] = {'T','A','P','t','a','p','.'};
-PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
 PROGMEM const byte AYFile[8] = {'Z','X','A','Y','E','M','U','L'};           // added additional AY file header check
 PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','F','i','l','e',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
-//Main Variables
 byte AYPASS = 0;
-byte hdrptr = 0;
 byte blkchksum = 0;
-byte EndOfFile=false;
 word ayblklen = 0;
-byte casduino = 0;
+byte hdrptr = 0;
+#endif
+
+byte EndOfFile=false;
+
 #ifdef ID11CDTspeedup
 byte AMScdt = 0;
 #endif
