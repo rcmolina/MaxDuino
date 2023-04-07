@@ -19,8 +19,8 @@ byte bits[11];
 byte fileStage=0;
 enum CASDUINO_FILETYPE{
   NONE = 0,
-  CASDUINO,
-  DRAGONMODE,
+  CASDUINO = 11, // number of bits
+  DRAGONMODE = 8, // number of bits
 };
 byte casduino = CASDUINO_FILETYPE::NONE;
 byte out=LOW;

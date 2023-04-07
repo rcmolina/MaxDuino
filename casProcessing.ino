@@ -62,35 +62,28 @@ void wave()
 
 void writeByte(byte b)
 {
+  byte * _pbits = bits;
 #if defined(Use_DRAGON)
-  if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
-    for(int i=0;i<8;i++)
-    {
-      if(b&1)
-      {
-        bits[i]=1;
-      } else bits[i]=0;
-      b = b >> 1;
-    }
-    bits[8]=2;
-    bits[9]=2;
-    bits[10]=2;
-  } else {
+  if(casduino == CASDUINO_FILETYPE::CASDUINO)
 #endif
-    bits[0]=0;
-    for(int i=1;i<9;i++)
-    {
-      if(b&1)
-      {
-        bits[i]=1;
-      } else bits[i]=0;
-      b = b >> 1;
-    }
-    bits[9]=1;
-    bits[10]=1;
-#if defined(Use_DRAGON)
+  {
+    *_pbits++ = 0; // 1 start bit
   }
+
+  for(int i=0;i<8;i++)
+  {
+    *_pbits++ = (b&1);
+    b >>= 1;
+  }
+
+#if defined(Use_DRAGON)
+  if(casduino == CASDUINO_FILETYPE::CASDUINO)
 #endif
+  {
+    // 2 stop bits
+    *_pbits++ = 1;
+    *_pbits++ = 1;
+  }
 }
 
 void writeSilence()
@@ -145,42 +138,28 @@ void process()
     }
      
   }
+
   if(currentTask==lookType)
   {
+    currentTask = wSilence;
+    count = LONG_SILENCE*scale;
+    fileStage=1;       
+    currentType = typeUnknown;
     if((r=readfile(10,bytesRead))==10)
     {
       if(!memcmp_P(input,ASCII,10))
       {
         currentType = typeAscii;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;
       }else if(!memcmp_P(input,BINF,10))
       {
         currentType = typeBinf;
-        currentTask  = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;        
       }else if(!memcmp_P(input,BASIC,10))
       {
         currentType = typeBasic;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;
-      } else 
-      {
-        currentType = typeUnknown;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;       
       }
-    } else {
-        currentType = typeUnknown;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;       
     }
   }
+
   if(currentTask==wSilence)
   {
     if(!count==0)
@@ -391,28 +370,22 @@ void casduinoLoop()
 #if defined(Use_DRAGON)
     if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
       processDragon();
-      for(int t=0;t<8;t++)
-      {
-        if(btemppos<buffsize)
-        {
-          wbuffer[btemppos][working ^ 1] = bits[t];
-          btemppos+=1;         
-        }        
-      }
-    } else {
-#endif
-      process();      
-      for(int t=0;t<11;t++)
-      {
-        if(btemppos<buffsize)
-        {
-          wbuffer[btemppos][working ^ 1] = bits[t];
-          btemppos+=1;         
-        }        
-      }
-#if defined(Use_DRAGON)
     }
+    else
 #endif
+    {
+      process();      
+    }
+
+    if(btemppos<buffsize)
+    {
+      // casduino isn't just true/false - it's the number of bits (8 or 11)
+      for(int t=0; t<casduino; t++)
+      {
+        wbuffer[btemppos][working ^ 1] = bits[t];
+        btemppos+=1;         
+      }        
+    }
   } else {
     if (pauseOn == 0) {      
     #if defined(SHOW_CNTR)
