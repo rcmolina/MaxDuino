@@ -7,7 +7,7 @@ void checkForEXT(const char * const filenameExt) {
 #endif
 
   if (!strcasecmp_P(filenameExt, PSTR("tap"))) {
-    currentTask=PROCESSID;
+    currentTask=TASK::PROCESSID;
     currentID=TAP;
     #ifdef tapORIC
       readfile(1,bytesRead);
@@ -17,16 +17,16 @@ void checkForEXT(const char * const filenameExt) {
     #endif
   }
   else if (!strcasecmp_P(filenameExt, PSTR("p"))) {
-    currentTask=PROCESSID;
+    currentTask=TASK::PROCESSID;
     currentID=ZXP;
   }
   else if (!strcasecmp_P(filenameExt, PSTR("o"))) {
-    currentTask=PROCESSID;
+    currentTask=TASK::PROCESSID;
     currentID=ZXO;
   }
 #ifdef AYPLAY  
   else if (!strcasecmp_P(filenameExt, PSTR("ay"))) {
-    currentTask=GETAYHEADER;
+    currentTask=TASK::GETAYHEADER;
     currentID=AYO;
     AYPASS = 0;
     hdrptr = HDRSTART;
@@ -34,7 +34,7 @@ void checkForEXT(const char * const filenameExt) {
 #endif
 #ifdef Use_UEF
   else if (!strcasecmp_P(filenameExt, PSTR("uef"))) {
-    currentTask=GETUEFHEADER;
+    currentTask=TASK::GETUEFHEADER;
     currentID=UEF;
   }
 #endif

@@ -22,44 +22,27 @@ PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
 
 byte bits[11];
 byte fileStage=0;
-enum CASDUINO_FILETYPE{
+enum class CASDUINO_FILETYPE : byte {
   NONE = 0,
   CASDUINO = 11, // number of bits
   DRAGONMODE = 8, // number of bits
 };
-byte casduino = CASDUINO_FILETYPE::NONE;
+CASDUINO_FILETYPE casduino = CASDUINO_FILETYPE::NONE;
 byte out=LOW;
+
+enum class CAS_TYPE : byte {
+  Nothing=0,
+  Ascii,
+  Binf,
+  Basic,
+  Unknown,
+  typeEOF,
+};
+CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
+
 #endif // Use_CAS
 
-/*
-#define lookNothing   0     //look for nothing
-#define lookHeader    1     //looking for header/data
-#define lookType      2     //looking for file type
-#define wHeader       3     //Write Header
-#define wSilence      4     //Write Silence
-#define wData         5     //Write Data
-#define wClose        6     //Write closing silence
-*/
-#define lookHeader    0     //looking for header/data
-#define lookType      1     //looking for file type
-#define wHeader       2     //Write Header
-#define wSilence      3     //Write Silence
-#define wData         4     //Write Data
-#define wClose        5     //Write closing silence
-#define wSync         6     //
-#define wNameFileBlk  7     //
-#define lookLeader    8
-#define wNewLeader    9
 
-#define typeNothing   0
-#define typeAscii     1
-#define typeBinf      2
-#define typeBasic     3
-#define typeUnknown   4
-#define typeEOF       5
-
-byte currentTask=lookHeader;
-byte currentType=typeNothing;
 
 //ISR Variables
 volatile byte pass = 0;
@@ -84,9 +67,7 @@ unsigned int lcdsegs = 0;
 unsigned int offset =2;
 
 byte currentBit=0;
-//Keep track of which ID, Task, and Block Task we're dealing with
-byte currentID = 0;
-byte currentBlockTask = 0;
+
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
 //TZX block list - uncomment as supported
@@ -124,25 +105,53 @@ word currentPeriod=1;
 #define TAP                 0xFE    //Tap File Mode
 #define IDEOF               0xFF    //End of file
 
-//TZX File Tasks
-#define GETFILEHEADER         0
-#define GETID                 1
-#define PROCESSID             2
-#define GETAYHEADER           3
+enum class TASK : byte
+{
+  //TZX File Tasks
+  GETFILEHEADER,
+  GETID,
+  PROCESSID,
+  GETAYHEADER,
 
-//TZX ID Tasks
-#define READPARAM             0
-#define PILOT                 1
-#define SYNC1                 2
-#define SYNC2                 3
-#define TDATA                 4
-#define PAUSE                 5
-#define NEWPARAM              6
-#define NAME                  7
-#define GAP                   8
-#define SYNCLAST              9
-#define NAME00                10
+  //TZX File Tasks for UEF
+  GETUEFHEADER,
+  GETCHUNKID,
+  PROCESSCHUNKID,
 
+  // CAS tasks
+  CAS_lookType,       //looking for file type
+  CAS_wHeader,        //Write Header
+  CAS_wSilence,       //Write Silence
+  CAS_wData,          //Write Data
+  CAS_wClose,         //Write closing silence
+  CAS_wSync,          //
+  CAS_wNameFileBlk,   //
+  CAS_lookLeader,
+  CAS_wNewLeader,
+};
+
+enum class BLOCKTASK : byte
+{
+  //TZX ID Tasks
+  READPARAM,
+  PILOT,
+  SYNC1,
+  SYNC2,
+  TDATA,
+  PAUSE,
+
+  // TZX tasks for ORIC
+  NEWPARAM,
+  NAME,
+  GAP,
+  SYNCLAST,
+  NAME00,
+};
+
+//Keep track of which ID, Task, and Block Task we're dealing with
+byte currentID = 0;
+TASK currentTask=TASK::GETFILEHEADER;
+BLOCKTASK currentBlockTask = BLOCKTASK::READPARAM;
 
 //Spectrum Standards
 #define PILOTLENGTH           619
@@ -264,11 +273,6 @@ PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
 #define ID0116              0x0116 // floating point gap: cycles = floatGap * this.baud
 #define ID0117              0x0117 // data encoding format change for 300 bauds
 #define IDCHUNKEOF          0xffff
-
-//TZX File Tasks for UEF
-#define GETUEFHEADER          4
-#define GETCHUNKID            5
-#define PROCESSCHUNKID        6
 
 // UEF stuff
 // For 1200 baud zero is 416us, one is 208us
