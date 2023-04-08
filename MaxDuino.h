@@ -73,8 +73,8 @@ volatile byte isStopped=false;
 volatile long count = 0;
 byte btemppos = 0;
 byte copybuff = LOW;
-byte input[11];
-byte filebuffer[11];
+byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
+byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
 unsigned long bytesRead=0;
 byte lastByte;
 byte currpct = 100;
