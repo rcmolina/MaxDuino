@@ -372,7 +372,7 @@ void TZXProcess() {
                 #ifdef XY2force
                   sendStrXY("10",7,4);
                   if ((block%10) == 0) {
-                    itoa((block/10)%10,(char *)input,10);
+                    utoa((block/10)%10,(char *)input,10);
                     sendStrXY((char *)input,14,4);
                   }
                   input[0]=48+block%10;
@@ -460,7 +460,7 @@ void TZXProcess() {
               #if defined(XY2) && defined(OLED1306_128_64)
                 #ifdef XY2force
                   sendStrXY("11",7,4);
-                  if ((block%10) == 0) {itoa((block/10)%10,(char *)input,10);sendStrXY((char *)input,14,4);}
+                  if ((block%10) == 0) {utoa((block/10)%10,(char *)input,10);sendStrXY((char *)input,14,4);}
                   input[0]=48+block%10;input[1]=0;sendStrXY((char *)input,15,4);                
                 #else
                   setXY(7,4);sendChar('1');sendChar('1');                    
@@ -682,7 +682,7 @@ void TZXProcess() {
                   #ifdef XY2force
                     sendStrXY("19",7,4);
                     if ((block%10) == 0) {
-                      itoa((block/10)%10,(char *)input,10);
+                      utoa((block/10)%10,(char *)input,10);
                       sendStrXY((char *)input,14,4);
                     }
                     input[0]=48+block%10;input[1]=0;sendStrXY((char *)input,15,4);                     
@@ -784,7 +784,7 @@ void TZXProcess() {
               #ifdef XY2force
                 sendStrXY("21",7,4);
                 if ((block%10) == 0) {
-                  itoa((block/10)%10,(char *)input,10);
+                  utoa((block/10)%10,(char *)input,10);
                   sendStrXY((char *)input,14,4);
                 }
                 input[0]=48+block%10;
@@ -946,7 +946,7 @@ void TZXProcess() {
                 #ifdef XY2force
                   sendStrXY("4B",7,4);
                   if ((block%10) == 0) {
-                    itoa((block/10)%10,(char *)input,10);
+                    utoa((block/10)%10,(char *)input,10);
                     sendStrXY((char *)input,14,4);
                   }
                   input[0]=48+block%10;
@@ -1095,7 +1095,7 @@ void TZXProcess() {
                   #ifdef XY2force
                     sendStrXY("FE",7,4);
                     if ((block%10) == 0) {
-                      itoa((block/10)%10,(char *)input,10);
+                      utoa((block/10)%10,(char *)input,10);
                       sendStrXY((char *)input,14,4);
                     }
                     input[0]=48+block%10;
@@ -1416,12 +1416,12 @@ void TZXProcess() {
           lcd.print(PlayBytes);
           lcd.setCursor(0,1);
           //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-          ltoa(bytesRead,PlayBytes,16);
+          utoa(bytesRead,PlayBytes,16);
           lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
         #endif
 
         #ifdef OLED1306
-          ltoa(bytesRead,PlayBytes,16);
+          utoa(bytesRead,PlayBytes,16);
           printtext(PlayBytes,lineaxy);
 
         #endif 
@@ -1436,7 +1436,7 @@ void TZXProcess() {
           lcd.print(PlayBytes);
           lcd.setCursor(0,1);
           //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-          ltoa(bytesRead,PlayBytes,16);
+          utoa(bytesRead,PlayBytes,16);
           lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
         #endif
 

@@ -119,7 +119,7 @@ void menuMode()
             }
 
             if(updateScreen) {
-              itoa(baudrate, (char *)input, 10);
+              utoa(baudrate, (char *)input, 10);
               if(BAUDRATE == baudrate) {
                 strcat_P((char *)input, PSTR(" *"));
               }
