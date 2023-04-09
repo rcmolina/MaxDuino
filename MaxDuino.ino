@@ -417,13 +417,13 @@ void loop(void) {
             char len=0;
             lcd.setCursor(0,0); 
       
-            lcd.print(itoa(oldMinFile,input,10));
+            lcd.print(utoa(oldMinFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(itoa(currentFile,input,10));
+            lcd.print(utoa(currentFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(itoa(oldMaxFile,input,10));
+            lcd.print(utoa(oldMaxFile,input,10));
             len += strlen(input); 
             for(char x=len;x<16;x++) {
               lcd.print(' '); 
@@ -460,13 +460,13 @@ void loop(void) {
           #if !defined(SHOW_DIRNAMES)
             char len=0;
             setXY(0,0);
-            sendStr(itoa(oldMinFile,input,10));
+            sendStr(utoa(oldMinFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(itoa(currentFile,input,10));
+            sendStr(utoa(currentFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(itoa(oldMaxFile,input,10));
+            sendStr(utoa(oldMaxFile,input,10));
             len += strlen(input);
             for(char x=len;x<16;x++) {
               sendChar(' ');
@@ -895,7 +895,8 @@ void seekFile() {
     #endif
     
   } else {
-    ltoa(filesize,PlayBytes,10);strcat_P(PlayBytes,PSTR(" bytes"));
+    utoa(filesize,PlayBytes,10);
+    strcat_P(PlayBytes,PSTR(" bytes"));
     #ifdef P8544
       printtext("                 ",3);
     #endif
@@ -1290,7 +1291,7 @@ void OledStatusLine() {
     sendStr("ID:   BLK:");
     #ifdef OLED1306_128_64
       setXY(0,7);
-      itoa(BAUDRATE,(char *)input,10);
+      utoa(BAUDRATE,(char *)input,10);
       sendStr((char *)input);
 
       #ifndef NO_MOTOR       
@@ -1312,7 +1313,7 @@ void OledStatusLine() {
     #else // OLED1306_128_64 not defined
 
       setXY(0,3);
-      itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
+      utoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       #ifndef NO_MOTOR        
         setXY(5,3);
         if(mselectMask==1) {
@@ -1333,7 +1334,7 @@ void OledStatusLine() {
   #ifdef XY2                        // Y with double value
     #ifdef OLED1306_128_64          // 8 rows supported
       sendStrXY("ID:   BLK:",4,4);        
-      itoa(BAUDRATE,(char *)input,10);
+      utoa(BAUDRATE,(char *)input,10);
       sendStrXY((char *)input,0,6);
       #ifndef NO_MOTOR       
         if(mselectMask==1) {
