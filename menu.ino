@@ -21,6 +21,13 @@
 #include "EEPROM.h"
 #endif
 
+#ifdef LCDSCREEN16x2
+// fixme later.  We should redefine lineaxy outside of the config files instead, and fix properly
+#define M_LINE2 1
+#else
+#define M_LINE2 lineaxy
+#endif
+
 enum MenuItems{
   VERSION,
   BAUD_RATE,
@@ -67,7 +74,7 @@ void menuMode()
   {
     if(updateScreen) {
       printtextF(PSTR("Menu"),0);
-      printtextF((char *)(pgm_read_ptr(&(MENU_ITEMS[menuItem]))), lineaxy);
+      printtextF((char *)(pgm_read_ptr(&(MENU_ITEMS[menuItem]))), M_LINE2);
       updateScreen=false;
     }
     if(button_down() && !lastbtn){
@@ -84,7 +91,7 @@ void menuMode()
       printtextF((char *)(pgm_read_ptr(&(MENU_ITEMS[menuItem]))), 0);
       switch(menuItem){
         case MenuItems::VERSION:
-          printtextF(P_VERSION, lineaxy);
+          printtextF(P_VERSION, M_LINE2);
           lastbtn=true;
           while(!button_stop() || lastbtn) {
             checkLastButton();
@@ -123,7 +130,7 @@ void menuMode()
               if(BAUDRATE == baudrate) {
                 strcat_P((char *)input, PSTR(" *"));
               }
-              printtext((char *)input, lineaxy);
+              printtext((char *)input, M_LINE2);
               updateScreen=false;
             }
                     
@@ -165,8 +172,8 @@ void doOnOffSubmenu(byte& refVar)
   lastbtn=true;
   while(!button_stop() || lastbtn) {
     if(updateScreen) {
-      if(refVar==0) printtextF(PSTR("off *"), lineaxy);
-      else  printtextF(PSTR("ON *"), lineaxy);
+      if(refVar==0) printtextF(PSTR("off *"), M_LINE2);
+      else  printtextF(PSTR("ON *"), M_LINE2);
       updateScreen=false;
     }
     
