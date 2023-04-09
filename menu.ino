@@ -67,7 +67,7 @@ void menuMode()
   {
     if(updateScreen) {
       printtextF(PSTR("Menu"),0);
-      printtextF(MENU_ITEMS[menuItem], lineaxy);
+      printtextF((char *)(pgm_read_ptr(&(MENU_ITEMS[menuItem]))), lineaxy);
       updateScreen=false;
     }
     if(button_down() && !lastbtn){
