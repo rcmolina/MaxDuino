@@ -4,13 +4,8 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-/* Buffer overflow detected by David Hooper
-   buffsize must be both a multiple of 11 (for MSX processing) and a multiple of 8 (for Dragon processing)
-   it also needs to be a mutiple of 2 (for TZX processing) but being a multiple of 8, it will already be a multple of 2.
-   We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
-   as a buffersize because it is a multiple of 8 and a multiple of 11...
-*/
-#define buffsize 176  // Impar para CoCo
+/* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
+#define buffsize            176  // Impar para CoCo
 
 #ifdef Use_CAS
 /* Header Definitions */
@@ -21,13 +16,11 @@ PROGMEM const byte BINF[10]  =  { 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0
 PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 };
 
 byte bits[11];
+#if defined(Use_DRAGON)
+byte dragonMode=0;
+#endif
 byte fileStage=0;
-enum CASDUINO_FILETYPE{
-  NONE = 0,
-  CASDUINO = 11, // number of bits
-  DRAGONMODE = 8, // number of bits
-};
-byte casduino = CASDUINO_FILETYPE::NONE;
+byte casduino = 0;
 byte out=LOW;
 #endif // Use_CAS
 
@@ -73,8 +66,8 @@ volatile byte isStopped=false;
 volatile long count = 0;
 byte btemppos = 0;
 byte copybuff = LOW;
-byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
-byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
+byte input[11];
+
 unsigned long bytesRead=0;
 byte lastByte;
 byte currpct = 100;

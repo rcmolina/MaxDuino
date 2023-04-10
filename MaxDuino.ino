@@ -417,13 +417,13 @@ void loop(void) {
             char len=0;
             lcd.setCursor(0,0); 
       
-            lcd.print(utoa(oldMinFile,input,10));
+            lcd.print(itoa(oldMinFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(utoa(currentFile,input,10));
+            lcd.print(itoa(currentFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(utoa(oldMaxFile,input,10));
+            lcd.print(itoa(oldMaxFile,input,10));
             len += strlen(input); 
             for(char x=len;x<16;x++) {
               lcd.print(' '); 
@@ -460,13 +460,13 @@ void loop(void) {
           #if !defined(SHOW_DIRNAMES)
             char len=0;
             setXY(0,0);
-            sendStr(utoa(oldMinFile,input,10));
+            sendStr(itoa(oldMinFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(utoa(currentFile,input,10));
+            sendStr(itoa(currentFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(utoa(oldMaxFile,input,10));
+            sendStr(itoa(oldMaxFile,input,10));
             len += strlen(input);
             for(char x=len;x<16;x++) {
               sendChar(' ');
@@ -895,8 +895,7 @@ void seekFile() {
     #endif
     
   } else {
-    utoa(filesize,PlayBytes,10);
-    strcat_P(PlayBytes,PSTR(" bytes"));
+    ltoa(filesize,PlayBytes,10);strcat_P(PlayBytes,PSTR(" bytes"));
     #ifdef P8544
       printtext("                 ",3);
     #endif
@@ -906,9 +905,6 @@ void seekFile() {
   
   scrollPos=0;
   scrollText(fileName);
-  #ifdef SERIALSCREEN
-    Serial.println(fileName);
-  #endif
 }
 
 void stopFile() {
@@ -1291,7 +1287,7 @@ void OledStatusLine() {
     sendStr("ID:   BLK:");
     #ifdef OLED1306_128_64
       setXY(0,7);
-      utoa(BAUDRATE,(char *)input,10);
+      itoa(BAUDRATE,(char *)input,10);
       sendStr((char *)input);
 
       #ifndef NO_MOTOR       
@@ -1313,7 +1309,7 @@ void OledStatusLine() {
     #else // OLED1306_128_64 not defined
 
       setXY(0,3);
-      utoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
+      itoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       #ifndef NO_MOTOR        
         setXY(5,3);
         if(mselectMask==1) {
@@ -1334,7 +1330,7 @@ void OledStatusLine() {
   #ifdef XY2                        // Y with double value
     #ifdef OLED1306_128_64          // 8 rows supported
       sendStrXY("ID:   BLK:",4,4);        
-      utoa(BAUDRATE,(char *)input,10);
+      itoa(BAUDRATE,(char *)input,10);
       sendStrXY((char *)input,0,6);
       #ifndef NO_MOTOR       
         if(mselectMask==1) {
@@ -1360,16 +1356,8 @@ void SetPlayBlock()
   #ifdef LCDSCREEN16x2
     lcd.setCursor(0,0);
     lcd.print(F("BLK:"));
-    lcd.print(block);
-    lcd.print(F(" ID:"));
-    lcd.print(currentID,HEX); // Block ID en hex
-  #endif
-
-  #ifdef SERIALSCREEN
-    Serial.print(F("BLK:"));
-    Serial.print(block, DEC);
-    Serial.print(F(" ID:"));
-    Serial.println(currentID, HEX);
+    lcd.print(block);lcd.print(' ');
+    lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
   #endif
 
   #if defined(OLED1306)
@@ -1460,7 +1448,7 @@ void SetPlayBlock()
   pass=0;
 
 #ifdef Use_CAS
-  if (!casduino) // not a CAS / DRAGON file
+  if (!casduino)
 #endif
   {
     currentBlockTask = READPARAM;               //First block task is to read in parameters

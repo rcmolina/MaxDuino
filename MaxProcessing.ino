@@ -25,7 +25,7 @@ void UniPlay(){
   isStopped=false;
   
 #ifdef Use_CAS 
-  if (casduino) { // CAS or DRAGON
+  if (casduino) {
     currentType=typeNothing;
     currentTask=lookHeader;
     fileStage=0;
@@ -60,7 +60,7 @@ void TZXStop() {
   AYPASS = 0;                                 // reset AY flag
 #endif
 #ifdef Use_CAS
-  casduino = CASDUINO_FILETYPE::NONE;
+  casduino=0;
 #endif
 }
 
@@ -372,7 +372,7 @@ void TZXProcess() {
                 #ifdef XY2force
                   sendStrXY("10",7,4);
                   if ((block%10) == 0) {
-                    utoa((block/10)%10,(char *)input,10);
+                    itoa((block/10)%10,(char *)input,10);
                     sendStrXY((char *)input,14,4);
                   }
                   input[0]=48+block%10;
@@ -460,7 +460,7 @@ void TZXProcess() {
               #if defined(XY2) && defined(OLED1306_128_64)
                 #ifdef XY2force
                   sendStrXY("11",7,4);
-                  if ((block%10) == 0) {utoa((block/10)%10,(char *)input,10);sendStrXY((char *)input,14,4);}
+                  if ((block%10) == 0) {itoa((block/10)%10,(char *)input,10);sendStrXY((char *)input,14,4);}
                   input[0]=48+block%10;input[1]=0;sendStrXY((char *)input,15,4);                
                 #else
                   setXY(7,4);sendChar('1');sendChar('1');                    
@@ -682,7 +682,7 @@ void TZXProcess() {
                   #ifdef XY2force
                     sendStrXY("19",7,4);
                     if ((block%10) == 0) {
-                      utoa((block/10)%10,(char *)input,10);
+                      itoa((block/10)%10,(char *)input,10);
                       sendStrXY((char *)input,14,4);
                     }
                     input[0]=48+block%10;input[1]=0;sendStrXY((char *)input,15,4);                     
@@ -784,7 +784,7 @@ void TZXProcess() {
               #ifdef XY2force
                 sendStrXY("21",7,4);
                 if ((block%10) == 0) {
-                  utoa((block/10)%10,(char *)input,10);
+                  itoa((block/10)%10,(char *)input,10);
                   sendStrXY((char *)input,14,4);
                 }
                 input[0]=48+block%10;
@@ -946,7 +946,7 @@ void TZXProcess() {
                 #ifdef XY2force
                   sendStrXY("4B",7,4);
                   if ((block%10) == 0) {
-                    utoa((block/10)%10,(char *)input,10);
+                    itoa((block/10)%10,(char *)input,10);
                     sendStrXY((char *)input,14,4);
                   }
                   input[0]=48+block%10;
@@ -1095,7 +1095,7 @@ void TZXProcess() {
                   #ifdef XY2force
                     sendStrXY("FE",7,4);
                     if ((block%10) == 0) {
-                      utoa((block/10)%10,(char *)input,10);
+                      itoa((block/10)%10,(char *)input,10);
                       sendStrXY((char *)input,14,4);
                     }
                     input[0]=48+block%10;
@@ -1233,112 +1233,58 @@ void TZXProcess() {
         switch(currentBlockTask) {            
           case READPARAM: // currentBit = 0 y count = 255
           case SYNC1:
-            if(currentBit >0) {
-              OricBitWrite();
-            } else {
-              ReadByte();
-              currentByte=outByte;
-              currentBit = 11;
-              bitChecksum = 0;
-              lastByte=0;
-              if (currentByte==0x16) {
-                count--;
-              } else {
-                currentBit = 0;
-                currentBlockTask=SYNC2;
-              } //0x24
+            if (currentBit >0) OricBitWrite();
+            else {
+              ReadByte();currentByte=outByte;currentBit = 11; bitChecksum = 0;lastByte=0;
+              if (currentByte==0x16) count--;
+              else {currentBit = 0; currentBlockTask=SYNC2;} //0x24
             }          
             break;
           case SYNC2:   
-            if(currentBit >0) {
-              OricBitWrite();
-            } else {
-              if(count >0) {
-                currentByte=0x16;
-                currentBit = 11;
-                bitChecksum = 0;
-                lastByte=0;
-                count--;
-              } else {
-                count=1;
-                currentBlockTask=SYNCLAST;
-              } //0x24 
+            if(currentBit >0) OricBitWrite();             
+            else {
+                  if (count >0) {currentByte=0x16; currentBit = 11; bitChecksum = 0;lastByte=0; count--;}
+                  else {count=1; currentBlockTask=SYNCLAST;} //0x24 
             }
             break;
               
           case SYNCLAST:   
-            if(currentBit >0) {
-              OricBitWrite();
-            } else {
-              if(count >0) {
-                currentByte=0x24;
-                currentBit = 11;
-                bitChecksum = 0;
-                lastByte=0;
-                count--;
-              } 
-              else {
-                count=9;
-                lastByte=0;
-                currentBlockTask=NEWPARAM;
-              }
+            if(currentBit >0) OricBitWrite();             
+            else {
+              if (count >0) {currentByte=0x24; currentBit = 11; bitChecksum = 0;lastByte=0; count--;} 
+              else {count=9;lastByte=0;currentBlockTask=NEWPARAM;}
             }
             break;
                     
           case NEWPARAM:            
-            if(currentBit >0) {
-              OricBitWrite();
-            } else {
-              if (count >0) {
-                ReadByte();
-                currentByte=outByte;
-                currentBit = 11;
-                bitChecksum = 0;
-                lastByte=0;
+            if(currentBit >0) OricBitWrite();
+            else {
+              if  (count >0) {
+                ReadByte();currentByte=outByte;currentBit = 11; bitChecksum = 0;lastByte=0;                                        
                 if      (count == 5) bytesToRead = (unsigned int)(outByte<<8);
                 else if (count == 4) bytesToRead = (unsigned int)(bytesToRead + outByte +1) ;
                 else if (count == 3) bytesToRead = (unsigned int)(bytesToRead -(outByte<<8)) ;
                 else if (count == 2) bytesToRead = (unsigned int)(bytesToRead - outByte); 
                 count--;
               }
-              else {
-                currentBlockTask=NAME;
+              else {currentBlockTask=NAME;
               }
             }
             break;
               
           case NAME:
-            if(currentBit >0) {
-              OricBitWrite();
-            } else {
-              ReadByte();
-              currentByte=outByte;
-              currentBit = 11;
-              bitChecksum = 0;
-              lastByte=0;
-              if (currentByte==0x00) {
-                count=1;
-                currentBit = 0;
-                currentBlockTask=NAME00;
-              }
+            if (currentBit >0) OricBitWrite();
+            else {
+              ReadByte();currentByte=outByte;currentBit = 11; bitChecksum = 0;lastByte=0;
+              if (currentByte==0x00) {count=1;currentBit = 0; currentBlockTask=NAME00;}
             }               
             break;
             
             case NAME00:
-            if(currentBit >0) {
-              OricBitWrite();
-            } else {
-              if (count >0) {
-                currentByte=0x00;
-                currentBit = 11;
-                bitChecksum = 0;
-                lastByte=0;
-                count--;
-              } else {
-                count=100;
-                lastByte=0;
-                currentBlockTask=GAP;
-              }
+            if(currentBit >0) OricBitWrite();             
+            else {
+                  if (count >0) {currentByte=0x00; currentBit = 11; bitChecksum = 0;lastByte=0; count--;} 
+                  else {count=100;lastByte=0;currentBlockTask=GAP;}
             }
             break;
 
@@ -1416,12 +1362,12 @@ void TZXProcess() {
           lcd.print(PlayBytes);
           lcd.setCursor(0,1);
           //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-          utoa(bytesRead,PlayBytes,16);
+          ltoa(bytesRead,PlayBytes,16);
           lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
         #endif
 
         #ifdef OLED1306
-          utoa(bytesRead,PlayBytes,16);
+          ltoa(bytesRead,PlayBytes,16);
           printtext(PlayBytes,lineaxy);
 
         #endif 
@@ -1436,7 +1382,7 @@ void TZXProcess() {
           lcd.print(PlayBytes);
           lcd.setCursor(0,1);
           //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-          utoa(bytesRead,PlayBytes,16);
+          ltoa(bytesRead,PlayBytes,16);
           lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
         #endif
 
@@ -2240,7 +2186,7 @@ void setBaud()
   Timer.stop();
 }
 
-
+/*
 void uniLoop() {
  #ifdef Use_CAS
     if (casduino)
@@ -2253,57 +2199,84 @@ void uniLoop() {
       TZXLoop();
     }
 }
+*/
+
+void uniLoop() {
+ #ifdef Use_CAS
+    if (!casduino) TZXLoop();
+    else casduinoLoop();  
+ #else
+    TZXLoop();
+ #endif
+}
+
+
+byte tmpbuffer[10];
 
 byte ReadByte() {
   //Read a byte from the file, and move file position on one if successful
-  //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(1, bytesRead);
-  if(i==1) bytesRead += 1;
-  outByte = filebuffer[0];
+  byte i=0;
+  if(entry.seekSet(bytesRead)) {
+    i = entry.read(tmpbuffer,1);
+    if(i==1) bytesRead += 1;
+  }
+  outByte = tmpbuffer[0];
   return i;
 }
 
 byte ReadWord() {
   //Read 2 bytes from the file, and move file position on two if successful
-  //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(2, bytesRead);
-  if(i==2) bytesRead += 2;
-  outWord = word(filebuffer[1], filebuffer[0]);
+  byte i=0;
+  if(entry.seekSet(bytesRead)) {
+    i = entry.read(tmpbuffer,2);
+    if(i==2) bytesRead += 2;
+  }
+  outWord = word(tmpbuffer[1],tmpbuffer[0]);
   return i;
 }
 
 byte ReadLong() {
   //Read 3 bytes from the file, and move file position on three if successful
-  //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(3, bytesRead);
-  if(i==3) bytesRead += 3;
-  outLong = ((unsigned long) word(filebuffer[2], filebuffer[1]) << 8) | filebuffer[0];
+  byte i=0;
+  if(entry.seekSet(bytesRead)) {
+    i = entry.read(tmpbuffer,3);
+    if(i==3) bytesRead += 3;
+  }
+  outLong = ((unsigned long) word(tmpbuffer[2],tmpbuffer[1]) << 8) | tmpbuffer[0];
   return i;
 }
 
 byte ReadDword() {
   //Read 4 bytes from the file, and move file position on four if successful  
-  //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(4, bytesRead);
-  if(i==4) bytesRead += 4;
-  outLong = ((unsigned long)word(filebuffer[3], filebuffer[2]) << 16) | word(filebuffer[1], filebuffer[0]);
+  byte i=0;
+  if(entry.seekSet(bytesRead)) {
+    i = entry.read(tmpbuffer,4);
+    if(i==4) bytesRead += 4;
+  }
+  outLong = ((unsigned long)word(tmpbuffer[3],tmpbuffer[2]) << 16) | word(tmpbuffer[1],tmpbuffer[0]);
   return i;
 }
 
-byte readfile(byte bytes, unsigned long p)
+// TODO:  move this some other place
+int readfile(byte bytes, unsigned long p)
 {
-  byte i=0;
+  int i=0;
+  int t=0;
   if(entry.seekSet(p)) {
-    i=entry.read(filebuffer, bytes);
+    i=entry.read(input,bytes);
   } 
   return i;
 }
 
 void ReadTZXHeader() {
   //Read and check first 10 bytes for a TZX header
-  if(readfile(10, 0)==10 && memcmp_P(filebuffer, TZXTape, 7)==0) {
-    bytesRead = 10;
-    return;
+  int i=0;
+  if(entry.seekSet(0)) {
+    i = entry.read(tmpbuffer,10);
+    if(i == 10 && memcmp_P(tmpbuffer,TZXTape,7)==0) {
+      bytesRead = 10;
+      return;
+    }
   }
 
   HeaderFail();
@@ -2318,9 +2291,13 @@ void HeaderFail() {
 #ifdef AYPLAY
 void ReadAYHeader() {
   //Read and check first 8 bytes for a TZX header
-  if(readfile(8, 0)==8 && memcmp_P(filebuffer, AYFile, 8)==0) {
-    bytesRead = 0;
-    return;
+  int i=0;
+  if(entry.seekSet(0)) {
+    i = entry.read(tmpbuffer,8);
+    if(i == 8 && memcmp_P(tmpbuffer,AYFile,8)==0) {
+      bytesRead = 0;
+      return;
+    }
   }
 
   HeaderFail();
@@ -2331,9 +2308,13 @@ void ReadAYHeader() {
 #ifdef Use_UEF
 void ReadUEFHeader() {
   //Read and check first 12 bytes for a UEF header
-  if(readfile(9, 0)==9 && memcmp_P(filebuffer, UEFFile, 9)==0) {
-    bytesRead = 12;
-    return;
+  int i=0;
+  if(entry.seekSet(0)) {
+    i = entry.read(tmpbuffer,9);
+    if(i == 9 && memcmp_P(tmpbuffer,UEFFile,9)==0) {
+      bytesRead = 12;
+      return;
+    }
   }
 
   HeaderFail();
@@ -2372,3 +2353,4 @@ void ForcePauseAfter0() {
     forcePause0=0;
     return;  
 }
+

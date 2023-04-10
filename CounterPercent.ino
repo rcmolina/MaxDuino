@@ -6,19 +6,19 @@ void lcdTime() {
 
       if (lcdsegs % 10 != 0) {
         // ultima cifra 1,2,3,4,5,6,7,8,9
-        utoa(lcdsegs%10,PlayBytes,10);
+        itoa(lcdsegs%10,PlayBytes,10);
         lcd.setCursor(15,0);
         lcd.print(PlayBytes);
       }
       else if (lcdsegs % CNTRBASE != 0) {
         // es 10,20,30,40,50,60,70,80,90,110,120,..
-        utoa(lcdsegs%CNTRBASE,PlayBytes,10);
+        itoa(lcdsegs%CNTRBASE,PlayBytes,10);
         lcd.setCursor(14,0);
         lcd.print(PlayBytes);
       }
       else if (lcdsegs % (CNTRBASE*10) != 0) {
         // es 100,200,300,400,500,600,700,800,900,1100,..
-        utoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);
+        itoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);
         lcd.setCursor(13,0);
         lcd.print(PlayBytes);
       } 
@@ -37,19 +37,19 @@ void lcdTime() {
       #ifdef XY2force
         if (lcdsegs % 10 != 0) {
           // ultima cifra 1,2,3,4,5,6,7,8,9
-          utoa(lcdsegs%10,(char *)input,10);
+          itoa(lcdsegs%10,(char *)input,10);
           sendStrXY((char *)input,15,0);
         }
         else if (lcdsegs % CNTRBASE != 0) {
           // es 10,20,30,40,50,60,70,80,90,110,120,..
-          utoa((lcdsegs % CNTRBASE)/10,(char *)input,10);
+          itoa((lcdsegs % CNTRBASE)/10,(char *)input,10);
           input[1]='0';
           input[2]=0;
           sendStrXY((char *)input,14,0);
         }
         else if (lcdsegs % (CNTRBASE*10) != 0) {
           // es 100,200,300,400,500,600,700,800,900,1100,..
-          utoa((lcdsegs % (CNTRBASE*10))/CNTRBASE,(char *)input,10);
+          itoa((lcdsegs % (CNTRBASE*10))/CNTRBASE,(char *)input,10);
           input[1]='0';
           input[2]='0';
           input[3]=0;
@@ -96,19 +96,19 @@ void lcdTime() {
     #ifdef P8544
       if (lcdsegs % 10 != 0) {
         // ultima cifra 1,2,3,4,5,6,7,8,9
-        utoa(lcdsegs%10,PlayBytes,10);
+        itoa(lcdsegs%10,PlayBytes,10);
         lcd.setCursor(13,3);
         lcd.print(PlayBytes);
       }
       else if (lcdsegs % CNTRBASE != 0) {
         // es 10,20,30,40,50,60,70,80,90,110,120,..
-        utoa(lcdsegs%CNTRBASE,PlayBytes,10);
+        itoa(lcdsegs%CNTRBASE,PlayBytes,10);
         lcd.setCursor(12,3);
         lcd.print(PlayBytes);
       }
       else if (lcdsegs % (CNTRBASE*10) != 0) {
         // es 100,200,300,400,500,600,700,800,900,1100,..
-        utoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);
+        itoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);
         lcd.setCursor(11,3);
         lcd.print(PlayBytes);
       }

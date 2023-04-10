@@ -3,7 +3,7 @@ void checkForEXT(const char * const filenameExt) {
   //Check for .xxx file extension as these have no header
 
 #ifdef Use_CAS
-  casduino = CASDUINO_FILETYPE::NONE;
+  casduino=0;
 #endif
 
   if (!strcasecmp_P(filenameExt, PSTR("tap"))) {
@@ -11,7 +11,7 @@ void checkForEXT(const char * const filenameExt) {
     currentID=TAP;
     #ifdef tapORIC
       readfile(1,bytesRead);
-      if (filebuffer[0] == 0x16) {
+      if (input[0] == 0x16) {
         currentID=ORIC;
       }
     #endif
@@ -40,13 +40,14 @@ void checkForEXT(const char * const filenameExt) {
 #endif
 #ifdef Use_CAS
   else if (!strcasecmp_P(filenameExt, PSTR("cas"))) {
-    casduino = CASDUINO_FILETYPE::CASDUINO;
+    casduino=1;
     out=LOW;
     #if defined(Use_DRAGON)
+      dragonMode=0;
       readfile(1,bytesRead);
-      if (filebuffer[0] == 0x55) {
+      if (input[0] == 0x55) {
         out=HIGH;
-        casduino == CASDUINO_FILETYPE::DRAGONMODE;
+        dragonMode=1;
         period=249;
         count=255;
       }
