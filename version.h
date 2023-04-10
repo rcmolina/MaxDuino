@@ -1,1 +1,1 @@
-#define _VERSION "MaxDuino 230410s"
+#define _VERSION "new MaxDuino"

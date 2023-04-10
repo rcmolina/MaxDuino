@@ -31,7 +31,7 @@ void wave()
           else WRITE_LOW;
         }
         #if defined(Use_DRAGON)
-        if(dragonMode==1 && pass == 1) {
+        if(casduino == CASDUINO_FILETYPE::DRAGONMODE && pass == 1) {
           pass=3;
         }
         #endif
@@ -62,35 +62,28 @@ void wave()
 
 void writeByte(byte b)
 {
+  byte * _pbits = bits;
 #if defined(Use_DRAGON)
-  if(dragonMode==1) {
-    for(int i=0;i<8;i++)
-    {
-      if(b&1)
-      {
-        bits[i]=1;
-      } else bits[i]=0;
-      b = b >> 1;
-    }
-    bits[8]=2;
-    bits[9]=2;
-    bits[10]=2;
-  } else {
+  if(casduino == CASDUINO_FILETYPE::CASDUINO)
 #endif
-    bits[0]=0;
-    for(int i=1;i<9;i++)
-    {
-      if(b&1)
-      {
-        bits[i]=1;
-      } else bits[i]=0;
-      b = b >> 1;
-    }
-    bits[9]=1;
-    bits[10]=1;
-#if defined(Use_DRAGON)
+  {
+    *_pbits++ = 0; // 1 start bit
   }
+
+  for(int i=0;i<8;i++)
+  {
+    *_pbits++ = (b&1);
+    b >>= 1;
+  }
+
+#if defined(Use_DRAGON)
+  if(casduino == CASDUINO_FILETYPE::CASDUINO)
 #endif
+  {
+    // 2 stop bits
+    *_pbits++ = 1;
+    *_pbits++ = 1;
+  }
 }
 
 void writeSilence()
@@ -124,7 +117,7 @@ void process()
   {
     if((r=readfile(8,bytesRead))==8) 
     {
-      if(!memcmp_P(input,HEADER,8)) {
+      if(!memcmp_P(filebuffer, HEADER,8)) {
         if(fileStage==0) 
         {
           currentTask = lookType;
@@ -145,42 +138,28 @@ void process()
     }
      
   }
+
   if(currentTask==lookType)
   {
+    currentTask = wSilence;
+    count = LONG_SILENCE*scale;
+    fileStage=1;       
+    currentType = typeUnknown;
     if((r=readfile(10,bytesRead))==10)
     {
-      if(!memcmp_P(input,ASCII,10))
+      if(!memcmp_P(filebuffer, ASCII, 10))
       {
         currentType = typeAscii;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;
-      }else if(!memcmp_P(input,BINF,10))
+      }else if(!memcmp_P(filebuffer, BINF, 10))
       {
         currentType = typeBinf;
-        currentTask  = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;        
-      }else if(!memcmp_P(input,BASIC,10))
+      }else if(!memcmp_P(filebuffer, BASIC, 10))
       {
         currentType = typeBasic;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;
-      } else 
-      {
-        currentType = typeUnknown;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;       
       }
-    } else {
-        currentType = typeUnknown;
-        currentTask = wSilence;
-        count = LONG_SILENCE*scale;
-        fileStage=1;       
     }
   }
+
   if(currentTask==wSilence)
   {
     if(!count==0)
@@ -221,8 +200,8 @@ void process()
   }
   if(currentTask==wData)
   {
-    writeByte(input[0]);
-    if(input[0]==0x1a && currentType==typeAscii) 
+    writeByte(filebuffer[0]);
+    if(filebuffer[0]==0x1a && currentType==typeAscii) 
     {
       fileStage=0;
     }
@@ -234,13 +213,13 @@ void process()
 #if defined(Use_DRAGON)
 void processDragon()
 {
-  lastByte=input[0];
+  lastByte=filebuffer[0];
   byte r=0;
   if((r=readfile(1,bytesRead))==1) {
 
   #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
     if(currentTask==lookHeader) {      
-      if(input[0] == 0x55) {
+      if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
        count--;
@@ -261,7 +240,7 @@ void processDragon()
         }
     } else if(currentTask==wNameFileBlk) {
         if(!count==0) {
-            writeByte(input[0]);
+            writeByte(filebuffer[0]);
             bytesRead+=1;
             count--;            
         } else {            
@@ -275,7 +254,7 @@ void processDragon()
   #if defined(Use_Dragon_sLeader) && defined(Expand_All)
      
     if(currentTask==lookHeader) {      
-      if(input[0] == 0x55) {
+      if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
        count--;
@@ -295,30 +274,30 @@ void processDragon()
 
     } else if(currentTask==wSync) { 
       if(!count==0) {
-        writeByte(input[0]);
+        writeByte(filebuffer[0]);
         bytesRead+=1;
         count--;
       } else {
-        writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
+        writeByte(filebuffer[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
         bytesRead+=1;
         currentTask=wNameFileBlk;
-        count=input[0]++;                   
+        count=filebuffer[0]++;                   
       }
  
     } else if(currentTask==wNameFileBlk) { 
       if(!count==0) {
-        writeByte(input[0]);
+        writeByte(filebuffer[0]);
         bytesRead+=1;
         count--;
       } else {
-        writeByte(input[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
+        writeByte(filebuffer[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
         bytesRead+=1;            
         currentTask=lookLeader;
         count=255;                 
       }
           
     } else if(currentTask==lookLeader) { 
-      if(input[0] == 0x55) {
+      if(filebuffer[0] == 0x55) {
         writeByte(0x55); 
         bytesRead+=1;
         count--;
@@ -338,7 +317,7 @@ void processDragon()
 
   #endif
       currentTask=wData;
-      writeByte(input[0]);
+      writeByte(filebuffer[0]);
       bytesRead+=1; 
   #if defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
     }
@@ -389,30 +368,24 @@ void casduinoLoop()
   if(btemppos<buffsize)
   { 
 #if defined(Use_DRAGON)
-    if(dragonMode==1) {
+    if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
       processDragon();
-      for(int t=0;t<8;t++)
-      {
-        if(btemppos<buffsize)
-        {
-          wbuffer[btemppos][working ^ 1] = bits[t];
-          btemppos+=1;         
-        }        
-      }
-    } else {
-#endif
-      process();      
-      for(int t=0;t<11;t++)
-      {
-        if(btemppos<buffsize)
-        {
-          wbuffer[btemppos][working ^ 1] = bits[t];
-          btemppos+=1;         
-        }        
-      }
-#if defined(Use_DRAGON)
     }
+    else
 #endif
+    {
+      process();      
+    }
+
+    if(btemppos<buffsize)
+    {
+      // casduino isn't just true/false - it's the number of bits (8 or 11)
+      for(int t=0; t<casduino; t++)
+      {
+        wbuffer[btemppos][working ^ 1] = bits[t];
+        btemppos+=1;         
+      }        
+    }
   } else {
     if (pauseOn == 0) {      
     #if defined(SHOW_CNTR)
@@ -426,4 +399,3 @@ void casduinoLoop()
 }
 
 #endif
-
