@@ -121,7 +121,7 @@ byte lineaxy=2;
 //#define EEPROM_LOGO_COMPRESS
 #define LOAD_MEM_LOGO             
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-#define LOAD_EEPROM_LOGO 
+//#define LOAD_EEPROM_LOGO 
 
 #if defined(OLED1306_128_64) || defined(video64text32)
   //#define EmptyLogo               // to erase
