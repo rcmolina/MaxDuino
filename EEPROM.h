@@ -7,8 +7,8 @@
   #include <EEPROM.h>
   #define EEPROM_put EEPROM.put
   #define EEPROM_get EEPROM.get
-#elif defined(__arm__) && defined(__STM32F1__)
 
+#elif defined(__arm__) && defined(__STM32F1__)
   #include <EEPROM.h>
   uint8_t EEPROM_get(uint16_t address, byte &data) {
     if (EEPROM.init()==EEPROM_OK) {
@@ -16,9 +16,7 @@
       return true;  
     } else 
       return false;
-  }
-  
-
+  } 
   uint8_t EEPROM_put(uint16_t address, byte data) {
     if (EEPROM.init()==EEPROM_OK) {
       EEPROM.write(address, (uint16_t) data); 
@@ -26,6 +24,20 @@
     } else
       return false;
   }
+  
+#elif defined(ESP8266)
+  #include <ESP_EEPROM.h>
+  uint8_t EEPROM_get(uint16_t address, byte &data) {
+      EEPROM.begin(512);
+      EEPROM.get(address, data) ;  
+      return true;     
+  }
+  uint8_t EEPROM_put(uint16_t address, byte data) {
+      EEPROM.begin(512);
+      EEPROM.put(address, data); 
+      EEPROM.commit();
+      return true;      
+  }
 #endif
-
+  
 #endif // EEPROM_H_INCLUDED
