@@ -104,7 +104,6 @@ void writeHeader()
 
 void process()
 {
-  byte r=0;
   if(currentType==typeEOF)
   {
     if(!count==0) {
@@ -115,7 +114,7 @@ void process()
   }
   if(currentTask==lookHeader || currentTask==wData)
   {
-    if((r=readfile(8,bytesRead))==8) 
+    if((readfile(8,bytesRead))==8) 
     {
       if(!memcmp_P(filebuffer, HEADER,8)) {
         if(fileStage==0) 
@@ -130,8 +129,7 @@ void process()
         bytesRead+=8;
       }
       
-    } else if(r==0) 
-    {
+    } else {
       currentType=typeEOF;
       currentTask=wClose;
       count=LONG_SILENCE*scale;
@@ -145,7 +143,7 @@ void process()
     count = LONG_SILENCE*scale;
     fileStage=1;       
     currentType = typeUnknown;
-    if((r=readfile(10,bytesRead))==10)
+    if((readfile(10,bytesRead))==10)
     {
       if(!memcmp_P(filebuffer, ASCII, 10))
       {
@@ -214,8 +212,7 @@ void process()
 void processDragon()
 {
   lastByte=filebuffer[0];
-  byte r=0;
-  if((r=readfile(1,bytesRead))==1) {
+  if((readfile(1,bytesRead))==1) {
 
   #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
     if(currentTask==lookHeader) {      
