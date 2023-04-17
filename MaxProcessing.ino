@@ -1458,10 +1458,10 @@ void StandardBlock() {
   switch (currentBlockTask) {
     case PILOT:
       //Start with Pilot Pulses
-      currentPeriod = pilotLength;
-      pilotPulses += -1;
-      if(pilotPulses == 0) {
+      if(!pilotPulses--) {
         currentBlockTask = SYNC1;
+      } else {
+        currentPeriod = pilotLength;
       }
       break;
     
