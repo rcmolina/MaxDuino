@@ -1512,32 +1512,32 @@ void StandardBlock() {
 #ifdef Use_UEF
 void UEFCarrierToneBlock() {
   //Pure Tone Block - Long string of pulses with the same length
-  currentPeriod = pilotLength;
-  pilotPulses += -1;
-  if(pilotPulses==0) {
+  if(!pilotPulses--) {
     currentTask = GETCHUNKID;
+  } else {
+    currentPeriod = pilotLength;
   }
 }
 #endif
 
 void PureToneBlock() {
   //Pure Tone Block - Long string of pulses with the same length
-  currentPeriod = pilotLength;
-  pilotPulses += -1;
-  if(pilotPulses==0) {
+  if(!pilotPulses--) {
     currentTask = GETID;
+  } else {
+    currentPeriod = pilotLength;
   }
 }
 
 void PulseSequenceBlock() {
   //Pulse Sequence Block - String of pulses each with a different length
   //Mainly used in speedload blocks
-  if(ReadWord()) {
-    currentPeriod = TickToUs(outWord);    
-  }
-  seqPulses += -1;
-  if(seqPulses==0) {
+  if(!seqPulses--) {
     currentTask = GETID;
+  } else {
+    if(ReadWord()) {
+      currentPeriod = TickToUs(outWord);    
+    }
   }
 }
 
@@ -1550,7 +1550,7 @@ void PureDataBlock() {
     
     case PAUSE:
       temppause = pauseLength;
-    currentID = IDPAUSE;
+      currentID = IDPAUSE;
     break;
   }
 }
