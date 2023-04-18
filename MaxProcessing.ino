@@ -2074,10 +2074,8 @@ void wave2() {
       isPauseBlock = true;
       bitClear(workingPeriod,15);         //Clear pause block flag
       pauseFlipBit = true;
-      wasPauseBlock = true;
-    } else {
-      if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
     }
+    
     #ifdef DIRECT_RECORDING
     if (bitRead(workingPeriod, 14)== 0) {
     #endif

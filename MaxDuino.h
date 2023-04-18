@@ -188,7 +188,6 @@ byte AMScdt = 0;
 
 volatile byte pinState=LOW;
 volatile byte isPauseBlock = false;
-volatile byte wasPauseBlock = false;
 volatile byte intError = false;
 volatile byte workingBuffer=0;
 byte outByte=0;
