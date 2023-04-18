@@ -101,7 +101,6 @@ void TZXLoop() {
 }
 
 void TZXProcess() {
-  byte r = 0;
   currentPeriod = 0;
   if(currentTask == GETFILEHEADER) {
     //grab 7 byte string
@@ -128,9 +127,9 @@ void TZXProcess() {
   }
   if(currentTask == GETCHUNKID) {
     //grab 2 byte ID
-    if(r=ReadWord()==2) {
+    if(ReadWord()) {
       chunkID = outWord;
-      if(r=ReadDword()==4) {
+      if(ReadDword()) {
         bytesToRead = outLong;
         parity = 0;  
         
@@ -139,7 +138,7 @@ void TZXProcess() {
             bytesToRead+= -3;
             bytesRead+= 1;
             //grab 1 byte Parity
-            if(ReadByte()==1) {
+            if(ReadByte()) {
               if (outByte == 'O') parity = TSXCONTROLzxpolarityUEFSWITCHPARITY ? 2 : 1;
               else if (outByte == 'E') parity = TSXCONTROLzxpolarityUEFSWITCHPARITY ? 1 : 2;
               else parity = 0 ;  // 'N'
@@ -192,7 +191,7 @@ void TZXProcess() {
 
       case ID0110:
         if(currentBlockTask==READPARAM){
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
 
             if (BAUDRATE == 1200) {                     
                 pilotPulses = UEFPILOTPULSES;
@@ -212,7 +211,7 @@ void TZXProcess() {
 
     #if defined(Use_c112)
       case ID0112:
-        if(r=ReadWord()==2) {
+        if(ReadWord()) {
           if (outWord>0) {
             temppause = outWord*2;
             currentPeriod = temppause;
@@ -227,7 +226,7 @@ void TZXProcess() {
       // HqUEF-specifc IDs are included here: ID0104, ID0111, ID0114, ID0116, ID0117
       case ID0111:
         if(currentBlockTask==READPARAM){
-          if(r=ReadWord()==2) {             
+          if(ReadWord()) {             
               pilotPulses = UEFPILOTPULSES; // for TURBOBAUD1500 is outWord<<2
               pilotLength = UEFPILOTLENGTH;                      
           }
@@ -264,7 +263,7 @@ void TZXProcess() {
 
       #if defined(Use_c114) // still inside defined(Use_hqUEF) block
         case ID0114: 
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
             pilotPulses = UEFPILOTPULSES;
             bytesRead-=2; 
           }
@@ -276,7 +275,7 @@ void TZXProcess() {
 
       #if defined(Use_c116) // still inside defined(Use_hqUEF) block
         case ID0116:
-          if(r=ReadDword()==4) {
+          if(ReadDword()) {
             byte * FloatB = (byte *) &outLong;
             outWord = (((*(FloatB+2)&0x80) >> 7) | (*(FloatB+3)&0x7f) << 1) + 10;
             outWord = *FloatB | (*(FloatB+1))<<8  | ((outWord&1)<<7)<<16 | (outWord>>1)<<24  ;
@@ -298,7 +297,7 @@ void TZXProcess() {
 
       #if defined(Use_c117) // still inside defined(Use_hqUEF) block
         case ID0117:
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
             if (outWord == 300) {
               passforZero = 8;
               passforOne = 16;
@@ -324,7 +323,7 @@ void TZXProcess() {
     
   if(currentTask == GETID) {
     //grab 1 byte ID
-    if(ReadByte()==1) {
+    if(ReadByte()) {
       currentID = outByte;
     } else {
       currentID = IDEOF;
@@ -399,13 +398,13 @@ void TZXProcess() {
             #if defined(BLOCKID_NOMEM_SEARCH) 
               block++;
             #endif             
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               pauseLength = outWord;
             }
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               bytesToRead = outWord +1;
             }
-            if(r=ReadByte()==1) {
+            if(ReadByte()) {
               if(outByte == 0) {
                 pilotPulses = PILOTNUMBERL;
               } else {
@@ -482,19 +481,19 @@ void TZXProcess() {
             #endif 
                         
           #if not defined(ID11CDTspeedup)
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               pilotLength = TickToUs(outWord);
             }
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               sync1Length = TickToUs(outWord);
             }
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               sync2Length = TickToUs(outWord);
             }          
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               zeroPulse = TickToUs(outWord);
             }
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               onePulse = TickToUs(outWord);
             }          
           #else    
@@ -523,34 +522,34 @@ void TZXProcess() {
                   break;
               }                                                                                                   
             } else {
-              if(r=ReadWord()==2) {
+              if(ReadWord()) {
                 pilotLength = TickToUs(outWord);
               }
-              if(r=ReadWord()==2) {
+              if(ReadWord()) {
                 sync1Length = TickToUs(outWord);
               }
-              if(r=ReadWord()==2) {
+              if(ReadWord()) {
                 sync2Length = TickToUs(outWord);
               }                             
-              if(r=ReadWord()==2) {
+              if(ReadWord()) {
                 zeroPulse = TickToUs(outWord);
               }
-              if(r=ReadWord()==2) {
+              if(ReadWord()) {
                 onePulse = TickToUs(outWord);
               }
             }    
           #endif
                           
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               pilotPulses = outWord;
             }
-            if(r=ReadByte()==1) {
+            if(ReadByte()) {
               usedBitsInLastByte = outByte;
             }
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               pauseLength = outWord;
             }
-            if(r=ReadLong()==3) {
+            if(ReadLong()) {
               bytesToRead = outLong +1;
             }
             currentBlockTask = PILOT;
@@ -565,10 +564,10 @@ void TZXProcess() {
       case ID12:
         //Process ID12 - Pure Tone Block      
         if(currentBlockTask==READPARAM){
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
               pilotLength = TickToUs(outWord);
           }
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
             pilotPulses = outWord;
             //DebugBlock("Pilot Pulses", pilotPulses);
           }
@@ -581,7 +580,7 @@ void TZXProcess() {
       case ID13:
         //Process ID13 - Sequence of Pulses                 
         if(currentBlockTask==READPARAM) {  
-          if(r=ReadByte()==1) {
+          if(ReadByte()) {
             seqPulses = outByte;
           }
           currentBlockTask = DATA;
@@ -593,19 +592,19 @@ void TZXProcess() {
       case ID14:
         //process ID14 - Pure Data Block             
         if(currentBlockTask==READPARAM) {
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
             zeroPulse = TickToUs(outWord); 
           }
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
             onePulse = TickToUs(outWord); 
           }
-          if(r=ReadByte()==1) {
+          if(ReadByte()) {
             usedBitsInLastByte = outByte;
           }
-          if(r=ReadWord()==2) {
+          if(ReadWord()) {
             pauseLength = outWord; 
           }
-          if(r=ReadLong()==3) {
+          if(ReadLong()) {
             bytesToRead = outLong+1;
           }
           currentBlockTask=DATA;
@@ -618,18 +617,18 @@ void TZXProcess() {
       case ID15:
         //process ID15 - Direct Recording          
         if(currentBlockTask==READPARAM) {
-          if(r=ReadWord()==2) {     
+          if(ReadWord()) {     
             SampleLength = TickToUs(outWord);
           }
-          if(r=ReadWord()==2) {      
+          if(ReadWord()) {      
             //Pause after this block in milliseconds
             pauseLength = outWord;  
           }
-          if(r=ReadByte()==1) {
+          if(ReadByte()) {
           //Used bits in last byte (other bits should be 0)
             usedBitsInLastByte = outByte;
           }
-          if(r=ReadLong()==3) {
+          if(ReadLong()) {
             // Length of samples' data
             bytesToRead = outLong+1;
             // Uncomment next line for testing to force id error
@@ -710,12 +709,12 @@ void TZXProcess() {
               #endif   
             #endif
 
-            if(r=ReadDword()==4) {
+            if(ReadDword()) {
               #ifdef BLOCKID19_IN
                 bytesToRead = outLong;
               #endif
             }
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               //Pause after this block in milliseconds
               pauseLength = outWord;
             }
@@ -741,7 +740,7 @@ void TZXProcess() {
 
       case ID20:
         //process ID20 - Pause Block          
-        if(r=ReadWord()==2) {
+        if(ReadWord()) {
           if(outWord>0) {
             forcePause0=0;          // pause0 FALSE
             temppause = outWord;
@@ -813,7 +812,7 @@ void TZXProcess() {
           #endif             
         #endif
                       
-        if(r=ReadByte()==1) {
+        if(ReadByte()) {
           bytesRead += outByte;
         }
         currentTask = GETID;
@@ -826,7 +825,7 @@ void TZXProcess() {
 
       case ID24:
         //Process ID24 - Loop Start          
-        if(r=ReadWord()==2) {
+        if(ReadWord()) {
           loopCount = outWord;
           loopStart = bytesRead;
         }
@@ -860,11 +859,11 @@ void TZXProcess() {
       
       case ID30:
         //Process ID30 - Text Description         
-        if(r=ReadByte()==1) {
+        if(ReadByte()) {
           //Show info on screen - removed until bigger screen used
           //byte j = outByte;
           //for(byte i=0; i<j; i++) {
-          //  if(ReadByte()==1) {
+          //  if(ReadByte()) {
           //    lcd.print(char(outByte));
           //  }
           //}
@@ -875,10 +874,10 @@ void TZXProcess() {
 
       case ID31:
         //Process ID31 - Message block         
-          if(r=ReadByte()==1) {
+        if(ReadByte()) {
           // dispayTime = outByte;
         }         
-        if(r=ReadByte()==1) {
+        if(ReadByte()) {
           bytesRead += outByte;
         }
         currentTask = GETID;
@@ -887,7 +886,7 @@ void TZXProcess() {
       case ID32:
         //Process ID32 - Archive Info
         //Block Skipped until larger screen used          
-        if(ReadWord()==2) {
+        if(ReadWord()) {
           bytesRead += outWord;
         }
         currentTask = GETID;
@@ -896,7 +895,7 @@ void TZXProcess() {
       case ID33:
         //Process ID32 - Archive Info
         //Block Skipped until larger screen used         
-        if(ReadByte()==1) {
+        if(ReadByte()) {
           bytesRead += (long(outByte) * 3);
         }
         currentTask = GETID;
@@ -906,7 +905,7 @@ void TZXProcess() {
         //Process ID35 - Custom Info Block
         //Block Skipped          
         bytesRead += 0x10;
-        if(r=ReadDword()==4) {
+        if(ReadDword()) {
           bytesRead += outLong;
         }
         currentTask = GETID;
@@ -974,23 +973,23 @@ void TZXProcess() {
               block++;
             #endif   
 
-            if(r=ReadDword()==4) {  // Data size to read
+            if(ReadDword()) {  // Data size to read
               bytesToRead = outLong - 12;
             }
-            if(r=ReadWord()==2) {  // Pause after block in ms
+            if(ReadWord()) {  // Pause after block in ms
               pauseLength = outWord;
             }
             if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 0){
-              if(r=ReadWord()==2) {  // T-states each pilot pulse
+              if(ReadWord()) {  // T-states each pilot pulse
                 pilotLength = TickToUs(outWord);
               }
-              if(r=ReadWord()==2) {  // Number of pilot pulses
+              if(ReadWord()) {  // Number of pilot pulses
                 pilotPulses = outWord;
               }
-              if(r=ReadWord()==2) {  // T-states 0 bit pulse
+              if(ReadWord()) {  // T-states 0 bit pulse
                 zeroPulse = TickToUs(outWord);
               }
-              if(r=ReadWord()==2) {  // T-states 1 bit pulse
+              if(ReadWord()) {  // T-states 1 bit pulse
                 onePulse = TickToUs(outWord);
               }
             } else {
@@ -1017,13 +1016,13 @@ void TZXProcess() {
               }
             } //End of TSX_SPEEDUP
 
-            if(r=ReadByte()==1) {  // BitCfg
+            if(ReadByte()) {  // BitCfg
               oneBitPulses =  outByte & 0x0f;       //(default:4)
               zeroBitPulses = outByte >> 4;         //(default:2)
               if (!oneBitPulses) oneBitPulses = 16;
               if (!zeroBitPulses) zeroBitPulses = 16;
             }
-            if(r=ReadByte()==1) {  // ByteCfg
+            if(ReadByte()) {  // ByteCfg
               //Start Bits Cfg
               startBitValue = (outByte >> 5) & 1;   //(default:0)
               /*startBits = */startBitPulses = (outByte >> 6) & 3;  //(default:1)
@@ -1125,10 +1124,10 @@ void TZXProcess() {
             #endif
                 
             pauseLength = PAUSELENGTH;
-            if(r=ReadWord()==2) {
+            if(ReadWord()) {
               bytesToRead = outWord+1;
             }
-            if(r=ReadByte()==1) {
+            if(ReadByte()) {
               if(outByte == 0) {
                 pilotPulses = PILOTNUMBERL + 1;
               } else {
@@ -1459,10 +1458,10 @@ void StandardBlock() {
   switch (currentBlockTask) {
     case PILOT:
       //Start with Pilot Pulses
-      currentPeriod = pilotLength;
-      pilotPulses += -1;
-      if(pilotPulses == 0) {
+      if(!pilotPulses--) {
         currentBlockTask = SYNC1;
+      } else {
+        currentPeriod = pilotLength;
       }
       break;
     
@@ -1533,8 +1532,7 @@ void PureToneBlock() {
 void PulseSequenceBlock() {
   //Pulse Sequence Block - String of pulses each with a different length
   //Mainly used in speedload blocks
-  byte r=0;
-  if(r=ReadWord()==2) {
+  if(ReadWord()) {
     currentPeriod = TickToUs(outWord);    
   }
   seqPulses += -1;
@@ -1588,7 +1586,6 @@ void KCSBlock() {
 
 void writeData4B() {
   //Convert byte (4B Block) from file into string of pulses.  One pulse per pass
-  byte r;
   byte dataBit;
 
   if (currentBit>0) {
@@ -1628,12 +1625,12 @@ void writeData4B() {
   else if (currentBit==0 && bytesToRead!=0)
   {
     //Read new byte
-    if (r=ReadByte()==1) {
+    if (ReadByte()) {
       bytesToRead += -1;
       currentByte = outByte;
       currentBit = 10;
       pass = 0;
-    } else if (r==0) {
+    } else {
       //End of file
       currentID=IDEOF;
       return;
@@ -1648,7 +1645,7 @@ void writeData4B() {
 }
 
 void ZX81FilenameBlock() {
-  //output ZX81 filename data  byte r;
+  //output ZX81 filename data
   if(currentBit==0) {                         //Check for byte end/first byte
     currentByte = pgm_read_byte(ZX81Filename+currentChar);
     currentChar+=1;
@@ -1663,9 +1660,8 @@ void ZX81FilenameBlock() {
 }
 
 void ZX8081DataBlock() {
-  byte r;
   if(currentBit==0) {                         //Check for byte end/first byte
-    if(r=ReadByte()==1) {            //Read in a byte
+    if(ReadByte()) {            //Read in a byte
       currentByte = outByte;
     #ifdef BLOCKID19_IN        
       bytesToRead += -1;
@@ -1676,7 +1672,7 @@ void ZX8081DataBlock() {
       }                   
     #endif 
           
-    } else if(r==0) {
+    } else {
       EndOfFile=true;
       temppause = pauseLength;
       currentID = IDPAUSE;
@@ -1719,13 +1715,12 @@ void writeUEFData() {
   //Serial.println(F("WriteUEFData"));
   #endif
   //Convert byte from file into string of pulses.  One pulse per pass
-  byte r;
   if(currentBit==0) {                         //Check for byte end/first byte
     #ifdef DEBUG
     //Serial.println(F("currentBit==0"));
     #endif
     
-    if(r=ReadByte()==1) {            //Read in a byte
+    if(ReadByte()) {            //Read in a byte
       currentByte = outByte;
       bytesToRead += -1;
       bitChecksum = 0; 
@@ -1741,7 +1736,7 @@ void writeUEFData() {
           currentBlockTask = PAUSE;           //Otherwise start the pause
         }
       }
-    } else if(r==0) {                         // If we reached the EOF
+    } else {                         // If we reached the EOF
       currentTask = GETCHUNKID;
     }
 
@@ -1804,9 +1799,8 @@ void writeUEFData() {
 
 void writeData() {
   //Convert byte from file into string of pulses.  One pulse per pass
-  byte r;
   if(currentBit==0) {                         //Check for byte end/first byte
-    if(r=ReadByte()==1) {            //Read in a byte
+    if(ReadByte()) {            //Read in a byte
       currentByte = outByte;
       #ifdef AYPLAY 
       if (AYPASS==5) {
@@ -1835,7 +1829,7 @@ void writeData() {
         
         return;                               // exit
       }
-    } else if(r==0) {                         // If we reached the EOF
+    } else {                         // If we reached the EOF
       
     #ifdef AYPLAY
       // Check if need to send checksum
@@ -1895,9 +1889,8 @@ void writeData() {
 void DirectRecording() {
   //Direct Recording - Output bits based on specified sample rate (Ticks per clock) either 44.1KHz or 22.05
 
-  byte r;
   if(currentBit==0) {                         //Check for byte end/first byte
-    if(r=ReadByte()==1) {            //Read in a byte
+    if(ReadByte()) {            //Read in a byte
       currentByte = outByte;
       bytesToRead += -1; 
     }  
@@ -1929,17 +1922,16 @@ void DirectRecording() {
 
 void OricDataBlock() {
   //Convert byte from file into string of pulses.  One pulse per pass
-  byte r;
   if(currentBit==0) {                         //Check for byte end/first byte
     
-    if(r=ReadByte()==1) {            //Read in a byte
+    if(ReadByte()) {            //Read in a byte
       currentByte = outByte;
       bytesToRead += -1;
       bitChecksum = 0;
       if(bytesToRead == 0) {                  //Check for end of data block
         lastByte = 1;
       }
-    } else if(r==0) {                         // If we reached the EOF
+    } else {                         // If we reached the EOF
       count =255;
       currentTask = GETID;
       return;
@@ -2051,7 +2043,7 @@ void OricBitWrite() {
   if ((currentBit==0) && (lastByte)) {
   #ifdef MenuBLK2A 
     count = 255; 
-    if(ReadByte()==1) { 
+    if(ReadByte()) { 
       bytesRead += -1;                      //rewind a byte if we've not reached the end           
       currentBlockTask = PAUSE;
     }else {
@@ -2257,37 +2249,49 @@ void uniLoop() {
 byte ReadByte() {
   //Read a byte from the file, and move file position on one if successful
   //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(1, bytesRead);
-  if(i==1) bytesRead += 1;
-  outByte = filebuffer[0];
-  return i;
+  if(readfile(1, bytesRead)==1)
+  {
+    bytesRead += 1;
+    outByte = filebuffer[0];
+    return true;
+  }
+  return false;
 }
 
 byte ReadWord() {
   //Read 2 bytes from the file, and move file position on two if successful
   //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(2, bytesRead);
-  if(i==2) bytesRead += 2;
-  outWord = word(filebuffer[1], filebuffer[0]);
-  return i;
+  if(readfile(2, bytesRead)==2)
+  {
+    bytesRead += 2;
+    outWord = word(filebuffer[1], filebuffer[0]);
+    return true;
+  }
+  return false;
 }
 
 byte ReadLong() {
   //Read 3 bytes from the file, and move file position on three if successful
   //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(3, bytesRead);
-  if(i==3) bytesRead += 3;
-  outLong = ((unsigned long) word(filebuffer[2], filebuffer[1]) << 8) | filebuffer[0];
-  return i;
+  if(readfile(3, bytesRead)==3)
+  {
+    bytesRead += 3;
+    outLong = ((unsigned long) word(filebuffer[2], filebuffer[1]) << 8) | filebuffer[0];
+    return true;
+  }
+  return false;
 }
 
 byte ReadDword() {
   //Read 4 bytes from the file, and move file position on four if successful  
   //Always reads from bytesRead, which is the current position in the file
-  byte i=readfile(4, bytesRead);
-  if(i==4) bytesRead += 4;
-  outLong = ((unsigned long)word(filebuffer[3], filebuffer[2]) << 16) | word(filebuffer[1], filebuffer[0]);
-  return i;
+  if(readfile(4, bytesRead)==4)
+  {
+    bytesRead += 4;
+    outLong = ((unsigned long)word(filebuffer[3], filebuffer[2]) << 16) | word(filebuffer[1], filebuffer[0]);
+    return true;
+  }
+  return false;
 }
 
 byte readfile(byte bytes, unsigned long p)
