@@ -42,6 +42,7 @@ void UniPlay(){
     EndOfFile=false;
     passforZero=2;
     passforOne=4;
+    pinState=LOW;
     WRITE_LOW;
     Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
     Timer.attachInterrupt(wave2);
@@ -62,6 +63,8 @@ void TZXStop() {
 #ifdef Use_CAS
   casduino = CASDUINO_FILETYPE::NONE;
 #endif
+  pinState=LOW;
+  WRITE_LOW;
 }
 
 void TZXPause() {
@@ -2199,9 +2202,9 @@ void clearBuffer2()
 
 void UniSetup() {
   INIT_OUTPORT;
-  WRITE_LOW;    
   isStopped=true;
   pinState=LOW;
+  WRITE_LOW;
 }
 
 void setBaud() 
