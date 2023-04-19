@@ -158,6 +158,14 @@ const char P_VERSION[] PROGMEM = _VERSION ;
   #include "userconfig.h"
 #endif
 
+#ifndef lineaxy
+#if defined(XY)
+#define lineaxy 1
+#elif defined(XY2)
+#define lineaxy 2
+#endif
+#endif
+
 #include "MaxDuino.h"
 #include "hwconfig.h"
 #include "buttons.h"

@@ -21,11 +21,10 @@
 #include "EEPROM.h"
 #endif
 
-#ifdef LCDSCREEN16x2
-// fixme later.  We should redefine lineaxy outside of the config files instead, and fix properly
-#define M_LINE2 1
-#else
+#if defined(lineaxy)
 #define M_LINE2 lineaxy
+#else
+#define M_LINE2 1
 #endif
 
 enum MenuItems{

@@ -72,12 +72,6 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 #define XY2                      // use double size font wihtout status line for menu
 #define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
     //#define XY2shadedplay 
-#ifdef XY
-byte lineaxy=1;
-#endif
-#ifdef XY2
-byte lineaxy=2;
-#endif
 
 #define SHOW_CNTR
 #define SHOW_PCT
