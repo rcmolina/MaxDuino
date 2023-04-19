@@ -57,7 +57,6 @@ void TZXStop() {
   seekFile(); 
   bytesRead=0;                                // reset read bytes PlayBytes
 #ifdef AYPLAY
-  blkchksum = 0;                              // reset block chksum byte for AY loading routine
   AYPASS = 0;                                 // reset AY flag
 #endif
 #ifdef Use_CAS
@@ -1215,7 +1214,7 @@ void TZXProcess() {
             currentBlockTask = PILOT;    // now send pilot, SYNC1, SYNC2 and DATA (writeheader() from String Vector on 1st pass then writeData() on second)
             if (hdrptr==HDRSTART) AYPASS = 1;     // Set AY TAP data read flag only if first run
             if (AYPASS == 2) {           // If we have already sent TAP header
-              blkchksum = 0;  
+              bitChecksum = 0;  
               bytesRead = 0;
               bytesToRead = ayblklen+2;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
               AYPASS = 5;                 // reset flag to read from file and output header 0xFF byte and end chksum
@@ -1816,7 +1815,7 @@ void writeData() {
         bytesToRead += -1;  
       #ifdef AYPLAY 
       }
-      blkchksum = blkchksum ^ currentByte;    // keep calculating checksum
+      bitChecksum ^= currentByte;    // keep calculating checksum
       #endif
       
 
@@ -1838,7 +1837,7 @@ void writeData() {
       // Check if need to send checksum
       if (AYPASS==4)
       {
-        currentByte = blkchksum;            // send calculated chksum
+        currentByte = bitChecksum;            // send calculated chksum
         bytesToRead += 1;                   // add one byte to read
         AYPASS = 0;                         // Reset flag to end block
       }
@@ -2162,7 +2161,7 @@ void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
   if(currentBit==0) {                         //Check for byte end/new byte                         
     if(hdrptr==19) {              // If we've reached end of header block send checksum byte
-      currentByte = blkchksum;
+      currentByte = bitChecksum;
       AYPASS = 2;                 // set flag to Stop playing from header in RAM 
       currentBlockTask = PAUSE;   // we've finished outputting the TAP header so now PAUSE and send DATA block normally from file
       return;
@@ -2185,7 +2184,7 @@ void writeHeader2() {
       } else if(hdrptr==14){
         currentByte = highByte(ayblklen);
       }
-      blkchksum = blkchksum ^ currentByte;    // Keep track of Chksum
+      bitChecksum ^= currentByte;    // Keep track of Chksum
       currentBit=8;
     } else {
       currentBit=usedBitsInLastByte;          //Otherwise only play back the bits needed
