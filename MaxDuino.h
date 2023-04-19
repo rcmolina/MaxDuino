@@ -188,7 +188,6 @@ byte AMScdt = 0;
 
 volatile byte pinState=LOW;
 volatile byte isPauseBlock = false;
-volatile byte intError = false;
 volatile byte workingBuffer=0;
 byte outByte=0;
 word pauseLength=0;
@@ -212,10 +211,12 @@ byte stopBitPulses = 8;
 byte stopBitValue = 1;
 byte endianness = 0;      //0:LSb 1:MSb (default:0)
 byte parity = 0 ;        //0:NoParity 1:ParityOdd 2:ParityEven (default:0)
-byte UEFSWITCHPARITY = 1;
 byte bitChecksum = 0;     // 0:Even 1:Odd number of one bits
 
+#ifdef DIRECT_RECORDING
 word SampleLength=0;
+#endif
+
 byte usedBitsInLastByte=8;
 word loopCount=0;
 byte seqPulses=0;
@@ -240,6 +241,7 @@ byte oldMinBlock = 0;
   byte oldMaxBlock = 19;
 #endif
 
+#ifdef Use_UEF
 PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
 #define UEF                 0xFA    //UEF file for ID list
 // UEF chunks
@@ -288,11 +290,17 @@ PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
   #define UEFTURBOONEPULSE          156
 #endif
 
+word chunkID = 0;
+byte UEFPASS = 0;
+
+#ifdef Use_c116
+float outFloat;
+#endif
+
+#endif // USE_Uef
+
 #define DEBUG 0
 
-word chunkID = 0;
-float outFloat;
-byte UEFPASS = 0;
 
 #define ORICZEROLOWPULSE  208
 #define ORICZEROHIGHPULSE 416

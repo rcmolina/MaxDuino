@@ -1923,6 +1923,7 @@ void DirectRecording() {
   currentBit += -1;               
 }
 
+#ifdef tapORIC
 void OricDataBlock() {
   //Convert byte from file into string of pulses.  One pulse per pass
   if(currentBit==0) {                         //Check for byte end/first byte
@@ -2060,12 +2061,27 @@ void OricBitWrite() {
   }    
 }
 
+void FlushBuffer(long newcount) {
+  if(count>0) {
+    currentPeriod = ORICONEPULSE;
+    count--;
+  } else {   
+    count= newcount;
+    currentBlockTask=SYNC1;
+    #ifdef MenuBLK2A
+      if (!skip2A) ForcePauseAfter0();
+    #endif
+  }             
+  return;
+}
+#endif // tapORIC
+
+
 void wave2() {
   //ISR Output routine
   word workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
   byte pauseFlipBit = false;
   unsigned long newTime=1;
-  intError = false;
  
   if(isStopped==0 && workingPeriod >= 1)
   {
@@ -2355,20 +2371,6 @@ void DelayedStop() {
     stopFile();
     return;
   }       
-}
-
-void FlushBuffer(long newcount) {
-  if(count>0) {
-    currentPeriod = ORICONEPULSE;
-    count--;
-  } else {   
-    count= newcount;
-    currentBlockTask=SYNC1;
-    #ifdef MenuBLK2A
-      if (!skip2A) ForcePauseAfter0();
-    #endif
-  }             
-  return;
 }
 
 void ForcePauseAfter0() {
