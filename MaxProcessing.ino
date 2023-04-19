@@ -499,7 +499,7 @@ void TZXProcess() {
               onePulse = TickToUs(outWord);
             }          
           #else    
-            if ((TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) && (AMScdt == 1)){ 
+            if (TSXCONTROLzxpolarityUEFSWITCHPARITY && AMScdt){ 
               bytesRead += 10;
               switch(BAUDRATE){
                 case 1200: // 1000 Normal baudrate
@@ -981,7 +981,7 @@ void TZXProcess() {
             if(ReadWord()) {  // Pause after block in ms
               pauseLength = outWord;
             }
-            if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 0){
+            if (!TSXCONTROLzxpolarityUEFSWITCHPARITY){
               if(ReadWord()) {  // T-states each pilot pulse
                 pilotLength = TickToUs(outWord);
               }

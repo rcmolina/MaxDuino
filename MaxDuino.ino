@@ -367,7 +367,7 @@ void loop(void) {
         //If no file is play, start playback
         playFile();
         #ifndef NO_MOTOR
-        if (mselectMask == 1){  
+        if (mselectMask){  
           //Start in pause if Motor Control is selected
           oldMotorState = 0;
         }
@@ -432,10 +432,10 @@ void loop(void) {
             lcd.setCursor(0,0);
             lcd.print(BAUDRATE);
             lcd.print(' ');
-            if(mselectMask==1) lcd.print(F(" M:ON"));
+            if(mselectMask) lcd.print(F(" M:ON"));
             else lcd.print(F("m:off"));
             lcd.print(' ');
-            if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
+            if (TSXCONTROLzxpolarityUEFSWITCHPARITY) lcd.print(F(" %^ON"));
             else lcd.print(F("%^off"));         
           #elif defined(SHOW_DIRNAMES)
             str4cpy(input,fileName);
@@ -497,7 +497,7 @@ void loop(void) {
     #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
       if(button_root() && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
         lcd.setCursor(11,0);
-        if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+        if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
           lcd.print(F(" %^ON"));
         } else {
           lcd.print(F("%^off"));
@@ -776,7 +776,7 @@ void loop(void) {
   #endif
 
   #ifndef NO_MOTOR
-    if(start==1 && (oldMotorState!=motorState) && mselectMask==1 ) {  
+    if(start==1 && (oldMotorState!=motorState) && mselectMask) {  
       //if file is playing and motor control is on then handle current motor state
       //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
       if(motorState==1 && pauseOn==0) {
@@ -1296,7 +1296,7 @@ void OledStatusLine() {
 
       #ifndef NO_MOTOR       
         setXY(5,7);
-        if(mselectMask==1) {
+        if(mselectMask) {
           sendStr(" M:ON");
         } else {
           sendStr("m:off");
@@ -1304,7 +1304,7 @@ void OledStatusLine() {
       #endif    
 
       setXY(11,7); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
         sendStr(" %^ON");
       } else {
         sendStr("%^off");
@@ -1316,14 +1316,14 @@ void OledStatusLine() {
       utoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       #ifndef NO_MOTOR        
         setXY(5,3);
-        if(mselectMask==1) {
+        if(mselectMask) {
           sendStr(" M:ON");
         } else {
           sendStr("m:off");
         }
       #endif    
       setXY(11,3); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
         sendStr(" %^ON");
       } else {
         sendStr("%^off");
@@ -1337,13 +1337,13 @@ void OledStatusLine() {
       utoa(BAUDRATE,(char *)input,10);
       sendStrXY((char *)input,0,6);
       #ifndef NO_MOTOR       
-        if(mselectMask==1) {
+        if(mselectMask) {
           sendStrXY(" M:ON",5,6);
         } else {
           sendStrXY("m:off",5,6);
         }
       #endif      
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
         sendStrXY(" %^ON",11,6);
       } else {
         sendStrXY("%^off",11,6);
