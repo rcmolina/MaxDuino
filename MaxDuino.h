@@ -201,6 +201,7 @@ word zeroPulse=0;
 word onePulse=0;
 byte passforZero=2;
 byte passforOne=4;
+int BAUDRATE = DEFAULT_BAUDRATE;
 byte scale; // gets set when you call setBaud
 int period; // gets set when you call setBaud
 
@@ -310,3 +311,10 @@ float outFloat;
 #define ORICTURBOZEROLOWPULSE  60
 #define ORICTURBOZEROHIGHPULSE 470
 #define ORICTURBOONEPULSE      60
+
+byte TSXCONTROLzxpolarityUEFSWITCHPARITY = DEFAULT_TSXzxpUEF;
+byte skip2A = DEFAULT_SKIP2A;
+
+// TODO really the following should only be defined ifndef NO_MOTOR
+// but the order of #includes is wrong and we only define NO_MOTOR later :-/
+byte mselectMask = DEFAULT_MSELECTMASK;

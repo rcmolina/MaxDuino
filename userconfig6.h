@@ -34,11 +34,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
-int BAUDRATE = 3850;
-byte mselectMask = 0;                   // Motor control state 1=on 0=off
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
-                                        //            Mask // SpeedControl for .tsx // UEF Switch Parity
-byte skip2A = 0;                        // Pause on for BLK:2A
+//** These are also the initial first-time defaults when you haven't saved preferences to EEPROM yet **//
+#define DEFAULT_BAUDRATE 3850
+#define DEFAULT_MSELECTMASK 0   // Motor control state 1=on 0=off
+#define DEFAULT_TSXzxpUEF 0     // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+                                //            Mask // SpeedControl for .tsx // UEF Switch Parity
+#define DEFAULT_SKIP2A 0        // Pause on for BLK:2A
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                   Configure your screen settings here                                                  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
