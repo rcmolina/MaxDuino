@@ -2360,18 +2360,6 @@ void ReadUEFHeader() {
 }
 #endif
 
-void DelayedStop() {
-  if(!count==0) {
-    currentPeriod = 10;
-    bitSet(currentPeriod, 15); 
-    bitSet(currentPeriod, 13);
-    count += -1;
-  } else {
-    stopFile();
-    return;
-  }       
-}
-
 void ForcePauseAfter0() {
     pauseOn=1;
     printtext2F(PSTR("PAUSED* "),0);
