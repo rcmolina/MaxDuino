@@ -83,7 +83,7 @@ unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
 unsigned int offset =2;
 
-volatile byte currentBit=0;
+byte currentBit=0;
 //Keep track of which ID, Task, and Block Task we're dealing with
 byte currentID = 0;
 byte currentBlockTask = 0;
@@ -223,8 +223,8 @@ word temppause=0;
 byte forcePause0=0;
 byte firstBlockPause = false;
 unsigned long loopStart=0;
-volatile byte currentChar=0;
-volatile byte currentByte=0;
+byte currentChar=0;
+byte currentByte=0;
 
 #ifdef BLKBIGSIZE
   word block = 0;
