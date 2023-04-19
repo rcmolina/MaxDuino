@@ -241,25 +241,13 @@ void doOnOffSubmenu(byte& refVar)
     if(!settings) return;
     
     #ifndef NO_MOTOR
-      if(bitRead(settings,7)) {
-        mselectMask=1;
-      } else {
-        mselectMask=0;
-      }
+      mselectMask=bitRead(settings,7);
     #endif
 
-    if(bitRead(settings,6)) {
-      TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
-    } else {
-      TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
-    }
+    TSXCONTROLzxpolarityUEFSWITCHPARITY=bitRead(settings,6);
     
     #ifdef MenuBLK2A
-      if(bitRead(settings,5)) {
-        skip2A=1;
-      } else {
-        skip2A=0;
-      }   
+      skip2A=bitRead(settings,5);
     #endif
     
     if(bitRead(settings,0)) {
