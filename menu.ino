@@ -67,7 +67,7 @@ void menuMode()
 { 
   byte menuItem=0;
   byte subItem=0;
-  byte updateScreen=true;
+  bool updateScreen=true;
   
   while(!button_stop() || lastbtn)
   {
