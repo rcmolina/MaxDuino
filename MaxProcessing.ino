@@ -5,6 +5,8 @@ word TickToUs(word ticks) {
 }
 
 void UniPlay(){
+  // initialise scale and period based on current BAUDRATE
+  // (although these could be overridden later e.g. during checkForEXT, depending on file type)
   setBaud();
 
   // on entry, currentFile is already pointing to the file entry you want to play

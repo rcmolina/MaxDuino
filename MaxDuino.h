@@ -201,6 +201,8 @@ word zeroPulse=0;
 word onePulse=0;
 byte passforZero=2;
 byte passforOne=4;
+byte scale; // gets set when you call setBaud
+int period; // gets set when you call setBaud
 
 byte oneBitPulses = 4;
 byte zeroBitPulses = 2;

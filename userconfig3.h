@@ -35,8 +35,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
 int BAUDRATE = 3850;
-byte scale = 2;                         // 1 for BAUDRATE 1200
-int period = 68;                        // 208 for BAUDRATE=1200
 byte mselectMask = 0;                   // Motor control state 1=on 0=off
 byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
