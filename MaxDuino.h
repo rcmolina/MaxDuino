@@ -65,14 +65,14 @@ byte currentType=typeNothing;
 volatile byte pass = 0;
 volatile byte pos = 0;
 volatile byte wbuffer[buffsize][2];
-volatile byte morebuff = HIGH;
+volatile bool morebuff = true;
 volatile byte working=0;
 volatile byte isStopped=false;
 
 //Main Variables
 volatile long count = 0;
 byte btemppos = 0;
-byte copybuff = LOW;
+bool copybuff = false;
 byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
 byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
 unsigned long bytesRead=0;
@@ -179,10 +179,10 @@ word ayblklen = 0;
 byte hdrptr = 0;
 #endif
 
-byte EndOfFile=false;
+bool EndOfFile=false;
 
 #ifdef ID11CDTspeedup
-byte AMScdt = 0;
+bool AMScdt = false;
 #endif
 
 volatile byte pinState=LOW;
@@ -231,8 +231,8 @@ byte usedBitsInLastByte=8;
 word loopCount=0;
 byte seqPulses=0;
 word temppause=0;
-byte forcePause0=0;
-byte firstBlockPause = false;
+bool forcePause0 = false;
+bool firstBlockPause = false;
 unsigned long loopStart=0;
 byte currentChar=0;
 byte currentByte=0;
@@ -320,9 +320,9 @@ float outFloat;
 #define ORICTURBOZEROHIGHPULSE 470
 #define ORICTURBOONEPULSE      60
 
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = DEFAULT_TSXzxpUEF;
-byte skip2A = DEFAULT_SKIP2A;
+bool TSXCONTROLzxpolarityUEFSWITCHPARITY = DEFAULT_TSXzxpUEF;
+bool skip2A = DEFAULT_SKIP2A;
 
 // TODO really the following should only be defined ifndef NO_MOTOR
 // but the order of #includes is wrong and we only define NO_MOTOR later :-/
-byte mselectMask = DEFAULT_MSELECTMASK;
+bool mselectMask = DEFAULT_MSELECTMASK;

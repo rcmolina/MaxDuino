@@ -165,7 +165,7 @@ void menuMode()
   debounce(button_stop);
 }
 
-void doOnOffSubmenu(byte& refVar)
+void doOnOffSubmenu(bool& refVar)
 {
   bool updateScreen=true;
   lastbtn=true;

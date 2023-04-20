@@ -198,7 +198,7 @@ byte oldMotorState = 1;             //Last motor control state
 
 byte start = 0;                     //Currently playing flag
 
-byte pauseOn = 0;                   //Pause state
+bool pauseOn = false;                   //Pause state
 uint16_t currentFile;               //File index (per filesystem) of current file, relative to current directory (pointed to by currentDir)
 uint16_t maxFile;                   //Total number of files in directory
 bool dirEmpty;                      //flag if directory is completely empty
@@ -384,7 +384,7 @@ void loop(void) {
         
       } else {
         //If a file is playing, pause or unpause the file                  
-        if (pauseOn == 0) {
+        if (!pauseOn) {
           printtext2F(PSTR("Paused  "),0);
           jblks =1; 
           firstBlockPause = true;
@@ -400,7 +400,7 @@ void loop(void) {
     }
 
   #ifdef ONPAUSE_POLCHG
-    if(button_root() && start==1 && pauseOn==1 
+    if(button_root() && start==1 && pauseOn 
                                         #ifdef btnRoot_AS_PIVOT   
                                                 && button_stop()
                                         #endif
@@ -503,7 +503,7 @@ void loop(void) {
     }
       
     #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
-      if(button_root() && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
+      if(button_root() && start==1 && pauseOn && !lastbtn) {                                          // show min-max block
         lcd.setCursor(11,0);
         if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
           lcd.print(F(" %^ON"));
@@ -591,7 +591,7 @@ void loop(void) {
   }
      
   #ifdef BLOCKMODE
-    if(button_up() && start==1 && pauseOn==1
+    if(button_up() && start==1 && pauseOn
                                   #ifdef btnRoot_AS_PIVOT
                                             && !button_root()
                                   #endif
@@ -619,7 +619,7 @@ void loop(void) {
     }
 
     #if defined(btnRoot_AS_PIVOT)
-      if(button_up() && start==1 && pauseOn==1 && button_root()) {  // up block half-interval search
+      if(button_up() && start==1 && pauseOn && button_root()) {  // up block half-interval search
         if (block >oldMinBlock) {
           oldMaxBlock = block;
           block = oldMinBlock + (oldMaxBlock - oldMinBlock)/2;
@@ -661,7 +661,7 @@ void loop(void) {
   #endif
 
   #if defined(BLOCKMODE) && defined(BLKSJUMPwithROOT)
-    if(button_root() && start==1 && pauseOn==1) {      // change blocks to jump 
+    if(button_root() && start==1 && pauseOn) {      // change blocks to jump 
 
       if (jblks==BM_BLKSJUMP) {
         jblks=1;
@@ -699,7 +699,7 @@ void loop(void) {
   #endif
 
   #ifdef BLOCKMODE
-    if(button_down() && start==1 && pauseOn==1
+    if(button_down() && start==1 && pauseOn
                                           #ifdef btnRoot_AS_PIVOT
                                                 && !button_root()
                                           #endif
@@ -744,7 +744,7 @@ void loop(void) {
   #endif
 
   #if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-    if(button_down() && start==1 && pauseOn==1 && button_root()) {     // down block half-interval search
+    if(button_down() && start==1 && pauseOn && button_root()) {     // down block half-interval search
       if (block <oldMaxBlock) {
         oldMinBlock = block;
         block = oldMinBlock + 1+ (oldMaxBlock - oldMinBlock)/2;
@@ -787,17 +787,17 @@ void loop(void) {
     if(start==1 && (oldMotorState!=motorState) && mselectMask) {  
       //if file is playing and motor control is on then handle current motor state
       //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
-      if(motorState==1 && pauseOn==0) {
+      if(motorState==1 && !pauseOn) {
         printtext2F(PSTR("PAUSED  "),0);
         scrollPos=0;
         scrollText(fileName);
-        pauseOn = 1;
+        pauseOn = true;
       } 
-      if(motorState==0 && pauseOn==1) {
+      if(motorState==0 && pauseOn) {
         printtext2F(PSTR("PLAYing "),0);
         scrollPos=0;
         scrollText(fileName);
-        pauseOn = 0;
+        pauseOn = false;
       }
       oldMotorState=motorState;
     }
@@ -940,7 +940,7 @@ void playFile() {
   {
     printtextF(PSTR("Playing"),0);
     scrollPos=0;
-    pauseOn = 0;
+    pauseOn = false;
     scrollText(fileName);
     currpct=100;
     lcdsegs=0;

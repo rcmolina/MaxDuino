@@ -16,7 +16,7 @@ void UniPlay(){
   }
 
 #ifdef ID11CDTspeedup
-  AMScdt = 0;
+  AMScdt = false;
 #endif
   block=0;                                    // Initial block when starting
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
@@ -75,12 +75,12 @@ void TZXPause() {
 void TZXLoop() {   
   noInterrupts();                           //Pause interrupts to prevent var reads and copy values out
   copybuff = morebuff;
-  morebuff = LOW;
+  morebuff = false;
   isStopped = pauseOn;
   interrupts();
-  if(copybuff==HIGH) {
+  if(copybuff) {
     btemppos=0;                             //Buffer has swapped, start from the beginning of the new page
-    copybuff=LOW;
+    copybuff=false;
   }
 
   if(btemppos<buffsize){                    // Keep filling until full
@@ -93,7 +93,7 @@ void TZXLoop() {
       btemppos+=2;        
     }
   } else {
-    if (pauseOn == 0) {
+    if (!pauseOn) {
     #if defined(SHOW_CNTR)
       lcdTime();          
     #endif
@@ -746,10 +746,10 @@ void TZXProcess() {
         //process ID20 - Pause Block          
         if(ReadWord()) {
           if(outWord>0) {
-            forcePause0=0;          // pause0 FALSE
+            forcePause0=false;          // pause0 FALSE
             temppause = outWord;
           } else {                    // If Pause duration is 0 ms then Stop The Tape
-            forcePause0=1;          // pause0 TRUE
+            forcePause0=true;          // pause0 TRUE
           }
           currentID = IDPAUSE;         
         }
@@ -850,7 +850,7 @@ void TZXProcess() {
         bytesRead+=4;
         if (skip2A) currentTask = GETID;
         else {
-          forcePause0 = 1;
+          forcePause0 = true;
           currentID = IDPAUSE;
         }        
         break;
@@ -1388,7 +1388,7 @@ void TZXProcess() {
             }
           } else { 
             currentTask = GETID;
-            if(EndOfFile==true) currentID=IDEOF;
+            if(EndOfFile) currentID=IDEOF;
           }
         } 
         break;
@@ -1508,7 +1508,7 @@ void StandardBlock() {
         currentBlockTask = READPARAM;
       }
 
-      if(EndOfFile==true) currentID=IDEOF;
+      if(EndOfFile) currentID=IDEOF;
       break;
   }
 }
@@ -2138,7 +2138,7 @@ void wave2() {
       {
         pos = 0;
         workingBuffer^=1;
-        morebuff = HIGH;                  //Request more data to fill inactive page
+        morebuff = true;                  //Request more data to fill inactive page
       } 
     }
 
@@ -2148,7 +2148,7 @@ void wave2() {
     if(pos >= buffsize) {
       pos = 0;
       workingBuffer ^= 1;
-      morebuff = HIGH;
+      morebuff = true;
     }
   } else {
     newTime = 50000;                         //Just in case we have a 0 in the buffer    
@@ -2363,8 +2363,8 @@ void ReadUEFHeader() {
 #endif
 
 void ForcePauseAfter0() {
-    pauseOn=1;
+    pauseOn=true;
     printtext2F(PSTR("PAUSED* "),0);
-    forcePause0=0;
+    forcePause0=false;
     return;  
 }

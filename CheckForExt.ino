@@ -55,7 +55,7 @@ void checkForEXT(const char * const filenameExt) {
 #endif
 #ifdef ID11CDTspeedup  
   else if (!strcasecmp_P(filenameExt, PSTR("cdt"))) {
-    AMScdt = 1;
+    AMScdt = true;
   }
 #endif  
 }
