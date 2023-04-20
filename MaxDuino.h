@@ -188,10 +188,18 @@ byte AMScdt = 0;
 volatile byte pinState=LOW;
 volatile byte isPauseBlock = false;
 volatile byte workingBuffer=0;
-byte outByte=0;
+
+union {
+  byte outbyte;
+  word outword;
+  unsigned long outlong=0;
+} readout;
+
+#define outByte readout.outbyte
+#define outWord readout.outword
+#define outLong readout.outlong
+
 word pauseLength=0;
-word outWord=0;
-unsigned long outLong=0;
 unsigned long bytesToRead=0;
 word pilotPulses=0;
 word pilotLength=0;
