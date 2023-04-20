@@ -26,12 +26,13 @@ void UniPlay(){
   checkForEXT(filenameExt);
   isStopped=false;
   
+  clearBuffer();
+
 #ifdef Use_CAS 
   if (casduino) { // CAS or DRAGON
     currentType=typeNothing;
     currentTask=lookHeader;
     fileStage=0;
-    clearBuffer();
     Timer.initialize(period);
     Timer.attachInterrupt(wave);
   }
@@ -39,7 +40,6 @@ void UniPlay(){
 #endif
   {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
-    clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
     count = 255;                                //End of file buffer flush 
     EndOfFile=false;
     passforZero=2;
@@ -2208,12 +2208,18 @@ void writeHeader2() {
 }  // End writeHeader2()
 #endif
 
-void clearBuffer2()
+void clearBuffer()
 {
-  for(int i=0;i<buffsize;i++)
+#ifdef Use_CAS
+  const byte fill = casduino?2:0;
+#else
+  const byte fill = 0;
+#endif
+
+  for(byte i=0;i<buffsize;i++)
   {
-    wbuffer[i][0]=0;
-    wbuffer[i][1]=0;
+    wbuffer[i][0]=fill;
+    wbuffer[i][1]=fill;
   } 
 }
 

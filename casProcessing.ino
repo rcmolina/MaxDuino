@@ -340,15 +340,6 @@ void processDragon()
 }
 #endif
 
-void clearBuffer()
-{
-  for(int i=0;i<buffsize;i++)
-  {
-    wbuffer[i][0]=2;
-    wbuffer[i][1]=2;
-  }
-}
-
 void casduinoLoop()
 {
   noInterrupts();
