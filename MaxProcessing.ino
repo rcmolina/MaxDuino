@@ -1218,7 +1218,7 @@ void TZXProcess() {
             if (AYPASS == 2) {           // If we have already sent TAP header
               bitChecksum = 0;  
               bytesRead = 0;
-              bytesToRead = ayblklen+2;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
+              bytesToRead = filesize+5;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
               AYPASS = 5;                 // reset flag to read from file and output header 0xFF byte and end chksum
             }
             usedBitsInLastByte=8;
@@ -2182,9 +2182,9 @@ void writeHeader2() {
         }
       }
       else if(hdrptr==13){                           // insert calculated block length minus LEN bytes
-        currentByte = lowByte(ayblklen-3);
+        currentByte = lowByte(filesize);
       } else if(hdrptr==14){
-        currentByte = highByte(ayblklen-3);
+        currentByte = highByte(filesize);
       }
       bitChecksum ^= currentByte;    // Keep track of Chksum
       currentBit=8;

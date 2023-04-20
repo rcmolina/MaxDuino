@@ -888,9 +888,6 @@ void seekFile() {
 
     entry.getName(fileName,filenameLength);
     filesize = entry.fileSize();
-    #ifdef AYPLAY
-    ayblklen = filesize + 3;  // add 3 file header, data byte and chksum byte to file length
-    #endif
     if(entry.isDir() || !strcmp(fileName, "ROOT")) { isDir=1; } else { isDir=0; }
     entry.close();
   }
