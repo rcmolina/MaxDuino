@@ -2184,7 +2184,7 @@ void writeHeader2() {
       else if(hdrptr==13){                           // insert calculated block length minus LEN bytes
         currentByte = lowByte(ayblklen-3);
       } else if(hdrptr==14){
-        currentByte = highByte(ayblklen);
+        currentByte = highByte(ayblklen-3);
       }
       bitChecksum ^= currentByte;    // Keep track of Chksum
       currentBit=8;
