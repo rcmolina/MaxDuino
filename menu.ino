@@ -21,11 +21,10 @@
 #include "EEPROM.h"
 #endif
 
-#ifdef LCDSCREEN16x2
-// fixme later.  We should redefine lineaxy outside of the config files instead, and fix properly
-#define M_LINE2 1
-#else
+#if defined(lineaxy)
 #define M_LINE2 lineaxy
+#else
+#define M_LINE2 1
 #endif
 
 enum MenuItems{
@@ -68,7 +67,7 @@ void menuMode()
 { 
   byte menuItem=0;
   byte subItem=0;
-  byte updateScreen=true;
+  bool updateScreen=true;
   
   while(!button_stop() || lastbtn)
   {
@@ -166,7 +165,7 @@ void menuMode()
   debounce(button_stop);
 }
 
-void doOnOffSubmenu(byte& refVar)
+void doOnOffSubmenu(bool& refVar)
 {
   bool updateScreen=true;
   lastbtn=true;
@@ -241,25 +240,13 @@ void doOnOffSubmenu(byte& refVar)
     if(!settings) return;
     
     #ifndef NO_MOTOR
-      if(bitRead(settings,7)) {
-        mselectMask=1;
-      } else {
-        mselectMask=0;
-      }
+      mselectMask=bitRead(settings,7);
     #endif
 
-    if(bitRead(settings,6)) {
-      TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
-    } else {
-      TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
-    }
+    TSXCONTROLzxpolarityUEFSWITCHPARITY=bitRead(settings,6);
     
     #ifdef MenuBLK2A
-      if(bitRead(settings,5)) {
-        skip2A=1;
-      } else {
-        skip2A=0;
-      }   
+      skip2A=bitRead(settings,5);
     #endif
     
     if(bitRead(settings,0)) {

@@ -42,13 +42,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //** If Use_MENU commented to remove Menu, then vars need setting preference cause no EEPROM for read/write **//
-int BAUDRATE = 3850;
-byte scale = 2;                         // 1 for BAUDRATE 1200
-int period = 68;                        // 208 for BAUDRATE=1200
-byte mselectMask = 0;                   // Motor control state 1=on 0=off
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
-                                        //            Mask // SpeedControl for .tsx // UEF Switch Parity
-byte skip2A = 0;                        // Pause on for BLK:2A
+//** These are also the initial first-time defaults when you haven't saved preferences to EEPROM yet **//
+#define DEFAULT_BAUDRATE 3850
+#define DEFAULT_MSELECTMASK 0   // Motor control state 1=on 0=off
+#define DEFAULT_TSXzxpUEF 0     // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+                                //            Mask // SpeedControl for .tsx // UEF Switch Parity
+#define DEFAULT_SKIP2A 0        // Pause on for BLK:2A
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                   Configure your screen settings here                                                  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,12 +77,6 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 #define XY2                      // use double size font wihtout status line for menu
 #define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
     //#define XY2shadedplay 
-#ifdef XY
-byte lineaxy=1;
-#endif
-#ifdef XY2
-byte lineaxy=2;
-#endif
 
 // disable these both due to noise on ESP32:
 //#define SHOW_CNTR

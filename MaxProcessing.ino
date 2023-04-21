@@ -5,6 +5,8 @@ word TickToUs(word ticks) {
 }
 
 void UniPlay(){
+  // initialise scale and period based on current BAUDRATE
+  // (although these could be overridden later e.g. during checkForEXT, depending on file type)
   setBaud();
 
   // on entry, currentFile is already pointing to the file entry you want to play
@@ -14,7 +16,7 @@ void UniPlay(){
   }
 
 #ifdef ID11CDTspeedup
-  AMScdt = 0;
+  AMScdt = false;
 #endif
   block=0;                                    // Initial block when starting
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
@@ -24,12 +26,13 @@ void UniPlay(){
   checkForEXT(filenameExt);
   isStopped=false;
   
+  clearBuffer();
+
 #ifdef Use_CAS 
   if (casduino) { // CAS or DRAGON
     currentType=typeNothing;
     currentTask=lookHeader;
     fileStage=0;
-    clearBuffer();
     Timer.initialize(period);
     Timer.attachInterrupt(wave);
   }
@@ -37,11 +40,11 @@ void UniPlay(){
 #endif
   {
     currentBlockTask = READPARAM;               //First block task is to read in parameters
-    clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
     count = 255;                                //End of file buffer flush 
     EndOfFile=false;
     passforZero=2;
     passforOne=4;
+    pinState=LOW;
     WRITE_LOW;
     Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
     Timer.attachInterrupt(wave2);
@@ -56,12 +59,13 @@ void TZXStop() {
   seekFile(); 
   bytesRead=0;                                // reset read bytes PlayBytes
 #ifdef AYPLAY
-  blkchksum = 0;                              // reset block chksum byte for AY loading routine
   AYPASS = 0;                                 // reset AY flag
 #endif
 #ifdef Use_CAS
   casduino = CASDUINO_FILETYPE::NONE;
 #endif
+  pinState=LOW;
+  WRITE_LOW;
 }
 
 void TZXPause() {
@@ -71,12 +75,12 @@ void TZXPause() {
 void TZXLoop() {   
   noInterrupts();                           //Pause interrupts to prevent var reads and copy values out
   copybuff = morebuff;
-  morebuff = LOW;
+  morebuff = false;
   isStopped = pauseOn;
   interrupts();
-  if(copybuff==HIGH) {
+  if(copybuff) {
     btemppos=0;                             //Buffer has swapped, start from the beginning of the new page
-    copybuff=LOW;
+    copybuff=false;
   }
 
   if(btemppos<buffsize){                    // Keep filling until full
@@ -89,7 +93,7 @@ void TZXLoop() {
       btemppos+=2;        
     }
   } else {
-    if (pauseOn == 0) {
+    if (!pauseOn) {
     #if defined(SHOW_CNTR)
       lcdTime();          
     #endif
@@ -497,7 +501,7 @@ void TZXProcess() {
               onePulse = TickToUs(outWord);
             }          
           #else    
-            if ((TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) && (AMScdt == 1)){ 
+            if (TSXCONTROLzxpolarityUEFSWITCHPARITY && AMScdt){ 
               bytesRead += 10;
               switch(BAUDRATE){
                 case 1200: // 1000 Normal baudrate
@@ -742,10 +746,10 @@ void TZXProcess() {
         //process ID20 - Pause Block          
         if(ReadWord()) {
           if(outWord>0) {
-            forcePause0=0;          // pause0 FALSE
+            forcePause0=false;          // pause0 FALSE
             temppause = outWord;
           } else {                    // If Pause duration is 0 ms then Stop The Tape
-            forcePause0=1;          // pause0 TRUE
+            forcePause0=true;          // pause0 TRUE
           }
           currentID = IDPAUSE;         
         }
@@ -846,7 +850,7 @@ void TZXProcess() {
         bytesRead+=4;
         if (skip2A) currentTask = GETID;
         else {
-          forcePause0 = 1;
+          forcePause0 = true;
           currentID = IDPAUSE;
         }        
         break;
@@ -979,7 +983,7 @@ void TZXProcess() {
             if(ReadWord()) {  // Pause after block in ms
               pauseLength = outWord;
             }
-            if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 0){
+            if (!TSXCONTROLzxpolarityUEFSWITCHPARITY){
               if(ReadWord()) {  // T-states each pilot pulse
                 pilotLength = TickToUs(outWord);
               }
@@ -1212,9 +1216,9 @@ void TZXProcess() {
             currentBlockTask = PILOT;    // now send pilot, SYNC1, SYNC2 and DATA (writeheader() from String Vector on 1st pass then writeData() on second)
             if (hdrptr==HDRSTART) AYPASS = 1;     // Set AY TAP data read flag only if first run
             if (AYPASS == 2) {           // If we have already sent TAP header
-              blkchksum = 0;  
+              bitChecksum = 0;  
               bytesRead = 0;
-              bytesToRead = ayblklen+2;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
+              bytesToRead = filesize+5;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
               AYPASS = 5;                 // reset flag to read from file and output header 0xFF byte and end chksum
             }
             usedBitsInLastByte=8;
@@ -1384,7 +1388,7 @@ void TZXProcess() {
             }
           } else { 
             currentTask = GETID;
-            if(EndOfFile==true) currentID=IDEOF;
+            if(EndOfFile) currentID=IDEOF;
           }
         } 
         break;
@@ -1504,7 +1508,7 @@ void StandardBlock() {
         currentBlockTask = READPARAM;
       }
 
-      if(EndOfFile==true) currentID=IDEOF;
+      if(EndOfFile) currentID=IDEOF;
       break;
   }
 }
@@ -1813,7 +1817,7 @@ void writeData() {
         bytesToRead += -1;  
       #ifdef AYPLAY 
       }
-      blkchksum = blkchksum ^ currentByte;    // keep calculating checksum
+      bitChecksum ^= currentByte;    // keep calculating checksum
       #endif
       
 
@@ -1835,7 +1839,7 @@ void writeData() {
       // Check if need to send checksum
       if (AYPASS==4)
       {
-        currentByte = blkchksum;            // send calculated chksum
+        currentByte = bitChecksum;            // send calculated chksum
         bytesToRead += 1;                   // add one byte to read
         AYPASS = 0;                         // Reset flag to end block
       }
@@ -1920,6 +1924,7 @@ void DirectRecording() {
   currentBit += -1;               
 }
 
+#ifdef tapORIC
 void OricDataBlock() {
   //Convert byte from file into string of pulses.  One pulse per pass
   if(currentBit==0) {                         //Check for byte end/first byte
@@ -2057,12 +2062,27 @@ void OricBitWrite() {
   }    
 }
 
+void FlushBuffer(long newcount) {
+  if(count>0) {
+    currentPeriod = ORICONEPULSE;
+    count--;
+  } else {   
+    count= newcount;
+    currentBlockTask=SYNC1;
+    #ifdef MenuBLK2A
+      if (!skip2A) ForcePauseAfter0();
+    #endif
+  }             
+  return;
+}
+#endif // tapORIC
+
+
 void wave2() {
   //ISR Output routine
   word workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
   byte pauseFlipBit = false;
   unsigned long newTime=1;
-  intError = false;
  
   if(isStopped==0 && workingPeriod >= 1)
   {
@@ -2074,10 +2094,8 @@ void wave2() {
       isPauseBlock = true;
       bitClear(workingPeriod,15);         //Clear pause block flag
       pauseFlipBit = true;
-      wasPauseBlock = true;
-    } else {
-      if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
     }
+    
     #ifdef DIRECT_RECORDING
     if (bitRead(workingPeriod, 14)== 0) {
     #endif
@@ -2120,7 +2138,7 @@ void wave2() {
       {
         pos = 0;
         workingBuffer^=1;
-        morebuff = HIGH;                  //Request more data to fill inactive page
+        morebuff = true;                  //Request more data to fill inactive page
       } 
     }
 
@@ -2130,7 +2148,7 @@ void wave2() {
     if(pos >= buffsize) {
       pos = 0;
       workingBuffer ^= 1;
-      morebuff = HIGH;
+      morebuff = true;
     }
   } else {
     newTime = 50000;                         //Just in case we have a 0 in the buffer    
@@ -2145,7 +2163,7 @@ void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
   if(currentBit==0) {                         //Check for byte end/new byte                         
     if(hdrptr==19) {              // If we've reached end of header block send checksum byte
-      currentByte = blkchksum;
+      currentByte = bitChecksum;
       AYPASS = 2;                 // set flag to Stop playing from header in RAM 
       currentBlockTask = PAUSE;   // we've finished outputting the TAP header so now PAUSE and send DATA block normally from file
       return;
@@ -2164,11 +2182,11 @@ void writeHeader2() {
         }
       }
       else if(hdrptr==13){                           // insert calculated block length minus LEN bytes
-        currentByte = lowByte(ayblklen-3);
+        currentByte = lowByte(filesize);
       } else if(hdrptr==14){
-        currentByte = highByte(ayblklen);
+        currentByte = highByte(filesize);
       }
-      blkchksum = blkchksum ^ currentByte;    // Keep track of Chksum
+      bitChecksum ^= currentByte;    // Keep track of Chksum
       currentBit=8;
     } else {
       currentBit=usedBitsInLastByte;          //Otherwise only play back the bits needed
@@ -2190,20 +2208,26 @@ void writeHeader2() {
 }  // End writeHeader2()
 #endif
 
-void clearBuffer2()
+void clearBuffer()
 {
-  for(int i=0;i<buffsize;i++)
+#ifdef Use_CAS
+  const byte fill = casduino?2:0;
+#else
+  const byte fill = 0;
+#endif
+
+  for(byte i=0;i<buffsize;i++)
   {
-    wbuffer[i][0]=0;
-    wbuffer[i][1]=0;
+    wbuffer[i][0]=fill;
+    wbuffer[i][1]=fill;
   } 
 }
 
 void UniSetup() {
   INIT_OUTPORT;
-  WRITE_LOW;    
   isStopped=true;
   pinState=LOW;
+  WRITE_LOW;
 }
 
 void setBaud() 
@@ -2344,35 +2368,9 @@ void ReadUEFHeader() {
 }
 #endif
 
-void DelayedStop() {
-  if(!count==0) {
-    currentPeriod = 10;
-    bitSet(currentPeriod, 15); 
-    bitSet(currentPeriod, 13);
-    count += -1;
-  } else {
-    stopFile();
-    return;
-  }       
-}
-
-void FlushBuffer(long newcount) {
-  if(count>0) {
-    currentPeriod = ORICONEPULSE;
-    count--;
-  } else {   
-    count= newcount;
-    currentBlockTask=SYNC1;
-    #ifdef MenuBLK2A
-      if (!skip2A) ForcePauseAfter0();
-    #endif
-  }             
-  return;
-}
-
 void ForcePauseAfter0() {
-    pauseOn=1;
+    pauseOn=true;
     printtext2F(PSTR("PAUSED* "),0);
-    forcePause0=0;
+    forcePause0=false;
     return;  
 }

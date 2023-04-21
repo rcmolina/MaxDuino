@@ -158,6 +158,14 @@ const char P_VERSION[] PROGMEM = _VERSION ;
   #include "userconfig.h"
 #endif
 
+#ifndef lineaxy
+#if defined(XY)
+#define lineaxy 1
+#elif defined(XY2)
+#define lineaxy 2
+#endif
+#endif
+
 #include "MaxDuino.h"
 #include "hwconfig.h"
 #include "buttons.h"
@@ -190,7 +198,7 @@ byte oldMotorState = 1;             //Last motor control state
 
 byte start = 0;                     //Currently playing flag
 
-byte pauseOn = 0;                   //Pause state
+bool pauseOn = false;                   //Pause state
 uint16_t currentFile;               //File index (per filesystem) of current file, relative to current directory (pointed to by currentDir)
 uint16_t maxFile;                   //Total number of files in directory
 bool dirEmpty;                      //flag if directory is completely empty
@@ -367,7 +375,7 @@ void loop(void) {
         //If no file is play, start playback
         playFile();
         #ifndef NO_MOTOR
-        if (mselectMask == 1){  
+        if (mselectMask){  
           //Start in pause if Motor Control is selected
           oldMotorState = 0;
         }
@@ -376,7 +384,7 @@ void loop(void) {
         
       } else {
         //If a file is playing, pause or unpause the file                  
-        if (pauseOn == 0) {
+        if (!pauseOn) {
           printtext2F(PSTR("Paused  "),0);
           jblks =1; 
           firstBlockPause = true;
@@ -392,7 +400,7 @@ void loop(void) {
     }
 
   #ifdef ONPAUSE_POLCHG
-    if(button_root() && start==1 && pauseOn==1 
+    if(button_root() && start==1 && pauseOn 
                                         #ifdef btnRoot_AS_PIVOT   
                                                 && button_stop()
                                         #endif
@@ -432,10 +440,10 @@ void loop(void) {
             lcd.setCursor(0,0);
             lcd.print(BAUDRATE);
             lcd.print(' ');
-            if(mselectMask==1) lcd.print(F(" M:ON"));
+            if(mselectMask) lcd.print(F(" M:ON"));
             else lcd.print(F("m:off"));
             lcd.print(' ');
-            if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
+            if (TSXCONTROLzxpolarityUEFSWITCHPARITY) lcd.print(F(" %^ON"));
             else lcd.print(F("%^off"));         
           #elif defined(SHOW_DIRNAMES)
             str4cpy(input,fileName);
@@ -495,9 +503,9 @@ void loop(void) {
     }
       
     #if defined(LCDSCREEN16x2) && defined(SHOW_BLOCKPOS_LCD)
-      if(button_root() && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
+      if(button_root() && start==1 && pauseOn && !lastbtn) {                                          // show min-max block
         lcd.setCursor(11,0);
-        if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+        if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
           lcd.print(F(" %^ON"));
         } else {
           lcd.print(F("%^off"));
@@ -583,7 +591,7 @@ void loop(void) {
   }
      
   #ifdef BLOCKMODE
-    if(button_up() && start==1 && pauseOn==1
+    if(button_up() && start==1 && pauseOn
                                   #ifdef btnRoot_AS_PIVOT
                                             && !button_root()
                                   #endif
@@ -611,7 +619,7 @@ void loop(void) {
     }
 
     #if defined(btnRoot_AS_PIVOT)
-      if(button_up() && start==1 && pauseOn==1 && button_root()) {  // up block half-interval search
+      if(button_up() && start==1 && pauseOn && button_root()) {  // up block half-interval search
         if (block >oldMinBlock) {
           oldMaxBlock = block;
           block = oldMinBlock + (oldMaxBlock - oldMinBlock)/2;
@@ -653,7 +661,7 @@ void loop(void) {
   #endif
 
   #if defined(BLOCKMODE) && defined(BLKSJUMPwithROOT)
-    if(button_root() && start==1 && pauseOn==1) {      // change blocks to jump 
+    if(button_root() && start==1 && pauseOn) {      // change blocks to jump 
 
       if (jblks==BM_BLKSJUMP) {
         jblks=1;
@@ -691,7 +699,7 @@ void loop(void) {
   #endif
 
   #ifdef BLOCKMODE
-    if(button_down() && start==1 && pauseOn==1
+    if(button_down() && start==1 && pauseOn
                                           #ifdef btnRoot_AS_PIVOT
                                                 && !button_root()
                                           #endif
@@ -736,7 +744,7 @@ void loop(void) {
   #endif
 
   #if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-    if(button_down() && start==1 && pauseOn==1 && button_root()) {     // down block half-interval search
+    if(button_down() && start==1 && pauseOn && button_root()) {     // down block half-interval search
       if (block <oldMaxBlock) {
         oldMinBlock = block;
         block = oldMinBlock + 1+ (oldMaxBlock - oldMinBlock)/2;
@@ -776,20 +784,20 @@ void loop(void) {
   #endif
 
   #ifndef NO_MOTOR
-    if(start==1 && (oldMotorState!=motorState) && mselectMask==1 ) {  
+    if(start==1 && (oldMotorState!=motorState) && mselectMask) {  
       //if file is playing and motor control is on then handle current motor state
       //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
-      if(motorState==1 && pauseOn==0) {
+      if(motorState==1 && !pauseOn) {
         printtext2F(PSTR("PAUSED  "),0);
         scrollPos=0;
         scrollText(fileName);
-        pauseOn = 1;
+        pauseOn = true;
       } 
-      if(motorState==0 && pauseOn==1) {
+      if(motorState==0 && pauseOn) {
         printtext2F(PSTR("PLAYing "),0);
         scrollPos=0;
         scrollText(fileName);
-        pauseOn = 0;
+        pauseOn = false;
       }
       oldMotorState=motorState;
     }
@@ -880,9 +888,6 @@ void seekFile() {
 
     entry.getName(fileName,filenameLength);
     filesize = entry.fileSize();
-    #ifdef AYPLAY
-    ayblklen = filesize + 3;  // add 3 file header, data byte and chksum byte to file length
-    #endif
     if(entry.isDir() || !strcmp(fileName, "ROOT")) { isDir=1; } else { isDir=0; }
     entry.close();
   }
@@ -932,7 +937,7 @@ void playFile() {
   {
     printtextF(PSTR("Playing"),0);
     scrollPos=0;
-    pauseOn = 0;
+    pauseOn = false;
     scrollText(fileName);
     currpct=100;
     lcdsegs=0;
@@ -1296,7 +1301,7 @@ void OledStatusLine() {
 
       #ifndef NO_MOTOR       
         setXY(5,7);
-        if(mselectMask==1) {
+        if(mselectMask) {
           sendStr(" M:ON");
         } else {
           sendStr("m:off");
@@ -1304,7 +1309,7 @@ void OledStatusLine() {
       #endif    
 
       setXY(11,7); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
         sendStr(" %^ON");
       } else {
         sendStr("%^off");
@@ -1316,14 +1321,14 @@ void OledStatusLine() {
       utoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
       #ifndef NO_MOTOR        
         setXY(5,3);
-        if(mselectMask==1) {
+        if(mselectMask) {
           sendStr(" M:ON");
         } else {
           sendStr("m:off");
         }
       #endif    
       setXY(11,3); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
         sendStr(" %^ON");
       } else {
         sendStr("%^off");
@@ -1337,13 +1342,13 @@ void OledStatusLine() {
       utoa(BAUDRATE,(char *)input,10);
       sendStrXY((char *)input,0,6);
       #ifndef NO_MOTOR       
-        if(mselectMask==1) {
+        if(mselectMask) {
           sendStrXY(" M:ON",5,6);
         } else {
           sendStrXY("m:off",5,6);
         }
       #endif      
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) {
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
         sendStrXY(" %^ON",11,6);
       } else {
         sendStrXY("%^off",11,6);

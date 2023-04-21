@@ -65,14 +65,14 @@ byte currentType=typeNothing;
 volatile byte pass = 0;
 volatile byte pos = 0;
 volatile byte wbuffer[buffsize][2];
-volatile byte morebuff = HIGH;
+volatile bool morebuff = true;
 volatile byte working=0;
 volatile byte isStopped=false;
 
 //Main Variables
 volatile long count = 0;
 byte btemppos = 0;
-byte copybuff = LOW;
+bool copybuff = false;
 byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
 byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
 unsigned long bytesRead=0;
@@ -83,7 +83,7 @@ unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
 unsigned int offset =2;
 
-volatile byte currentBit=0;
+byte currentBit=0;
 //Keep track of which ID, Task, and Block Task we're dealing with
 byte currentID = 0;
 byte currentBlockTask = 0;
@@ -175,26 +175,30 @@ PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
 PROGMEM const byte AYFile[8] = {'Z','X','A','Y','E','M','U','L'};           // added additional AY file header check
 PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','F','i','l','e',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
 byte AYPASS = 0;
-byte blkchksum = 0;
-word ayblklen = 0;
 byte hdrptr = 0;
 #endif
 
-byte EndOfFile=false;
+bool EndOfFile=false;
 
 #ifdef ID11CDTspeedup
-byte AMScdt = 0;
+bool AMScdt = false;
 #endif
 
 volatile byte pinState=LOW;
 volatile byte isPauseBlock = false;
-volatile byte wasPauseBlock = false;
-volatile byte intError = false;
 volatile byte workingBuffer=0;
-byte outByte=0;
+
+union {
+  byte outbyte;
+  word outword;
+  unsigned long outlong=0;
+} readout;
+
+#define outByte readout.outbyte
+#define outWord readout.outword
+#define outLong readout.outlong
+
 word pauseLength=0;
-word outWord=0;
-unsigned long outLong=0;
 unsigned long bytesToRead=0;
 word pilotPulses=0;
 word pilotLength=0;
@@ -204,6 +208,9 @@ word zeroPulse=0;
 word onePulse=0;
 byte passforZero=2;
 byte passforOne=4;
+word BAUDRATE = DEFAULT_BAUDRATE;
+byte scale; // gets set when you call setBaud
+byte period; // gets set when you call setBaud
 
 byte oneBitPulses = 4;
 byte zeroBitPulses = 2;
@@ -213,19 +220,21 @@ byte stopBitPulses = 8;
 byte stopBitValue = 1;
 byte endianness = 0;      //0:LSb 1:MSb (default:0)
 byte parity = 0 ;        //0:NoParity 1:ParityOdd 2:ParityEven (default:0)
-byte UEFSWITCHPARITY = 1;
-byte bitChecksum = 0;     // 0:Even 1:Odd number of one bits
+byte bitChecksum = 0;     // For oric and uef:  0:Even 1:Odd number of one bits  For AY: checksum byte
 
+#ifdef DIRECT_RECORDING
 word SampleLength=0;
+#endif
+
 byte usedBitsInLastByte=8;
 word loopCount=0;
 byte seqPulses=0;
 word temppause=0;
-byte forcePause0=0;
-byte firstBlockPause = false;
+bool forcePause0 = false;
+bool firstBlockPause = false;
 unsigned long loopStart=0;
-volatile byte currentChar=0;
-volatile byte currentByte=0;
+byte currentChar=0;
+byte currentByte=0;
 
 #ifdef BLKBIGSIZE
   word block = 0;
@@ -241,6 +250,7 @@ byte oldMinBlock = 0;
   byte oldMaxBlock = 19;
 #endif
 
+#ifdef Use_UEF
 PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
 #define UEF                 0xFA    //UEF file for ID list
 // UEF chunks
@@ -289,11 +299,17 @@ PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
   #define UEFTURBOONEPULSE          156
 #endif
 
+word chunkID = 0;
+byte UEFPASS = 0;
+
+#ifdef Use_c116
+float outFloat;
+#endif
+
+#endif // USE_Uef
+
 #define DEBUG 0
 
-word chunkID = 0;
-float outFloat;
-byte UEFPASS = 0;
 
 #define ORICZEROLOWPULSE  208
 #define ORICZEROHIGHPULSE 416
@@ -302,3 +318,10 @@ byte UEFPASS = 0;
 #define ORICTURBOZEROLOWPULSE  60
 #define ORICTURBOZEROHIGHPULSE 470
 #define ORICTURBOONEPULSE      60
+
+bool TSXCONTROLzxpolarityUEFSWITCHPARITY = DEFAULT_TSXzxpUEF;
+bool skip2A = DEFAULT_SKIP2A;
+
+// TODO really the following should only be defined ifndef NO_MOTOR
+// but the order of #includes is wrong and we only define NO_MOTOR later :-/
+bool mselectMask = DEFAULT_MSELECTMASK;

@@ -52,7 +52,7 @@ void wave()
       {
         pos = 0;
         working ^=1;
-        morebuff = HIGH;
+        morebuff = true;
       }
     }
   } else {
@@ -340,26 +340,17 @@ void processDragon()
 }
 #endif
 
-void clearBuffer()
-{
-  for(int i=0;i<buffsize;i++)
-  {
-    wbuffer[i][0]=2;
-    wbuffer[i][1]=2;
-  }
-}
-
 void casduinoLoop()
 {
   noInterrupts();
   copybuff = morebuff;
-  morebuff = LOW;
+  morebuff = false;
   isStopped=pauseOn;
   interrupts();
 
-  if(copybuff==HIGH) {
+  if(copybuff) {
     btemppos=0;
-    copybuff=LOW;
+    copybuff=false;
   }
 
   if(btemppos<buffsize)
@@ -384,7 +375,7 @@ void casduinoLoop()
       }        
     }
   } else {
-    if (pauseOn == 0) {      
+    if (!pauseOn) {      
     #if defined(SHOW_CNTR)
       lcdTime();          
     #endif
