@@ -1679,7 +1679,8 @@ void ZX8081DataBlock() {
           
     } else {
       EndOfFile=true;
-      temppause = pauseLength;
+      //temppause = pauseLength;
+      temppause = PAUSELENGTH;
       currentID = IDPAUSE;
       return;
     }
