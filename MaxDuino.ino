@@ -1,5 +1,9 @@
+const char P_PRODUCT_NAME[] PROGMEM = "new MaxDuino";
+
 #include "version.h"
-const char P_VERSION[] PROGMEM = _VERSION ;
+#define XXSTR(a) XSTR(a)
+#define XSTR(a) #a
+const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
 
 // ---------------------------------------------------------------------------------
 // DO NOT USE CLASS-10 CARDS on this project - they're too fast to operate using SPI
@@ -240,10 +244,10 @@ void setup() {
     lcd.backlight();
     lcd.clear();
     #if (SPLASH_SCREEN)
-        lcd.setCursor(0,0);
-        lcd.print(F("Welcome to")); // Set the text at the initilization for LCD Screen (Line 1)
-        lcd.setCursor(0,1); 
-        lcd.print(F("Maxduino")); // Set the text at the initilization for LCD Screen (Line 2)
+      lcd.setCursor(0,0);
+      lcd.print(reinterpret_cast <const __FlashStringHelper *>P_PRODUCT_NAME); // Set the text at the initialization for LCD Screen (Line 1)
+      lcd.setCursor(0,1); 
+      lcd.print(reinterpret_cast <const __FlashStringHelper *>P_VERSION); // Set the text at the initialization for LCD Screen (Line 2)
     #endif   
   #endif
   
@@ -257,9 +261,13 @@ void setup() {
     init_OLED();
     #if (!SPLASH_SCREEN)
       #if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
-        delay(1500);              // Show logo
+        delay(1500);             // Show logo
       #endif
       reset_display();           // Clear logo and load saved mode
+      printtextF(P_PRODUCT_NAME, 0);
+      printtextF(P_VERSION, lineaxy);
+      delay(1500);               // Show version info
+      reset_display();           // Clear screen
     #endif
   #endif
 
@@ -272,12 +280,18 @@ void setup() {
   setup_buttons();
  
   #ifdef SPLASH_SCREEN
-      while (!button_any()){
-        delay(100);              // Show logo (OLED) or text (LCD) and remains until a button is pressed.
+    while (!button_any()){
+      delay(100);                // Show logo (OLED) or text (LCD) and remains until a button is pressed.
+    }   
+    #ifdef OLED1306    
+      reset_display();           // Clear logo and load saved mode
+      printtextF(P_PRODUCT_NAME, 0);
+      printtextF(P_VERSION, lineaxy);
+      while (button_any()){
+        delay(100);              // Show version while button is still pressed (let go to continue)
       }   
-      #ifdef OLED1306    
-          reset_display();           // Clear logo and load saved mode
-      #endif
+      reset_display();           // Clear screen
+    #endif
   #endif
 
   while (!sd.begin(chipSelect, SD_SPI_CLOCK_SPEED)) {
@@ -556,8 +570,8 @@ void loop(void) {
       reset_display();           // Clear logo and load saved mode
       printtextF(PSTR("Reset.."),0);
       delay(500);
-      strcpy_P(PlayBytes, P_VERSION);
-      printtextF(P_VERSION, 0);
+      strcpy_P(PlayBytes, P_PRODUCT_NAME);
+      printtextF(P_PRODUCT_NAME, 0);
       #if defined(OSTATUSLINE)
         OledStatusLine();
       #endif
@@ -894,7 +908,7 @@ void seekFile() {
 
   if (isDir==1) {
     if (subdir >0)strcpy(PlayBytes,prevSubDir);
-    else strcpy_P(PlayBytes, P_VERSION);
+    else strcpy_P(PlayBytes, P_PRODUCT_NAME);
     #ifdef P8544
       printtext("                 ",3);
     #endif
