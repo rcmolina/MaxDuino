@@ -727,15 +727,16 @@ void TZXProcess() {
             #ifdef BLOCKID19_IN
               bytesToRead += -88; // pauseLength + SYMDEFs
             #endif
-            currentBlockTask=PAUSE;
+            //currentBlockTask=PAUSE;
+            currentBlockTask=DATA;
             break;
-
+        /*
           case PAUSE:
             currentPeriod = PAUSELENGTH;
             bitSet(currentPeriod, 15);
             currentBlockTask=DATA;
             break; 
-                        
+         */               
           case DATA:
             ZX8081DataBlock();
             break;
