@@ -1459,6 +1459,7 @@ void SetPlayBlock()
     lcd.setCursor(12,3);lcd.print('B'+block);
   #endif
 
+  clearBuffer();
   currpct=100; 
   lcdsegs=0;       
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
