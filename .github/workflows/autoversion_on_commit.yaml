@@ -22,6 +22,9 @@ jobs:
     permissions:
       contents: write
       
+    # don't run in forks. only the main repo has automatic versioning, and if you autoupdate versions in forks (like branches) you'd get conflicts on version.h every time you merge
+    if: github.repository == 'rcmolina/MaxDuino'
+      
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
