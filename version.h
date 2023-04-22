@@ -1,1 +1,1 @@
-#define _VERSION 1.77.1000.xxxxxx
+#define _VERSION 1.77.1001.929d41
