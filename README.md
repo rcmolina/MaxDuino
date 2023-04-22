@@ -3,6 +3,14 @@
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
+
+* V1.77.x  **SEE VERSION.H FOR MORE DETAILS**  first rolling version with automatic version numbering.
+  See git commit history for changes: https://github.com/rcmolina/MaxDuino/commits/master
+  See version.h (and the Menu "Version..." option) to display what version you currently have.
+  V1.77 uses semantic versioning :  MAJOR.minor.patch.sha  (build is incremented for each commit, and sha corresponds to the first few characters of the github commit hash)
+  e.g. 1.77.1234.ffca means this is v1.77 , patch number 1234 (based on number of changes), commit HEAD ffca
+
+* "New MaxDuino": No version Numbers due to collaborative new contributions for the project
 26/06/2022 Oric: Fixed pointer bug when loading some tap programs (Pulsoid, @desUBIKado).
 24/06/2022 Assisted Oric tap multiblock loading with automatic pausing when setting Skip_BLK2A flag to off in menu.
 18/06/2022 SAMD21 Support (@David), tested Arduino Micro and new pin definitions (@Rafa)
@@ -10,7 +18,6 @@ https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 11/06/2022: ZX:inject the real filename into the fake ay header + Refixed inversion for zx polarity loading.
 zx81:Removed initial pause from zx81 loading to avoid inversion problems.
 
-No more version Numbers due to collaborative new contributions for the project, so ROLLING VERSION now.
 * V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly for Amstrad CPC ID11 blocks (like TSXControl).
 A bunch of bugs solved: At last solved memory corruption problem when reconfiguring options due to wrong buffer overflow , also reoptimized size to free more space. Changed also logic for searching extension when reading file (thanks to David Hooper alias stripwax).
 Double font i2c_start syntax error (@alferboy).
@@ -40,7 +47,7 @@ so Oricium game now can load in 4 minutes in Oric Atmos, file attached for testi
 * V1.53 Some rework for Arduino nano every and timers TCA / TCB0 and using last SDFat for better speed.
 * V1.52 New arduino nano EVERY micro supported. Need work for turbo loading. Compressed logo where only even columns are used for load/save with EEPROM. Different config files for new high capacity chips (Riccardo Repetto).
 * V1.51 Dragon TOSEC files with short leader loading now.
-* V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schröder).
+* V1.50 aka "Maria". File auto-scrolling when holding down UP or DOWN buttons (Frank Schrï¿½der).
 * V1.49 ID15 adjustment for slow Amstrad musical loaders.
 * V1.48 New chunks for Acorn computers: Implemented parity handling when loading protected games (@acf76es). Remove warnings when compilation from IDE (@llopis).
 * V1.47 Optional BLOCKID_INTO_MEM if loading many turbo short blocks. BLOCK_EEPROM_PUT must be disabled when loading Amstrad cpc Breaking Baud demo. Bug fixed: block counter should not be incremented when pausing. 
