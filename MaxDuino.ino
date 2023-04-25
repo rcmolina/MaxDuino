@@ -264,10 +264,12 @@ void setup() {
         delay(1500);             // Show logo
       #endif
       reset_display();           // Clear logo and load saved mode
+/*      
       printtextF(P_PRODUCT_NAME, 0);
       printtextF(P_VERSION, lineaxy);
       delay(1500);               // Show version info
       reset_display();           // Clear screen
+*/     
     #endif
   #endif
 
@@ -285,6 +287,7 @@ void setup() {
     }   
     #ifdef OLED1306    
       reset_display();           // Clear logo and load saved mode
+
       printtextF(P_PRODUCT_NAME, 0);
       printtextF(P_VERSION, lineaxy);
       while (button_any()){
@@ -914,7 +917,7 @@ void seekFile() {
     #endif
     
   } else {
-    utoa(filesize,PlayBytes,10);
+    ultoa(filesize,PlayBytes,10);
     strcat_P(PlayBytes,PSTR(" bytes"));
     #ifdef P8544
       printtext("                 ",3);
@@ -1543,6 +1546,11 @@ void GetAndPlayBlock()
 
         case ID14:  bytesRead+=7;
                     if(ReadLong()) bytesRead += outLong;
+                    /*
+                      #if defined(OLEDBLKMATCH) //&& defined(BLOCKID14_IN)
+                        i++;
+                      #endif 
+                    */                   
                     break;
 
         case ID15:  bytesRead+=5;
