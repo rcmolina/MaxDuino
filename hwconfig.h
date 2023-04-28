@@ -141,7 +141,7 @@
     #define SCL_PIN 0 
     #include <SoftWire.h>
     SoftWire Wire = SoftWire();
-   #elif defined(Use_SoftI2CMaster) && defined(__AVR_ATmega32U4__) 
+   #elif defined(Use_SoftWire) && defined(__AVR_ATmega32U4__) 
     #define SDA_PORT PORTD
     #define SDA_PIN 1 
     #define SCL_PORT PORTD
