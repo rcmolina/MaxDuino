@@ -75,6 +75,9 @@
     #undef Use_SoftWire
   #endif
 
+#elif defined(__AVR_ATmega2560__) 
+  //#define TimerOne
+
 #elif defined(__AVR_ATmega32U4__)
 //#undef Use_SoftI2CMaster
 //#undef Use_SoftWire
@@ -82,7 +85,7 @@
 
 #elif defined(__AVR_ATmega328P__)
   //#define TimerOne
-
+  
 #else
   #error I2C definitions (SoftI2CMaster/SoftWire/etc) not defined for board
 #endif
