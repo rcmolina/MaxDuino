@@ -587,7 +587,7 @@ void TZXProcess() {
           if(ReadByte()) {
             seqPulses = outByte;
           }
-          currentBlockTask = DATA;
+          currentBlockTask = TDATA;
         } else {
           PulseSequenceBlock();
         }
@@ -611,7 +611,7 @@ void TZXProcess() {
           if(ReadLong()) {
             bytesToRead = outLong+1;
           }
-          currentBlockTask=DATA;
+          currentBlockTask=TDATA;
         } else {
           PureDataBlock();
         }
@@ -638,7 +638,7 @@ void TZXProcess() {
             // Uncomment next line for testing to force id error
             //currentID=0x9A;
           }            
-          currentBlockTask=DATA;
+          currentBlockTask=TDATA;
         } else if(currentBlockTask==PAUSE) {
           temppause = pauseLength;
           currentID = IDPAUSE;                     
@@ -728,16 +728,16 @@ void TZXProcess() {
               bytesToRead += -88; // pauseLength + SYMDEFs
             #endif
             //currentBlockTask=PAUSE;
-            currentBlockTask=DATA;
+            currentBlockTask=TDATA;
             break;
         /*
           case PAUSE:
             currentPeriod = PAUSELENGTH;
             bitSet(currentPeriod, 15);
-            currentBlockTask=DATA;
+            currentBlockTask=TDATA;
             break; 
          */               
-          case DATA:
+          case TDATA:
             ZX8081DataBlock();
             break;
         }  
@@ -1045,13 +1045,13 @@ void TZXProcess() {
           case PILOT:
             //Start with Pilot Pulses
             if (!pilotPulses--) {
-              currentBlockTask = DATA;
+              currentBlockTask = TDATA;
             } else {
               currentPeriod = pilotLength;
             }
             break;
       
-          case DATA:
+          case TDATA:
             //Data playback
             writeData4B();
             break;
@@ -1169,7 +1169,7 @@ void TZXProcess() {
             ZX81FilenameBlock();
           break;
           
-          case DATA:
+          case TDATA:
             ZX8081DataBlock();
           break;
         }
@@ -1182,10 +1182,10 @@ void TZXProcess() {
             // fallthrough ->
                       
           case PAUSE:
-            currentBlockTask=DATA;
+            currentBlockTask=TDATA;
           break; 
           
-          case DATA:
+          case TDATA:
             ZX8081DataBlock();
           break; 
         }
@@ -1214,7 +1214,7 @@ void TZXProcess() {
             sync2Length = SYNCSECOND;
             zeroPulse = ZEROPULSE;
             onePulse = ONEPULSE;
-            currentBlockTask = PILOT;    // now send pilot, SYNC1, SYNC2 and DATA (writeheader() from String Vector on 1st pass then writeData() on second)
+            currentBlockTask = PILOT;    // now send pilot, SYNC1, SYNC2 and TDATA (writeheader() from String Vector on 1st pass then writeData() on second)
             if (hdrptr==HDRSTART) AYPASS = 1;     // Set AY TAP data read flag only if first run
             if (AYPASS == 2) {           // If we have already sent TAP header
               bitChecksum = 0;  
@@ -1351,11 +1351,11 @@ void TZXProcess() {
               currentPeriod = ORICONEPULSE;
               count--;
             } else {   
-              currentBlockTask=DATA;
+              currentBlockTask=TDATA;
             }             
             break;
 
-          case DATA:
+          case TDATA:
             OricDataBlock();
             break;
               
@@ -1479,10 +1479,10 @@ void StandardBlock() {
     case SYNC2:
       //Second Sync Pulse
       currentPeriod = sync2Length;
-      currentBlockTask = DATA;
+      currentBlockTask = TDATA;
       break;
     
-    case DATA:  
+    case TDATA:  
       //Data Playback
 #ifdef AYPLAY
       if ((AYPASS==0)||(AYPASS==4)||(AYPASS==5))
@@ -1549,7 +1549,7 @@ void PulseSequenceBlock() {
 void PureDataBlock() {
   //Pure Data Block - Data & pause only, no header, sync
   switch(currentBlockTask) {
-    case DATA:
+    case TDATA:
       writeData();          
     break;
     
@@ -1568,13 +1568,13 @@ void KCSBlock() {
     case PILOT:
       //Start with Pilot Pulses
       if (!pilotPulses--) {
-        currentBlockTask = DATA;
+        currentBlockTask = TDATA;
       } else {
         currentPeriod = pilotLength;
       }
       break;
 
-    case DATA:
+    case TDATA:
       //Data playback
       writeData4B();
       break;
@@ -1655,7 +1655,7 @@ void ZX81FilenameBlock() {
     currentByte = pgm_read_byte(ZX81Filename+currentChar);
     currentChar+=1;
     if(currentChar==10) {
-      currentBlockTask = DATA;
+      currentBlockTask = TDATA;
       return;
     }
     currentBit=9;
@@ -2082,6 +2082,7 @@ void FlushBuffer(long newcount) {
 
 void wave2() {
   //ISR Output routine
+//  unsigned long zeroTime = micros();
   word workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
   byte pauseFlipBit = false;
   unsigned long newTime=1;
@@ -2155,9 +2156,10 @@ void wave2() {
   } else {
     newTime = 50000;                         //Just in case we have a 0 in the buffer    
   }
-  
-  newTime += 6; // why 6? STM32F1 code used to do newTime += 2.  Why 2?
-  Timer.setPeriod(newTime); //Finally set the next pulse length
+
+  newTime += 6;
+//  newTime += (micros() - zeroTime); 
+  Timer.setPeriod(newTime);                 //Finally set the next pulse length
 }
 
 #ifdef AYPLAY

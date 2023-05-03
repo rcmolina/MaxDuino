@@ -135,7 +135,7 @@ word currentPeriod=1;
 #define PILOT                 1
 #define SYNC1                 2
 #define SYNC2                 3
-#define DATA                  4
+#define TDATA                 4
 #define PAUSE                 5
 #define NEWPARAM              6
 #define NAME                  7
