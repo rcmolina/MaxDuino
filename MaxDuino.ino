@@ -1483,10 +1483,10 @@ void SetPlayBlock()
   pass=0;
 
 #ifdef Use_CAS
-  if (!casduino) // not a CAS / DRAGON file
+  if (casduino==CASDUINO_FILETYPE::NONE) // not a CAS / DRAGON file
 #endif
   {
-    currentBlockTask = READPARAM;               //First block task is to read in parameters
+    currentBlockTask = BLOCKTASK::READPARAM;               //First block task is to read in parameters
     Timer.setPeriod(1000);
   }
 }
@@ -1623,13 +1623,13 @@ void GetAndPlayBlock()
 
   bytesRead=oldbytesRead;
   if (currentID==TAP) {
-    currentTask=PROCESSID;
+    currentTask=TASK::PROCESSID;
   }else {
-    currentTask=GETID;    //Get new TZX Block
+    currentTask=TASK::GETID;    //Get new TZX Block
     if(ReadByte()) {
       //TZX with blocks GETID
       currentID = outByte;
-      currentTask=PROCESSID;
+      currentTask=TASK::PROCESSID;
     }
   }
    
