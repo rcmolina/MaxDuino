@@ -64,7 +64,6 @@ byte currpct = 100;
 byte newpct = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
-unsigned int offset =2;
 
 byte currentBit=0;
 
