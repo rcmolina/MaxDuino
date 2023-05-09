@@ -108,6 +108,7 @@ void LiquidCrystal_I2C::init_priv()
     begin(_cols, _rows);  
   #else   
   	Wire.begin();
+    Wire.setClock(I2CCLOCK);
   	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
   	begin(_cols, _rows);
   #endif  
