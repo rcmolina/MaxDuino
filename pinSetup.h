@@ -160,7 +160,7 @@
 
 #define chipSelect    D7
 #define BUTTON_ADC
-#define btnADC        A3 // analog input pin for ADC buttons
+#define btnADC        A2 // analog input pin for ADC buttons // CHANGED!!!
 #define NO_MOTOR    // because no spare gpio
 
 #elif defined(ARDUINO_ESP8266_WEMOS_D1MINI)
