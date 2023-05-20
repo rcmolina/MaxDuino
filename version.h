@@ -1,1 +1,1 @@
-#define _VERSION 1.77.1011.2b33fc
+#define _VERSION 1.77.1012.8ad00f
