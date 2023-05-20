@@ -337,6 +337,8 @@ void setup() {
   #endif
 }
 
+extern unsigned long soft_poweroff_timer;
+
 void loop(void) {
   if(start==1)
   {
@@ -385,7 +387,29 @@ void loop(void) {
     
   if (millis() - timeDiff > 50) {   // check switch every 50ms 
     timeDiff = millis();           // get current millisecond count
-      
+
+  #ifdef SOFT_POWER_OFF
+    if(start==0)
+    {
+      if(button_stop())
+      {
+        soft_poweroff_timer += 50;
+        if (soft_poweroff_timer >= SOFT_POWER_OFF)
+        {
+          power_off();
+        }
+      }
+      else
+      {
+        soft_poweroff_timer = 0;
+      }
+    }
+    else
+    {
+      soft_poweroff_timer = 0;
+    }
+  #endif
+
     if(button_play()) {
       //Handle Play/Pause button
       if(start==0) {

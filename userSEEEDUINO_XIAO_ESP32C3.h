@@ -8,6 +8,10 @@
 // maximum clock speed that works with this board (depends also on MaxDuino PCB and supporting components)
 #define SD_SPI_CLOCK_SPEED SD_SCK_MHZ(4)
 
+// ability to turn off (deep sleep) via holding down stop button
+// (most useful for battery-powered devices)
+#define SOFT_POWER_OFF (4000) // milliseconds for holding down STOP to powerdown
+
 
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
