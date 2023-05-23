@@ -1,6 +1,8 @@
 #ifdef SOFT_POWER_OFF
 
 unsigned long soft_poweroff_timer = 0;
+unsigned long poweroff_millis = 0;
+bool b_poweroff_key_detected = false;
 
 #ifndef POWER_OFF_LOGO
 #define POWER_OFF_LOGO DEFAULT
@@ -43,6 +45,39 @@ static void power_off_clear_display()
   sendcommand(0x01); // lowest contrast
   displayOff();
 #endif
+}
+
+void check_power_off_key()
+{
+  if(button_stop())
+  {
+    if(!b_poweroff_key_detected)
+    {
+      b_poweroff_key_detected = true;
+      poweroff_millis = millis();
+    }
+    else
+    {
+      unsigned long tdiff = millis() - poweroff_millis;
+      poweroff_millis = millis();
+      soft_poweroff_timer += tdiff;
+      if (soft_poweroff_timer >= SOFT_POWER_OFF)
+      {
+        power_off();
+      }
+    }
+  }
+  else
+  {
+    clear_power_off();
+  }
+}
+
+void clear_power_off()
+{
+  soft_poweroff_timer = 0;
+  poweroff_millis = 0;
+  b_poweroff_key_detected = false;
 }
 
 void power_off()
