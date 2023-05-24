@@ -301,6 +301,9 @@ void setup() {
     //Start SD card and check it's working
     printtextF(PSTR("No SD Card"),0);
     delay(50);
+    #ifdef SOFT_POWER_OFF
+    check_power_off_key();
+    #endif
   }    
 
   #ifdef USB_STORAGE_ENABLED
@@ -391,22 +394,11 @@ void loop(void) {
   #ifdef SOFT_POWER_OFF
     if(start==0)
     {
-      if(button_stop())
-      {
-        soft_poweroff_timer += 50;
-        if (soft_poweroff_timer >= SOFT_POWER_OFF)
-        {
-          power_off();
-        }
-      }
-      else
-      {
-        soft_poweroff_timer = 0;
-      }
+      check_power_off_key();
     }
     else
     {
-      soft_poweroff_timer = 0;
+      clear_power_off();
     }
   #endif
 
