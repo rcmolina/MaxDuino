@@ -52,7 +52,7 @@ void wave()
       {
         pos = 0;
         working ^=1;
-        morebuff = HIGH;
+        morebuff = true;
       }
     }
   } else {
@@ -115,7 +115,7 @@ void process()
   }
   if(currentTask==TASK::GETFILEHEADER || currentTask==TASK::CAS_wData)
   {
-    if((r=readfile(8,bytesRead))==8) 
+    if((r=readfile(8,bytesRead))==8)
     {
       if(!memcmp_P(filebuffer, HEADER,8)) {
         if(fileStage==0) 
@@ -130,7 +130,7 @@ void process()
         bytesRead+=8;
       }
       
-    } else if(r==0) 
+    } else if(r==0)
     {
       cas_currentType=CAS_TYPE::typeEOF;
       currentTask=TASK::CAS_wClose;
@@ -217,17 +217,17 @@ void processDragon()
   byte r=0;
   if((r=readfile(1,bytesRead))==1) {
 
-  #if defined(Use_Dragon_sLeader) && not defined(Expand_All)   
-    if(currentTask==TASK::GETFILEHEADER) {     
+  #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
+    if(currentTask==TASK::GETFILEHEADER) {
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
        count--;
       } else {
-       currentTask=TASK::CAS_wHeader; 
+       currentTask=TASK::CAS_wHeader;
       }
-         
-    } else if(currentTask==TASK::CAS_wHeader) {    
+
+    } else if(currentTask==TASK::CAS_wHeader) {
         if(count>=0) {
           writeByte(0x55);
           count--;
@@ -252,8 +252,8 @@ void processDragon()
   #endif
     
   #if defined(Use_Dragon_sLeader) && defined(Expand_All)
-          
-    if(currentTask==TASK::GETFILEHEADER) { 
+
+    if(currentTask==TASK::GETFILEHEADER) {
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
@@ -261,8 +261,8 @@ void processDragon()
       } else {
        currentTask=TASK::CAS_wHeader;
       }
-            
-    } else if(currentTask==TASK::CAS_wHeader) {  
+
+    } else if(currentTask==TASK::CAS_wHeader) {
       if(count>=0) {
         writeByte(0x55);
         count--;
@@ -302,10 +302,10 @@ void processDragon()
         bytesRead+=1;
         count--;
       } else {
-        currentTask=TASK::CAS_wNewLeader; 
+        currentTask=TASK::CAS_wNewLeader;
       }
-     
-    } else if(currentTask==TASK::CAS_wNewLeader) { 
+
+    } else if(currentTask==TASK::CAS_wNewLeader) {
       if(count>=0) {
         writeByte(0x55);
         count--;
@@ -329,10 +329,9 @@ void processDragon()
           writeByte(0x55);
       }      
       count = 54;
-//      currentTask=wSilence;
       currentTask=TASK::CAS_wSilence;
     }    
-    if(currentTask==TASK::CAS_wSilence) {  
+    if(currentTask==TASK::CAS_wSilence) {
       if(!count==0) {
         writeSilence();
         count--;
@@ -348,13 +347,13 @@ void casduinoLoop()
 {
   noInterrupts();
   copybuff = morebuff;
-  morebuff = LOW;
+  morebuff = false;
   isStopped=pauseOn;
   interrupts();
 
-  if(copybuff==HIGH) {
+  if(copybuff) {
     btemppos=0;
-    copybuff=LOW;
+    copybuff=false;
   }
 
   if(btemppos<buffsize)
@@ -379,7 +378,7 @@ void casduinoLoop()
       }        
     }
   } else {
-    if (pauseOn == 0) {      
+    if (!pauseOn) {      
     #if defined(SHOW_CNTR)
       lcdTime();          
     #endif
