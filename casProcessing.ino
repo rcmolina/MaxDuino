@@ -104,10 +104,11 @@ void writeHeader()
 
 void process()
 {
-  byte r=0;
+//  byte r=0;
   if(cas_currentType==CAS_TYPE::typeEOF)
   {
-    if(!count==0) {
+//    if(!count==0) {
+    if(count) {
       writeSilence();
       count+=-1;  
     } else stopFile();    
@@ -115,7 +116,8 @@ void process()
   }
   if(currentTask==TASK::GETFILEHEADER || currentTask==TASK::CAS_wData)
   {
-    if((r=readfile(8,bytesRead))==8)
+//    if((r=readfile(8,bytesRead))==8)
+    if(readfile(8,bytesRead))
     {
       if(!memcmp_P(filebuffer, HEADER,8)) {
         if(fileStage==0) 
@@ -130,7 +132,8 @@ void process()
         bytesRead+=8;
       }
       
-    } else if(r==0)
+//    } else if(r==0)
+    } else
     {
       cas_currentType=CAS_TYPE::typeEOF;
       currentTask=TASK::CAS_wClose;
@@ -145,7 +148,8 @@ void process()
     count = LONG_SILENCE*scale;
     fileStage=1;       
     cas_currentType = CAS_TYPE::Unknown;
-    if((r=readfile(10,bytesRead))==10)
+//    if((r=readfile(10,bytesRead))==10)
+    if((readfile(10,bytesRead))==10)
     {
       if(!memcmp_P(filebuffer, ASCII, 10))
       {
@@ -162,7 +166,8 @@ void process()
 
   if(currentTask==TASK::CAS_wSilence)
   {
-    if(!count==0)
+//    if(!count==0)
+    if(count)
     {
       writeSilence();
       count+=-1;
@@ -188,7 +193,8 @@ void process()
   }
   if(currentTask==TASK::CAS_wHeader)
   {
-    if(!count==0)
+//    if(!count==0)
+    if(count)
     {
       writeHeader();
       count+=-1;
@@ -214,8 +220,9 @@ void process()
 void processDragon()
 {
   lastByte=filebuffer[0];
-  byte r=0;
-  if((r=readfile(1,bytesRead))==1) {
+//  byte r=0;
+//  if((r=readfile(1,bytesRead))==1) {
+  if((readfile(1,bytesRead))==1) {
 
   #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
     if(currentTask==TASK::GETFILEHEADER) {
@@ -239,7 +246,8 @@ void processDragon()
           }
         }
     } else if(currentTask==TASK::CAS_wNameFileBlk) {
-        if(!count==0) {
+//        if(!count==0) {
+        if(count) {
             writeByte(filebuffer[0]);
             bytesRead+=1;
             count--;            
@@ -273,7 +281,8 @@ void processDragon()
       }
 
     } else if(currentTask==TASK::CAS_wSync) { 
-      if(!count==0) {
+//      if(!count==0) {
+      if(count) {
         writeByte(filebuffer[0]);
         bytesRead+=1;
         count--;
@@ -285,7 +294,8 @@ void processDragon()
       }
  
     } else if(currentTask==TASK::CAS_wNameFileBlk) { 
-      if(!count==0) {
+//      if(!count==0) {
+      if(count) {
         writeByte(filebuffer[0]);
         bytesRead+=1;
         count--;
@@ -332,7 +342,8 @@ void processDragon()
       currentTask=TASK::CAS_wSilence;
     }    
     if(currentTask==TASK::CAS_wSilence) {
-      if(!count==0) {
+//      if(!count==0) {
+      if(count) {
         writeSilence();
         count--;
       } else {
