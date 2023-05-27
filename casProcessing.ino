@@ -52,7 +52,7 @@ void wave()
       {
         pos = 0;
         working ^=1;
-        morebuff = true;
+        morebuff = HIGH;
       }
     }
   } else {
@@ -104,6 +104,7 @@ void writeHeader()
 
 void process()
 {
+  byte r=0;
   if(cas_currentType==CAS_TYPE::typeEOF)
   {
     if(!count==0) {
@@ -114,7 +115,7 @@ void process()
   }
   if(currentTask==TASK::GETFILEHEADER || currentTask==TASK::CAS_wData)
   {
-    if((readfile(8,bytesRead))==8) 
+    if((r=readfile(8,bytesRead))==8) 
     {
       if(!memcmp_P(filebuffer, HEADER,8)) {
         if(fileStage==0) 
@@ -129,7 +130,8 @@ void process()
         bytesRead+=8;
       }
       
-    } else {
+    } else if(r==0) 
+    {
       cas_currentType=CAS_TYPE::typeEOF;
       currentTask=TASK::CAS_wClose;
       count=LONG_SILENCE*scale;
@@ -143,7 +145,7 @@ void process()
     count = LONG_SILENCE*scale;
     fileStage=1;       
     cas_currentType = CAS_TYPE::Unknown;
-    if((readfile(10,bytesRead))==10)
+    if((r=readfile(10,bytesRead))==10)
     {
       if(!memcmp_P(filebuffer, ASCII, 10))
       {
@@ -212,10 +214,11 @@ void process()
 void processDragon()
 {
   lastByte=filebuffer[0];
-  if((readfile(1,bytesRead))==1) {
+  byte r=0;
+  if((r=readfile(1,bytesRead))==1) {
 
-  #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
-    if(currentTask==TASK::GETFILEHEADER) {      
+  #if defined(Use_Dragon_sLeader) && not defined(Expand_All)   
+    if(currentTask==TASK::GETFILEHEADER) {     
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
@@ -223,8 +226,8 @@ void processDragon()
       } else {
        currentTask=TASK::CAS_wHeader; 
       }
-        
-    } else if(currentTask==TASK::CAS_wHeader) {      
+         
+    } else if(currentTask==TASK::CAS_wHeader) {    
         if(count>=0) {
           writeByte(0x55);
           count--;
@@ -249,17 +252,17 @@ void processDragon()
   #endif
     
   #if defined(Use_Dragon_sLeader) && defined(Expand_All)
-     
-    if(currentTask==TASK::GETFILEHEADER) {      
+          
+    if(currentTask==TASK::GETFILEHEADER) { 
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
        count--;
       } else {
-       currentTask=TASK::CAS_wHeader; 
+       currentTask=TASK::CAS_wHeader;
       }
-        
-    } else if(currentTask==TASK::CAS_wHeader) {      
+            
+    } else if(currentTask==TASK::CAS_wHeader) {  
       if(count>=0) {
         writeByte(0x55);
         count--;
@@ -301,8 +304,8 @@ void processDragon()
       } else {
         currentTask=TASK::CAS_wNewLeader; 
       }
-
-    } else if(currentTask==TASK::CAS_wNewLeader) {      
+     
+    } else if(currentTask==TASK::CAS_wNewLeader) { 
       if(count>=0) {
         writeByte(0x55);
         count--;
@@ -326,9 +329,10 @@ void processDragon()
           writeByte(0x55);
       }      
       count = 54;
+//      currentTask=wSilence;
       currentTask=TASK::CAS_wSilence;
-    }
-    if(currentTask==TASK::CAS_wSilence) {      
+    }    
+    if(currentTask==TASK::CAS_wSilence) {  
       if(!count==0) {
         writeSilence();
         count--;
@@ -344,13 +348,13 @@ void casduinoLoop()
 {
   noInterrupts();
   copybuff = morebuff;
-  morebuff = false;
+  morebuff = LOW;
   isStopped=pauseOn;
   interrupts();
 
-  if(copybuff) {
+  if(copybuff==HIGH) {
     btemppos=0;
-    copybuff=false;
+    copybuff=LOW;
   }
 
   if(btemppos<buffsize)
@@ -375,7 +379,7 @@ void casduinoLoop()
       }        
     }
   } else {
-    if (!pauseOn) {      
+    if (pauseOn == 0) {      
     #if defined(SHOW_CNTR)
       lcdTime();          
     #endif
