@@ -287,7 +287,7 @@ void processDragon()
         bytesRead+=1;
         count--;
       } else {
-        writeByte(filebuffer[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
+        writeByte(filebuffer[0]);            // block length
         bytesRead+=1;
         currentTask=TASK::CAS_wNameFileBlk;
         count=filebuffer[0]++;                   
@@ -312,9 +312,16 @@ void processDragon()
         bytesRead+=1;
         count--;
       } else {
-        currentTask=TASK::CAS_wNewLeader;
+        //currentTask=TASK::CAS_wNewLeader;
+        if(count>=0) {
+          writeByte(0x55);
+          count--;
+        } else {   
+          currentTask=TASK::CAS_wData;
+        }
+        
       }
-
+/*
     } else if(currentTask==TASK::CAS_wNewLeader) {
       if(count>=0) {
         writeByte(0x55);
@@ -322,7 +329,7 @@ void processDragon()
       } else {   
         currentTask=TASK::CAS_wData;
       }
-                  
+*/                  
     } else {
 
   #endif
