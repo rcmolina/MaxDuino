@@ -6,7 +6,7 @@ const char P_PRODUCT_NAME[] PROGMEM = "new MaxDuino";
 const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
 
 // ---------------------------------------------------------------------------------
-// DO NOT USE CLASS-10 CARDS on this project - they're too fast to operate using SPI
+// USE CLASS-4 AND CLASS-10 CARDS on this project WITH SDFAT2 FOR BETTER ACCESS SPEED
 // ---------------------------------------------------------------------------------
 /*
  *                                    TZXduino
@@ -145,6 +145,8 @@ const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
  //                     to skip some blocks thus matching live oled block count.
  //               V1.76 New option to trace ID15 blocks #BLOCKID15_IN. Support variable baudrate on the fly 
  //                     for Amstrad CPC ID11 blocks (like TSXControl).
+ //               V1.77 Started new Maxduino version, big sdfat savings by David Hooper @stripwax, solved buffer corruption al last
+ //               V2.00 New maxduino stable and tested reference version. Dragon optimizations.
  //
 #if defined(__AVR_ATmega2560__)
   #include "userMAXconfig.h"

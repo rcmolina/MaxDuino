@@ -312,9 +312,10 @@ void processDragon()
         bytesRead+=1;
         count--;
       } else {
-        currentTask=TASK::CAS_wNewLeader;
+        //currentTask=TASK::CAS_wNewLeader;
+        currentTask=TASK::CAS_wData;
       }
-
+/*
     } else if(currentTask==TASK::CAS_wNewLeader) {
       if(count>=0) {
         writeByte(0x55);
@@ -322,18 +323,18 @@ void processDragon()
       } else {   
         currentTask=TASK::CAS_wData;
       }
-                  
+*/                  
     } else {
 
   #endif
-      currentTask=TASK::CAS_wData;
+      //currentTask=TASK::CAS_wData;
       writeByte(filebuffer[0]);
       bytesRead+=1; 
-  #if defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
+  //#if defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
     }
-  #endif
+  //#endif
   
-    } else {
+    } else {          // readfile !=1 , ending
       if(currentTask==TASK::CAS_wData) {
        if(lastByte != 0x55) {
           writeByte(0x55);
