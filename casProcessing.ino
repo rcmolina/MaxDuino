@@ -312,10 +312,9 @@ void processDragon()
         bytesRead+=1;
         count--;
       } else {
-        //currentTask=TASK::CAS_wNewLeader;
-        currentTask=TASK::CAS_wData;
+        currentTask=TASK::CAS_wNewLeader;
       }
-/*
+
     } else if(currentTask==TASK::CAS_wNewLeader) {
       if(count>=0) {
         writeByte(0x55);
@@ -323,7 +322,7 @@ void processDragon()
       } else {   
         currentTask=TASK::CAS_wData;
       }
-*/                  
+                  
     } else {
 
   #endif
