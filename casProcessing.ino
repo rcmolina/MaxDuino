@@ -231,9 +231,19 @@ void processDragon()
        bytesRead+=1;
        count--;
       } else {
-       currentTask=TASK::CAS_wHeader;
+       //currentTask=TASK::CAS_wHeader;
+        if(count>=0) {
+          writeByte(0x55);
+          count--;
+        } else {    
+          if (fileStage > 0) currentTask=TASK::CAS_wData;
+          else {
+            count =19;
+            currentTask=TASK::CAS_wNameFileBlk;
+          }
+        }       
       }
-
+/*
     } else if(currentTask==TASK::CAS_wHeader) {
         if(count>=0) {
           writeByte(0x55);
@@ -245,6 +255,7 @@ void processDragon()
             currentTask=TASK::CAS_wNameFileBlk;
           }
         }
+*/
     } else if(currentTask==TASK::CAS_wNameFileBlk) {
 //        if(!count==0) {
         if(count) {
@@ -267,9 +278,17 @@ void processDragon()
        bytesRead+=1;
        count--;
       } else {
-       currentTask=TASK::CAS_wHeader;
+       //currentTask=TASK::CAS_wHeader;
+        if(count>=0) {
+          writeByte(0x55);
+          count--;
+        } else {
+          //count= 119;
+          count = 2;      
+          currentTask=TASK::CAS_wSync;
+        }       
       }
-
+/*
     } else if(currentTask==TASK::CAS_wHeader) {
       if(count>=0) {
         writeByte(0x55);
@@ -279,7 +298,7 @@ void processDragon()
         count = 2;      
         currentTask=TASK::CAS_wSync;
       }
-
+*/
     } else if(currentTask==TASK::CAS_wSync) { 
 //      if(!count==0) {
       if(count) {
@@ -330,12 +349,12 @@ void processDragon()
         currentTask=TASK::CAS_wData;
       }
 */                  
-    } else {
+    } else {              // data block
 
   #endif
       //currentTask=TASK::CAS_wData;
       writeByte(filebuffer[0]);
-      bytesRead+=1; 
+      bytesRead+=1;             // increase pointer to read next byte (not the same)
   //#if defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
     }
   //#endif
