@@ -102,14 +102,20 @@
         for(int i=0;i<8;i++){
           int il=0;
           int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
-          
+
+ /*
           for(int ib=0;ib<4;ib++){
             if (bitRead (ril,ib)){
               il |= (1 << ib*2);
               il |= (1 << (ib*2)+1);
             }
           }
-  
+*/
+          if (bitRead(ril,0)) il|= 1+2;
+          if (bitRead(ril,1)) il|= 4+8;
+          if (bitRead(ril,2)) il|= 16+32;
+          if (bitRead(ril,3)) il|= 64+128;
+            
           mx_i2c_write(il);
         }
 
@@ -126,13 +132,20 @@
         for(int i=0;i<8;i++){
           int ih=0;
           int rih=(pgm_read_byte(myFont[*stringH-0x20]+i));
-        
+
+/*
           for(int ic=4;ic<8;ic++){
             if (bitRead (rih,ic)) {
               ih |= (1 << (ic-4)*2);
               ih |= (1 << ((ic-4)*2)+1);
             }   
           }
+*/
+          if (bitRead(rih,4)) ih|= 1+2;
+          if (bitRead(rih,5)) ih|= 4+8;
+          if (bitRead(rih,6)) ih|= 16+32;
+          if (bitRead(rih,7)) ih|= 64+128;
+                    
           mx_i2c_write(ih);
         }
 
