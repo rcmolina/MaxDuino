@@ -191,11 +191,13 @@
 
 #ifdef DoubleFont
 //#define Retro8x16
-#define Led8x16
+//#define Led8x16
 //#define rconsole8x16
 //#define symon8x16
 //#define uniscr8x16
 //#define atariST8x16
+#define cartoon8x16
+
 #else
 //#define BasicFont
 //#define BoldFont
