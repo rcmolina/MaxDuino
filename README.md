@@ -3,7 +3,8 @@
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
-* V2.00.x New maxduino stable and tested reference version
+* V2.01 aka "San Fermin". Fixed oled corruption and new cartoon8x16 font.
+* V2.00.x New maxduino stable and tested reference version.
 * V1.77.x  **SEE VERSION.H FOR MORE DETAILS**  first rolling version with automatic version numbering.
   See git commit history for changes: https://github.com/rcmolina/MaxDuino/commits/master
   See version.h (and the Menu "Version..." option) to display what version you currently have.

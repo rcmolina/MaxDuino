@@ -147,6 +147,7 @@ const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
  //                     for Amstrad CPC ID11 blocks (like TSXControl).
  //               V1.77 Started new Maxduino version, big sdfat savings by David Hooper @stripwax, solved buffer corruption al last
  //               V2.00 New maxduino stable and tested reference version. Dragon optimizations.
+ //               V2.01 aka "San Fermin". Fixed oled corruption and new cartoon8x16 font
  //
 #if defined(__AVR_ATmega2560__)
   #include "userMAXconfig.h"
