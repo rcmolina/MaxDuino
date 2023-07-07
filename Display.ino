@@ -101,7 +101,8 @@
 
         for(int i=0;i<8;i++){
           int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
-          int il=(pgm_read_byte(&DFONT[ril & 0x0F]));
+          //int il=(pgm_read_byte(&DFONT[ril & 0x0F]));
+          int il=DFONT[ril %16];
  /*
           for(int ib=0;ib<4;ib++){
             if (bitRead (ril,ib)){
@@ -135,7 +136,8 @@
         
         for(int i=0;i<8;i++){
           int rih=(pgm_read_byte(myFont[*stringH-0x20]+i));
-          int ih=(pgm_read_byte(&DFONT[rih >>4]));
+          //int ih=(pgm_read_byte(&DFONT[rih >>4]));
+          int ih=DFONT[rih / 16];
 /*
           for(int ic=4;ic<8;ic++){
             if (bitRead (rih,ic)) {
