@@ -48,12 +48,17 @@
     mx_i2c_write(0xb0+(row)); //set page address (row)
     mx_i2c_write(0x80); //command mode
     #ifdef OLED1106_1_3            
-      mx_i2c_write(0x02+(8*col&0x0f)); //set low col address
+      //mx_i2c_write(0x02+(8*col&0x0f)); //set low col address
+      //mx_i2c_write(0x02+(8*col %16)); //set low col address
+      mx_i2c_write( 0x02+(8*(col %2)) ); //set low col address
     #else
-      mx_i2c_write(0x00+(8*col&0x0f)); //set low col address
+      //mx_i2c_write(0x00+(8*col&0x0f)); //set low col address
+      //mx_i2c_write(0x00+(8*col %16)); //set low col address
+      mx_i2c_write( 0x00+(8*(col %2)) ); //set low col address
     #endif
     mx_i2c_write(0x80); 
-    mx_i2c_write(0x10+((8*col>>4)&0x0f)); //set high col address 
+    //mx_i2c_write(0x10+((8*col>>4)&0x0f)); //set high col address
+    mx_i2c_write(0x10+((col /2) %16)); //set high col address 
     mx_i2c_end();         
   }   
 
