@@ -6,6 +6,7 @@ bool b_poweroff_key_detected = false;
 
 #ifndef POWER_OFF_LOGO
 #define POWER_OFF_LOGO DEFAULT
+//#define POWER_OFF_LOGO SQUARED
 #endif
 
 #ifdef BUTTON_ADC
