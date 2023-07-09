@@ -62,7 +62,7 @@ void lcdTime() {
 
         lcdsegs++;
 
-      #else // XY2force
+      #else // not XY2force
 
         if (lcdsegs % 10 != 0) {
           // ultima cifra 1,2,3,4,5,6,7,8,9
@@ -138,9 +138,10 @@ void lcdPercent() {
     #ifdef OLED1306
       #ifdef XY2force
         if (newpct <10) {
-          input[0]=48+(newpct%10);
-          input[1]='%';
-          input[2]=0;
+          input[0]=' ';
+          input[1]=48+(newpct%10);
+          input[2]='%';
+          input[3]=0;
           sendStrXY((char *)input,8,0);
         }
         else if (newpct <100) {
@@ -159,9 +160,10 @@ void lcdPercent() {
           sendStrXY((char *)input,8,0);
         }
                                           
-      #else // XY2force
+      #else // not XY2force
         if (newpct <10) {
           setXY(8,0);
+          sendChar(48);
           sendChar(48+newpct%10);
         }
         else if (newpct <100) {
