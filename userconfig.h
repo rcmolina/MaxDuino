@@ -30,7 +30,7 @@
 #elif CONFIGFILE == 5
 #include "userconfig5.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                    6:PRO MICRO 28672, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO Use_CAS                    */
+/*                    6:PRO MICRO 28672, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, no AYPLAY, no hqUEF                    */
 #elif CONFIGFILE == 6
 #include "userconfig6.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
