@@ -271,8 +271,8 @@
     */  
     sendcommand(0xAE);             //DISPLAYOFF
 
-    // sendcommand(0xD5);  // SSD1306_SETDISPLAYCLOCKDIV
-    // sendcommand(0x80);  // the suggested ratio 0x80
+     sendcommand(0xD5);  // SSD1306_SETDISPLAYCLOCKDIV
+     sendcommand(0x40);  // the suggested ratio 0x80, 4 higher bits for oscilator frecuency, and 4 lower for divide ratio
 
     // sendcommand(0xD3);  // SSD1306_SETDISPLAYOFFSET
     // sendcommand(0x0);  // no offset
@@ -285,7 +285,7 @@
       sendcommand(0x1f);            //--1/48 duty, NEW!!!  128x32 OLED: 0x1f
     #endif
       
-    sendcommand(0x8D);            //CHARGEPUMP
+    sendcommand(0x8D);            //CHARGEPUMP, 0x14 to enable and 0x10 to turn off
     sendcommand(0x14);
     
     #ifdef OLED_ROTATE180    
@@ -324,8 +324,8 @@
       sendcommand(0x02);            //Set Memory Addressing Mode ab Page addressing mode      
     #endif              
 
-    // sendcommand(0xd9); // SSD1306_SETPRECHARGE
-    // sendcommand(0xF1);
+     //sendcommand(0xd9); // SSD1306_SETPRECHARGE
+     //sendcommand(0xF1);
 
     // sendcommand(0xDB); // SSD1306_SETVCOMDETECT
     // sendcommand(0x40);
