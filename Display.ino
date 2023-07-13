@@ -271,12 +271,12 @@
     */  
     sendcommand(0xAE);             //DISPLAYOFF
 
-     sendcommand(0xD5);  // SSD1306_SETDISPLAYCLOCKDIV
-     sendcommand(0x40);  // the suggested ratio 0x80, 4 higher bits for oscilator frecuency, and 4 lower for divide ratio
+     //sendcommand(0xD5);  // SSD1306_SETDISPLAYCLOCKDIV
+     //sendcommand(0x80);  // the suggested ratio 0x80, 4 higher bits for oscilator frecuency, and 4 lower for divide ratio
 
     // sendcommand(0xD3);  // SSD1306_SETDISPLAYOFFSET
     // sendcommand(0x0);  // no offset
-
+/*
     #if defined(OLED1306_128_64) || defined(video64text32) 
       sendcommand(0xA8);            //SSD1306_SETMULTIPLEX      
       sendcommand(0x3f);            //--1/48 duty, NEW!!!  128x64 OLED: 0x3f
@@ -284,7 +284,7 @@
       sendcommand(0xA8);            //SSD1306_SETMULTIPLEX     
       sendcommand(0x1f);            //--1/48 duty, NEW!!!  128x32 OLED: 0x1f
     #endif
-      
+*/      
     sendcommand(0x8D);            //CHARGEPUMP, 0x14 to enable and 0x10 to turn off
     sendcommand(0x14);
     

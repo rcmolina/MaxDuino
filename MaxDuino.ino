@@ -357,14 +357,21 @@ void loop(void) {
   if((millis()>=scrollTime) && start==0 && (strlen(fileName)> SCREENSIZE)) {
     //Filename scrolling only runs if no file is playing to prevent I2C writes 
     //conflicting with the playback Interrupt
-    scrollTime = millis()+scrollSpeed;
+    
+    //default values in hwconfig.h: scrollSpeed=250 and scrollWait=3000
+    //scrollTime = millis()+scrollSpeed;
+    //if (scrollPos ==0) scrollTime+=(scrollWait-scrollSpeed);
+    scrollTime = millis();
+    scrollTime+= (scrollPos? scrollSpeed : scrollWait);
     scrollText(fileName);
-    scrollPos +=1;
+    scrollPos = (scrollPos+1) %strlen(fileName) ;
+ /*   
     if(scrollPos>strlen(fileName)) {
       scrollPos=0;
       scrollTime=millis()+scrollWait;
       scrollText(fileName);
     }
+ */
   }
 
   #ifndef NO_MOTOR
