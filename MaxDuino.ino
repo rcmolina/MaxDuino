@@ -148,6 +148,7 @@ const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
  //               V1.77 Started new Maxduino version, big sdfat savings by David Hooper @stripwax, solved buffer corruption al last
  //               V2.00 New maxduino stable and tested reference version. Dragon optimizations.
  //               V2.01 aka "San Fermin". Fixed oled corruption and new cartoon8x16 font
+ //               V2.02 Oled driver optimizations
  //
 #if defined(__AVR_ATmega2560__)
   #include "userMAXconfig.h"
@@ -196,7 +197,8 @@ byte subdir = 0;
 unsigned long filesize;             // filesize used for dimensioning AY files
 
 byte scrollPos = 0;                 //Stores scrolling text position
-unsigned long scrollTime = millis() + scrollWait;
+//unsigned long scrollTime = millis() + scrollWait;
+unsigned long scrollTime = 0;
 
 #ifndef NO_MOTOR
 byte motorState = 1;                //Current motor control state
