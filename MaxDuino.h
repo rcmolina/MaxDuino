@@ -10,7 +10,13 @@
    We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
    as a buffersize because it is a multiple of 8 and a multiple of 11...
 */
-#define buffsize 176  // Impar para CoCo
+//#define LARGEBUFFER   
+// small buffer size used by default
+#ifdef LARGEBUFFER
+  #define buffsize 208  // factors of this value are: 11 for MSX and 8 for DRAGON
+#else
+  #define buffsize 176  // factors of this value are: 11 for MSX and 8 for DRAGON
+#endif
 
 #if defined(XY2) && not defined(DoubleFont)
 PROGMEM  const byte DFONT[16] = { 0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F, 0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF };

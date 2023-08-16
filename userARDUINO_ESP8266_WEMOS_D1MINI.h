@@ -72,7 +72,6 @@
 //#define XY                         // use original settings for Oled line 0,1 and status for menu
 #define XY2                      // use double size font wihtout status line for menu
 #define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
-    //#define XY2shadedplay 
 
 // disable these both due to noise on ESP8266:
 // #define SHOW_CNTR
@@ -175,7 +174,8 @@
   //#define dostanques
   //#define cablemax
   //#define sony
-  //#define miniduino          
+  //#define miniduino
+  //#define cat            
 #else
 //#define LOGOARDUITAPE            // original arduitape logo
 //#define LOGOMAXDUINO             // new logo created by Spirax

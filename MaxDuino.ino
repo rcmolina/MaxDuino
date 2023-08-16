@@ -213,9 +213,13 @@ uint16_t maxFile;                   //Total number of files in directory
 bool dirEmpty;                      //flag if directory is completely empty
 uint16_t oldMinFile = 0;
 uint16_t oldMaxFile = 0;
-#define fnameLength  5
-char oldMinFileName[fnameLength];
-char oldMaxFileName[fnameLength];
+
+#ifdef SHOW_DIRNAMES
+  #define fnameLength  5
+  char oldMinFileName[fnameLength];
+  char oldMaxFileName[fnameLength];
+#endif
+
 bool isDir;                         //Is the current file a directory
 unsigned long timeDiff = 0;         //button debounce
 
@@ -226,8 +230,10 @@ unsigned long timeDiff = 0;         //button debounce
 
 char PlayBytes[17];
 
+#ifdef BLOCKID_INTO_MEM 
 unsigned long blockOffset[maxblock];
 byte blockID[maxblock];
+#endif
 
 byte lastbtn=true;
 
@@ -1647,9 +1653,9 @@ void GetAndPlayBlock()
       #endif  
     }
 
+    bytesRead=oldbytesRead;
   #endif   
 
-  bytesRead=oldbytesRead;
   if (currentID==TAP) {
     currentTask=TASK::PROCESSID;
   }else {

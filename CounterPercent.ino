@@ -163,7 +163,7 @@ void lcdPercent() {
       #else // not XY2force
         if (newpct <10) {
           setXY(8,0);
-          sendChar(48);
+          sendChar(' ');
           sendChar(48+newpct%10);
         }
         else if (newpct <100) {
