@@ -10,8 +10,7 @@
    We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
    as a buffersize because it is a multiple of 8 and a multiple of 11...
 */
-//#define LARGEBUFFER   
-// small buffer size used by default
+
 #ifdef LARGEBUFFER
   #define buffsize 208  // factors of this value are: 11 for MSX and 8 for DRAGON
 #else
