@@ -188,13 +188,14 @@ SdFat sd;                           //Initialise Sd card
 SdBaseFile entry, currentDir, tmpdir;                       //SD card file and directory
 
 #ifdef FREERAM
-  #define filenameLength 190
+  #define filenameLength 160
+  #define nMaxPrevSubDirs 7  
 #else 
   #define filenameLength 255
+  #define nMaxPrevSubDirs 10  
 #endif
 
 char fileName[filenameLength + 1];    //Current filename
-#define nMaxPrevSubDirs 10
 char prevSubDir[SCREENSIZE+1];
 uint16_t DirFilePos[nMaxPrevSubDirs];  //File Positions in Directory to be restored (also, history of subdirectories)
 byte subdir = 0;
