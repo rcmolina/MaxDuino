@@ -6,6 +6,7 @@
  *  Baud:
  *    1200
  *    2400
+ *    3150
  *    3600
  *    3850
  *  
@@ -61,7 +62,7 @@ const char* const MENU_ITEMS[] PROGMEM = {
 #endif
 };
 
-const word BAUDRATES[] PROGMEM = {1200, 2400, 3600, 3850};
+const word BAUDRATES[] PROGMEM = {1200, 2400, 3150, 3600, 3850};
 
 void menuMode()
 { 
@@ -103,7 +104,7 @@ void menuMode()
           lastbtn=true;
           while(!button_stop() || lastbtn) {
             if(button_down() && !lastbtn){
-              if(subItem<3) subItem+=1;
+              if(subItem<4) subItem+=1;
               lastbtn=true;
               updateScreen=true;
             }
@@ -194,9 +195,9 @@ void doOnOffSubmenu(bool& refVar)
     /* Setting Byte: 
     *  bit 0: 1200
     *  bit 1: 2400
-    *  bit 2: 3600
-    *  bit 3: 3850
-    *  bit 4: n/a
+    *  bit 2: 3150
+    *  bit 3: 3600
+    *  bit 4: 3850
     *  bit 5: BLK_2A control
     *  bit 6: TSXCONTROLzxpolarityUEFSWITCHPARITY
     *  bit 7: Motor control
@@ -210,12 +211,15 @@ void doOnOffSubmenu(bool& refVar)
       case 2400:
       settings |=2;
       break;
+      case 3150:
+      settings |=4;
+      break;    
       case 3600:
-      settings |=4;  
+      settings |=8;  
       break;      
       case 3850:
-      settings |=8;
-      break;
+      settings |=16;
+      break;     
     }
 
     #ifndef NO_MOTOR
@@ -256,9 +260,12 @@ void doOnOffSubmenu(bool& refVar)
       BAUDRATE=2400;
     }
     if(bitRead(settings,2)) {
-      BAUDRATE=3600;  
+      BAUDRATE=3150;  
     }
     if(bitRead(settings,3)) {
+      BAUDRATE=3600;  
+    }
+    if(bitRead(settings,4)) {
       BAUDRATE=3850;  
     }
   }

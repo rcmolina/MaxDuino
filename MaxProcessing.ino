@@ -514,6 +514,7 @@ void TZXProcess() {
                   pilotLength = onePulse = 334;
                   sync1Length = sync2Length = zeroPulse = 167; 
                   break;
+                case 3150:
                 case 3600: // 3500 Max ROM baudrate
                   //zeroPulse = TickToUs(333);
                   pilotLength = onePulse = 190;
@@ -1003,19 +1004,29 @@ void TZXProcess() {
               bytesRead += 8;
               switch(BAUDRATE){
                 case 1200:
-                  pilotLength = onePulse = TickToUs(729);
-                  zeroPulse = TickToUs(1458);                       
+                  //pilotLength = onePulse = TickToUs(729);
+                  //zeroPulse = TickToUs(1458);
+                  pilotLength = onePulse = 208;
+                  zeroPulse = 417;                                              
                   break;                    
                 case 2400:
-                  pilotLength = onePulse = TickToUs(365);
-                  zeroPulse = TickToUs(729);      
+                  //pilotLength = onePulse = TickToUs(365);
+                  //zeroPulse = TickToUs(729);
+                  pilotLength = onePulse = 104;
+                  zeroPulse = 208;                        
                   break;
+                case 3150:
+                  pilotLength = onePulse = 81; //3125=1000000/(80*4), one=81 y zero=160
+                  zeroPulse = 160;
+                  break;                      
                 case 3600:
-                  pilotLength = onePulse = TickToUs(243); //3600
-                  zeroPulse = TickToUs(486);                    
+                  //pilotLength = onePulse = TickToUs(243); // onePulse= 69 (68 para 3675 y en CAS lo tengo a 70)
+                  //zeroPulse = TickToUs(486);              // zeroPulse= 139 
+                  pilotLength = onePulse = 70; //3571=1000000/4/70
+                  zeroPulse = 140;                                              
                   break;
                 case 3850:
-                  pilotLength = onePulse = 65; //3850=1000000/(65*4)
+                  pilotLength = onePulse = 65; //3846=1000000/(65*4), 66 funciona tb con 3787 bauds
                   zeroPulse = 130;                  
                   break;
               }
@@ -2245,16 +2256,20 @@ void setBaud()
       scale=1;
       period=104;
       break;
+    case 3150:
+      scale=1;
+      period=80;
+      break;
     case 3600:
       //scale=2713/1200;
       scale=2;
       //period=93; //2700 baudios
       //period = TickToUs(243);
-      period=70;
+      period=70; //3571 bauds=1000000/4/70 con period 70us, 3675 baudios con period=68 
       break;      
     case 3850:
       scale=2;
-      period = 68; //3675 baudios con period=68, 3760 con period=66.5
+      period = 65; //3850 baudios con period=65
       break;
   }
   Timer.stop();

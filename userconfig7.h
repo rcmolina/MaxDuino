@@ -47,7 +47,7 @@
 //Set defines for various types of screen
 
 //#define SERIALSCREEN              // For testing and debugging
-//#define FREERAM                   // Changing filenameLength from 255 to 190
+//#define FREERAM                   // Changing filenameLength from 255 to 160
 //#define LARGEBUFFER               // small buffer size used by default to free RAM
 
 #define LCD_I2C_ADDR    0x27        // Set the i2c address of your 1602LCD usually 0x27
