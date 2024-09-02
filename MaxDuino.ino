@@ -185,7 +185,10 @@ const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
 char fline[17];
 
 SdFat sd;                           //Initialise Sd card 
-SdBaseFile entry, currentDir, tmpdir;                       //SD card file and directory
+SdBaseFile _tmpdirs[2]; // internal file pointers.  (*currentDir points to either _tmpdirs[0] or _tmpdirs[1] and the other is 'scratch')
+SdBaseFile *currentDir = &_tmpdirs[0];  // SD card directory
+SdBaseFile entry;  // SD card file
+char _alt_tmp_dir = 1; // which of the _tmpdirs is scratch (we flip this between 0 and 1)
 
 #ifdef FREERAM
   #define filenameLength 160
@@ -875,7 +878,7 @@ void upFile() {
     // Do this here, so that we only need this logic in one place
     // and so we can make seekFile dumber
     entry.close();
-    if (entry.open(&currentDir, currentFile, O_RDONLY))
+    if (entry.open(currentDir, currentFile, O_RDONLY))
     {
       entry.close();
       break;
@@ -931,7 +934,7 @@ void seekFile() {
   }
   else
   {
-    while (!entry.open(&currentDir, currentFile, O_RDONLY) && currentFile<maxFile)
+    while (!entry.open(currentDir, currentFile, O_RDONLY) && currentFile<maxFile)
     {
       // if entry.open fails, when given an index, sdfat 2.1.2 automatically adjust curPosition to the next good entry
       // (which means that we can just retry calling open, passing in curPosition)
@@ -1009,15 +1012,15 @@ void playFile() {
 void getMaxFile() {    
   // gets the total files in the current directory and stores the number in maxFile
   // and also gets the file index of the last file found in this directory
-  currentDir.rewind();
+  currentDir->rewind();
   maxFile = 0;
   dirEmpty=true;
-  while(entry.openNext(&currentDir, O_RDONLY)) {
-    maxFile = currentDir.curPosition()/32-1;
+  while(entry.openNext(currentDir, O_RDONLY)) {
+    maxFile = currentDir->curPosition()/32-1;
     dirEmpty=false;
     entry.close();
   }
-  currentDir.rewind(); // precautionary but I think might be unnecessary since we're using currentFile everywhere else now
+  currentDir->rewind(); // precautionary but I think might be unnecessary since we're using currentFile everywhere else now
   oldMinFile = 0;
   oldMaxFile = maxFile;
   currentFile = 0;
@@ -1045,9 +1048,11 @@ void changeDir() {
       fileName[SCREENSIZE] = '\0';
       strcpy(prevSubDir, fileName);
     }
-    tmpdir.open(&currentDir, currentFile, O_RDONLY);
-    currentDir = tmpdir;
-    tmpdir.close();
+    _tmpdirs[_alt_tmp_dir].open(currentDir, currentFile, O_RDONLY);
+    // flip the dir pointers so currentDir is now the newly opened dir and tmpdir points to the spare
+    currentDir = &_tmpdirs[_alt_tmp_dir];
+    _alt_tmp_dir = 1-_alt_tmp_dir;
+    _tmpdirs[_alt_tmp_dir].close(); // closes the old dir
   }
   getMaxFile();
   seekFile();
@@ -1068,12 +1073,14 @@ void changeDirParent()
   {
     for(int i=0; i<subdir; i++)
     {
-      tmpdir.open(&currentDir, DirFilePos[i], O_RDONLY);
-      currentDir = tmpdir;
-      tmpdir.close();
+      _tmpdirs[_alt_tmp_dir].open(currentDir, DirFilePos[i], O_RDONLY);
+      // flip the dir pointers so currentDir is now the newly opened dir and tmpdir points to the spare
+      currentDir = &_tmpdirs[_alt_tmp_dir];
+      _alt_tmp_dir = 1-_alt_tmp_dir;
+      _tmpdirs[_alt_tmp_dir].close(); // closes the old dir
     }
     // get the filename of the last directory we opened, because this is now the prevSubDir for display
-    currentDir.getName(fileName, filenameLength);
+    currentDir->getName(fileName, filenameLength);
     fileName[SCREENSIZE] = '\0'; // copy only the piece we need. small cheat here - we terminate the string where we want it to end...
     strcpy(prevSubDir, fileName);
   }
@@ -1085,8 +1092,8 @@ void changeDirParent()
 
 void changeDirRoot()
 {
-  currentDir.close();
-  currentDir.open("/", O_RDONLY);                    //set SD to root directory
+  currentDir->close();
+  currentDir->open("/", O_RDONLY);                    //set SD to root directory
 }
 
 void scrollText(char* text){
@@ -1689,7 +1696,7 @@ void str4cpy (char *dest, char *src)
 void GetFileName(uint16_t pos)
 {
   entry.close(); // precautionary, and seems harmless if entry is already closed
-  if (entry.open(&currentDir, pos, O_RDONLY))
+  if (entry.open(currentDir, pos, O_RDONLY))
   {
     entry.getName(fileName,filenameLength);
   }
