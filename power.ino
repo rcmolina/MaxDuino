@@ -94,8 +94,9 @@ void power_off()
 
   // ensure SD is finished before we stop everything (common)
   entry.close();
-  currentDir.close();
-  tmpdir.close();
+  currentDir->close();
+  _tmpdirs[0].close();
+  _tmpdirs[1].close();
   sd.end();
 
   device_power_off();

@@ -11,7 +11,7 @@ void UniPlay(){
 
   // on entry, currentFile is already pointing to the file entry you want to play
   // and fileName is already set
-  if(!entry.open(&currentDir, currentFile, O_RDONLY)) {
+  if(!entry.open(currentDir, currentFile, O_RDONLY)) {
   //  printtextF(PSTR("Error Opening File"),0);
   }
 
