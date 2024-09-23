@@ -150,7 +150,7 @@
 
 #define chipSelect    12            //Sd card chip select pin - map to LED (on assumption that SD CS is actually just tied directly to GND)
 #define BUTTON_ADC
-#define btnADC        A3 // analog input pin for ADC buttons
+#define btnADC        A2 // analog input pin for ADC buttons
 #define NO_MOTOR    // because no spare gpio
 
 #elif defined(ARDUINO_XIAO_ESP32C3)
