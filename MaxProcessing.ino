@@ -44,11 +44,17 @@ void UniPlay(){
     EndOfFile=false;
     passforZero=2;
     passforOne=4;
-    pinState=LOW;
-    WRITE_LOW;
+    reset_output_state();
     Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
     Timer.attachInterrupt(wave2);
   }
+}
+
+void reset_output_state() {
+  pinState=LOW;
+  WRITE_LOW;
+  wasPauseBlock=false;
+  isPauseBlock=false;
 }
 
 void TZXStop() {
@@ -64,8 +70,7 @@ void TZXStop() {
 #ifdef Use_CAS
   casduino = CASDUINO_FILETYPE::NONE;
 #endif
-  pinState=LOW;
-  WRITE_LOW;
+  reset_output_state();
 }
 
 void TZXPause() {
@@ -2096,36 +2101,53 @@ void wave2() {
 //  unsigned long zeroTime = micros();
   word workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
   byte pauseFlipBit = false;
-  unsigned long newTime=1;
+  unsigned long newTime;
  
-  if(isStopped==0 && workingPeriod >= 1)
+  if(isStopped)
   {
-    if bitRead(workingPeriod, 15)          
-    {
-      //If bit 15 of the current period is set we're about to run a pause
-      //Pauses start with a 1.5ms where the output is untouched after which the output is set LOW
-      //Pause block periods are stored in milliseconds not microseconds
-      isPauseBlock = true;
-      bitClear(workingPeriod,15);         //Clear pause block flag
-      pauseFlipBit = true;
-    }
-    
-    #ifdef DIRECT_RECORDING
-    if (bitRead(workingPeriod, 14)== 0) {
-    #endif
-      pinState = !pinState;
-      if (pinState == LOW)     WRITE_LOW;    
-      else  WRITE_HIGH;
-    #ifdef DIRECT_RECORDING
-    } else {
-      if (bitRead(workingPeriod, 13) == 0)     WRITE_LOW;    
-      else  {WRITE_HIGH; bitClear(workingPeriod,13);}     
-      bitClear(workingPeriod,14);         //Clear ID15 flag
-      workingPeriod = SampleLength;
-    }
-    #endif
+    newTime = 50000;
+    goto _set_period;
+  }
 
-    if(pauseFlipBit==true) {
+  if bitRead(workingPeriod, 15)          
+  {
+    //If bit 15 of the current period is set we're about to run a pause
+    //Pauses start with a 1.5ms where the output is untouched after which the output is set LOW
+    //Pause block periods are stored in milliseconds not microseconds
+    isPauseBlock = true;
+    bitClear(workingPeriod,15);         //Clear pause block flag
+    if (!wasPauseBlock)
+      pauseFlipBit = true;
+  }
+  #ifdef DIRECT_RECORDING
+  else if (bitRead(workingPeriod, 14))
+  {
+    if bitRead(workingPeriod, 13)
+      WRITE_HIGH;
+    else
+      WRITE_LOW;    
+    newTime = SampleLength;
+    goto _next;
+  }
+  #endif
+  else if (workingPeriod==0)
+  {
+    newTime = 1000; // Just in case we have a 0 in the buffer
+    goto _next;
+  }
+
+  if (pauseFlipBit || !isPauseBlock)
+    pinState = !pinState;
+
+  if (pinState == LOW)
+    WRITE_LOW;    
+  else
+    WRITE_HIGH;
+
+  if (isPauseBlock)
+  {
+    if(pauseFlipBit)
+    {
       newTime = 1500;                     //Set 1.5ms initial pause block
       pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;
       workingPeriod = workingPeriod - 1; 
@@ -2138,38 +2160,30 @@ void wave2() {
 
       wbuffer[pos][workingBuffer] = workingPeriod /256;  //reduce pause by 1ms as we've already pause for 1.5ms
       wbuffer[pos+1][workingBuffer] = workingPeriod  %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
+      pos -= 2; // adjust back so that when we add += 2 just a few lines below we're pointing at the same pos
       pauseFlipBit=false;
     } else {
-      if(isPauseBlock==true) {
-        newTime = long(workingPeriod)*1000; //Set pause length in microseconds
-        isPauseBlock = false;
-      } else {
-        newTime = workingPeriod;          //After all that, if it's not a pause block set the pulse period 
-      }
-      //pos += 1;
-      pos += 2;
-      if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
-      {
-        pos = 0;
-        workingBuffer^=1;
-        morebuff = true;                  //Request more data to fill inactive page
-      } 
+      newTime = long(workingPeriod)*1000; //Set pause length in microseconds
+      isPauseBlock=false;
+      wasPauseBlock=true;
     }
-
-  } else if (isStopped==0) {  
-    newTime = 1000;                         //Just in case we have a 0 in the buffer
-    pos += 2;
-    if(pos >= buffsize) {
-      pos = 0;
-      workingBuffer ^= 1;
-      morebuff = true;
-    }
-  } else {
-    newTime = 50000;                         //Just in case we have a 0 in the buffer    
   }
+  else
+  {
+    wasPauseBlock=false;
+    newTime = workingPeriod;          //After all that, if it's not a pause block set the pulse period 
+  }
+  
+_next:
+  pos += 2;
+  if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
+  {
+    pos = 0;
+    workingBuffer^=1;
+    morebuff = true;                  //Request more data to fill inactive page
+  } 
 
-  newTime += 6;
-//  newTime += (micros() - zeroTime); 
+_set_period:
   Timer.setPeriod(newTime);                 //Finally set the next pulse length
 }
 
