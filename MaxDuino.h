@@ -202,7 +202,8 @@ bool AMScdt = false;
 #endif
 
 volatile byte pinState=LOW;
-volatile byte isPauseBlock = false;
+volatile bool isPauseBlock = false;
+volatile bool wasPauseBlock = false;
 volatile byte workingBuffer=0;
 
 union {

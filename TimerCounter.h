@@ -467,13 +467,13 @@ class TimerCounter
       _Timer->CTRLA.reg &= ~TC_CTRLA_ENABLE;
       while (_Timer->STATUS.bit.SYNCBUSY);
 
-      _Timer->CTRLA.reg &= ~(TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCALER_DIV256 | TC_CTRLA_PRESCALER_DIV64 | TC_CTRLA_PRESCALER_DIV16 | TC_CTRLA_PRESCALER_DIV4 | TC_CTRLA_PRESCALER_DIV2 | TC_CTRLA_PRESCALER_DIV1);
+      _Timer->CTRLA.reg &= ~(TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCALER_DIV256 | TC_CTRLA_PRESCALER_DIV64 | TC_CTRLA_PRESCALER_DIV16 | TC_CTRLA_PRESCALER_DIV8 | TC_CTRLA_PRESCALER_DIV4 | TC_CTRLA_PRESCALER_DIV2 | TC_CTRLA_PRESCALER_DIV1);
       while (_Timer->STATUS.bit.SYNCBUSY);
 
       // impose some kind of minimum cycle time, to avoid deadlock
-      if (microseconds < 100)
+      if (microseconds < 20)
       {
-        microseconds = 100;
+        microseconds = 20;
       }
       // avoid wraparound for periods longer than the maximum permitted with the widest prescaler
       if (microseconds > 1398080)
