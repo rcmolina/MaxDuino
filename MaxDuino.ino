@@ -1465,18 +1465,8 @@ void SetPlayBlock()
         sendStrXY(" ID:", 7,0);
       }
           
-      if (currentID/16 < 10) {
-        input[0]=48+currentID/16;
-      } else {
-        input[0]=55+currentID/16;
-      }
-
-      if (currentID%16 < 10) {
-        input[1]=48+currentID%16;
-      } else {
-        input[1]=55+currentID%16;
-      }
-                      
+      input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
+      input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
       input[2]=0;
       if (block < 100) {
         sendStrXY((char *)input,10,0);
@@ -1503,16 +1493,8 @@ void SetPlayBlock()
       sendStr((char *)input);//sendChar(' ');
       sendStr(" ID:");
 
-      if (currentID/16 < 10) {
-        input[0]=48+currentID/16;
-      } else {
-        input[0]=55+currentID/16;
-      }
-      if (currentID%16 < 10) {
-        input[1]=48+currentID%16;
-      } else {
-        input[1]=55+currentID%16;
-      }
+      input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
+      input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
       input[2]=0;
       sendStr((char *)input);
     #endif
