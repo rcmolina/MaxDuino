@@ -1649,40 +1649,6 @@ void writeData() {
   }    
 }
 
-void DirectRecording() {
-  //Direct Recording - Output bits based on specified sample rate (Ticks per clock) either 44.1KHz or 22.05
-
-  if(currentBit==0) {                         //Check for byte end/first byte
-    if(ReadByte()) {            //Read in a byte
-      currentByte = outByte;
-      bytesToRead += -1; 
-    }  
-      
-    if(bytesToRead == 0) {                  //Check for end of data block
-      bytesRead += -1;                      //rewind a byte if we've reached the end
-      if(pauseLength==0) {                  //Search for next ID if there is no pause
-        //currentTask = TASK::GETID;
-      } else {
-        currentBlockTask = BLOCKTASK::PAUSE;           //Otherwise start the pause
-      }
-      return;                               // exit
-    }
-
-    if(bytesToRead!=1) {                      //If we're not reading the last byte play all 8 bits
-      currentBit=8;
-    } else {
-      currentBit=usedBitsInLastByte;          //Otherwise only play back the bits needed
-    }
-  } 
- 
-  if(currentByte&0x80) {                       //Set next period depending on value of bit 0
-    bitSet(currentPeriod, 13);
-  }
-
-  currentByte <<= 1;                        //Shift along to the next bit
-  currentBit += -1;               
-}
-
 #ifdef tapORIC
 void OricDataBlock() {
   //Convert byte from file into string of pulses.  One pulse per pass
