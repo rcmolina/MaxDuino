@@ -422,9 +422,11 @@ ISR(TIMER1_OVF_vect)
   
 class TimerCounter
 {
+  unsigned long _current_microseconds;
   public:
     TimerCounter()
     {
+      _current_microseconds = 0;
       TC3_callback = NULL;
     }
     
@@ -461,6 +463,33 @@ class TimerCounter
     void _setPeriod_TIMER_TC3(unsigned long microseconds)
     {
       TcCount16* _Timer = SAMD_TC3;
+      if (_current_microseconds == microseconds)
+      {
+        // nothing to do - timer is already set for the correct
+        // period, and it will just wrap and repeat and retrigger
+        // the interrupt anyway
+        return;
+      }
+
+      // adjust microseconds if out of bounds:
+      // 1. impose some kind of minimum cycle time, to avoid deadlock
+      if (microseconds < 20)
+      {
+        microseconds = 20;
+      }
+      // 2. avoid wraparound for periods longer than the maximum permitted with the widest prescaler
+      if (microseconds > 1398080)
+      {
+        microseconds = 1398080;
+      }
+      // if the adjusted microseconds matches what we previously configured
+      // then again nothing to do, timer will repeat as planned
+      if (_current_microseconds == microseconds)
+        return;
+
+      // otherwise, set new timer registers
+      
+      _current_microseconds = microseconds;
       
       bool ctrla_enabled = _Timer->CTRLA.reg & TC_CTRLA_ENABLE;
       
@@ -469,17 +498,6 @@ class TimerCounter
 
       _Timer->CTRLA.reg &= ~(TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCALER_DIV256 | TC_CTRLA_PRESCALER_DIV64 | TC_CTRLA_PRESCALER_DIV16 | TC_CTRLA_PRESCALER_DIV8 | TC_CTRLA_PRESCALER_DIV4 | TC_CTRLA_PRESCALER_DIV2 | TC_CTRLA_PRESCALER_DIV1);
       while (_Timer->STATUS.bit.SYNCBUSY);
-
-      // impose some kind of minimum cycle time, to avoid deadlock
-      if (microseconds < 20)
-      {
-        microseconds = 20;
-      }
-      // avoid wraparound for periods longer than the maximum permitted with the widest prescaler
-      if (microseconds > 1398080)
-      {
-        microseconds = 1398080;
-      }
 
       uint32_t cycles = (TIMER_HZ/1000000) * microseconds;
       if (cycles > (65535*256)) 
