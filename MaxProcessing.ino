@@ -526,6 +526,7 @@ void TZXProcess() {
       case ID15:
         //process ID15 - Direct Recording          
         if(currentBlockTask==BLOCKTASK::READPARAM) {
+          currentBit = 0;
           if(ReadWord()) {     
             SampleLength = TickToUs(outWord);
           }
@@ -534,7 +535,7 @@ void TZXProcess() {
             pauseLength = outWord;  
           }
           if(ReadByte()) {
-          //Used bits in last byte (other bits should be 0)
+            //Used bits in last byte (other bits should be 0)
             usedBitsInLastByte = outByte;
           }
           if(ReadLong()) {
@@ -544,13 +545,23 @@ void TZXProcess() {
             //currentID=0x9A;
           }            
           currentBlockTask=BLOCKTASK::TDATA;
+
+          // and write the sample period information to the output using this format:
+          // 011sssssssssssss  = 0x6000 + S
+          // |||\___________/
+          // |||     |
+          // |||     +-- S = sampleLength
+          // ||+-- always 1
+          // |+-- always 1
+          // +-- always 0
+
+          currentPeriod = SampleLength | 0x6000;
+
         } else if(currentBlockTask==BLOCKTASK::PAUSE) {
           temppause = pauseLength;
           currentID = IDPAUSE;                     
         } else {
-          currentPeriod = SampleLength;
-          bitSet(currentPeriod, 14);
-          writeData();
+          writeDataDirect();
         }
         break;
     #endif
@@ -1560,87 +1571,83 @@ void writeUEFData() {
 }
 #endif // Use_UEF
 
+bool getNextDataByte() {
+  if(ReadByte()) {            //Read in a byte
+    currentByte = outByte;
+    #ifdef AYPLAY 
+    if (AYPASS==5) {
+      currentByte = 0xFF;                 // Only insert first DATA byte if sending AY TAP DATA Block and don't decrement counter
+      AYPASS = 4;                         // set Checksum flag to be sent when EOF reached
+      bytesRead += -1;                    // rollback ptr and compensate for dummy read byte
+      bytesToRead += 2;                   // add 2 bytes to read as we send 0xFF (data flag header byte) and chksum at the end of the block
+    } else {
+    #endif
+      bytesToRead += -1;  
+    #ifdef AYPLAY 
+    }
+    bitChecksum ^= currentByte;    // keep calculating checksum
+    #endif
+    
+
+    if(bytesToRead == 0) {                  //Check for end of data block
+      pass = 0;
+      bytesRead += -1;                      //rewind a byte if we've reached the end
+      
+      if(pauseLength==0) {                  //Search for next ID if there is no pause
+        currentTask = TASK::GETID;
+      } else {
+        currentBlockTask = BLOCKTASK::PAUSE;           //Otherwise start the pause
+      }
+      
+      return false;  // exit
+    }
+  } else {                         // If we reached the EOF
+    
+  #ifdef AYPLAY
+    // Check if need to send checksum
+    if (AYPASS==4)
+    {
+      currentByte = bitChecksum;            // send calculated chksum
+      bytesToRead += 1;                   // add one byte to read
+      AYPASS = 0;                         // Reset flag to end block
+    }
+    else
+  #endif
+    {
+      EndOfFile=true;  
+  
+      if(pauseLength==0) {
+        currentTask = TASK::GETID;
+      } else {
+        currentBlockTask = BLOCKTASK::PAUSE;
+      }
+      return false;                           // return here if normal TAP or TZX  
+    }
+  }
+
+  if(bytesToRead!=1) {                      //If we're not reading the last byte play all 8 bits
+    currentBit=8;
+  } else {
+    currentBit=usedBitsInLastByte;          //Otherwise only play back the bits needed
+  }
+
+  return true;
+}
+
 void writeData() {
   //Convert byte from file into string of pulses.  One pulse per pass
-  if(currentBit==0) {                         //Check for byte end/first byte
-    if(ReadByte()) {            //Read in a byte
-      currentByte = outByte;
-      #ifdef AYPLAY 
-      if (AYPASS==5) {
-        currentByte = 0xFF;                 // Only insert first DATA byte if sending AY TAP DATA Block and don't decrement counter
-        AYPASS = 4;                         // set Checksum flag to be sent when EOF reached
-        bytesRead += -1;                    // rollback ptr and compensate for dummy read byte
-        bytesToRead += 2;                   // add 2 bytes to read as we send 0xFF (data flag header byte) and chksum at the end of the block
-      } else {
-      #endif
-        bytesToRead += -1;  
-      #ifdef AYPLAY 
-      }
-      bitChecksum ^= currentByte;    // keep calculating checksum
-      #endif
-      
-
-      if(bytesToRead == 0) {                  //Check for end of data block
-        bytesRead += -1;                      //rewind a byte if we've reached the end
-        
-        if(pauseLength==0) {                  //Search for next ID if there is no pause
-          //if (bitRead(currentPeriod, 14) == 0) currentTask = TASK::GETID;
-          currentTask = TASK::GETID;
-        } else {
-          currentBlockTask = BLOCKTASK::PAUSE;           //Otherwise start the pause
-        }
-        
-        return;                               // exit
-      }
-    } else {                         // If we reached the EOF
-      
-    #ifdef AYPLAY
-      // Check if need to send checksum
-      if (AYPASS==4)
-      {
-        currentByte = bitChecksum;            // send calculated chksum
-        bytesToRead += 1;                   // add one byte to read
-        AYPASS = 0;                         // Reset flag to end block
-      }
-      else
-    #endif
-      {
-        EndOfFile=true;  
-    
-        if(pauseLength==0) {
-          currentTask = TASK::GETID;
-        } else {
-          currentBlockTask = BLOCKTASK::PAUSE;
-        }
-        return;                           // return here if normal TAP or TZX  
-      }
-    }
-
-    if(bytesToRead!=1) {                      //If we're not reading the last byte play all 8 bits
-      currentBit=8;
-    } else {
-      currentBit=usedBitsInLastByte;          //Otherwise only play back the bits needed
-    }
+  if(currentBit==0) { //Check for byte end/first byte
+    if (!getNextDataByte()) // false == no more bytes
+      return;
     pass=0;
   }
 
-  #ifdef DIRECT_RECORDING
-  if bitRead(currentPeriod, 14) {
-    if(currentByte&0x80) bitSet(currentPeriod, 13);
-    pass+=2;
+  if(currentByte&0x80){                       //Set next period depending on value of bit 0
+    currentPeriod = onePulse;
+  } else {
+    currentPeriod = zeroPulse;
   }
-  else
-  {
-  #endif
-    if(currentByte&0x80){                       //Set next period depending on value of bit 0
-      currentPeriod = onePulse;
-    } else {
-      currentPeriod = zeroPulse;
-    }
-    pass+=1;
-  #ifdef DIRECT_RECORDING
-  }
-  #endif
+  pass+=1;
   
   if(pass==2) {
     currentByte <<= 1;                        //Shift along to the next bit
@@ -1648,6 +1655,30 @@ void writeData() {
     pass=0;  
   }    
 }
+
+#ifdef DIRECT_RECORDING
+void writeDataDirect() {
+  // Push byte from file into the buffer, with minimal processing.
+  // One byte (8 bits) from file turns directly into one entry in the buffer
+  // that encapsulates the DirectRecording mode (plus an extra entry at the
+  // start to indicate the sample period))
+  if (!getNextDataByte()) // false == no more bytes
+    return;
+
+  // 010xxbbbbbbbbiii = 0x4000 + (B<<3) + I
+  // |||\/\______/\_/
+  // ||| |   |     |
+  // ||| |   |     +-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits', 0 means 'just use one bit'
+  // ||| |   +-- B = 8 bits (leftmost bit next)
+  // ||| +-- X = unused
+  // ||+-- always 0
+  // |+-- always 1
+  // +-- always 0
+
+  // process 8 bits (or, all currentBit #bits), in one go, to reduce overhead here
+  currentPeriod = (1<<14) + (currentByte << 3) + (currentBit-1);
+}
+#endif
 
 #ifdef tapORIC
 void OricDataBlock() {
@@ -1809,6 +1840,9 @@ void wave2() {
   word workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
   byte pauseFlipBit = false;
   unsigned long newTime;
+  #ifdef DIRECT_RECORDING
+  static unsigned long directSampleLength;
+  #endif
  
   if(isStopped)
   {
@@ -1830,11 +1864,48 @@ void wave2() {
   else if (bitRead(workingPeriod, 14))
   {
     if bitRead(workingPeriod, 13)
+    {
+      // this signifies the start of a direct recording block, where we encode the sample period
+      directSampleLength = workingPeriod & 0x1fff;
+      pos += 2;
+      if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
+      {
+        pos = 0;
+        workingBuffer^=1;
+        morebuff = true;                  //Request more data to fill inactive page
+      } 
+      workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
+    }
+    newTime = directSampleLength;
+
+    // 010xxbbbbbbbbiii
+    //      ^
+    //      |
+    //      +-- this is bit 10
+    //
+    if bitRead(workingPeriod, 10) {
+      pinState = !LOW;
       WRITE_HIGH;
+    } else {
+      pinState = LOW;
+      WRITE_LOW;
+    }
+    
+    if (workingPeriod & 7)
+    {
+      // more bits remaining
+      // do two things at once:  shift the bbbbbbbb left one bit (we drop the lefthand bit
+      // so we only need to mask 7 bits not 8, so 0x03f8 gets us 000000bbbbbbb000 )
+      // and decrement the iii by 1 (and we knowing iii > 0 because we just checked that)
+      workingPeriod = (1<<14) + ((workingPeriod & 0x03f8) << 1) + (workingPeriod & 7) - 1;
+      wbuffer[pos][workingBuffer] = workingPeriod /256;
+      wbuffer[pos+1][workingBuffer] = workingPeriod  %256;
+      goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
+    }
     else
-      WRITE_LOW;    
-    newTime = SampleLength;
-    goto _next;
+    {
+      goto _next;
+    }
   }
   #endif
   else if (workingPeriod==0)
@@ -1867,8 +1938,9 @@ void wave2() {
 
       wbuffer[pos][workingBuffer] = workingPeriod /256;  //reduce pause by 1ms as we've already pause for 1.5ms
       wbuffer[pos+1][workingBuffer] = workingPeriod  %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
-      pos -= 2; // adjust back so that when we add += 2 just a few lines below we're pointing at the same pos
       pauseFlipBit=false;
+      goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
+
     } else {
       newTime = long(workingPeriod)*1000; //Set pause length in microseconds
       isPauseBlock=false;
