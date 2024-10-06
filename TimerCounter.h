@@ -138,11 +138,19 @@ class TimerCounter
 
 class TimerCounter
 {
+  unsigned long _current_microseconds;
+
   public:
+  
+    TimerCounter()
+    {
+      _current_microseconds = 0;
+    }
+
     //****************************
     //  Configuration
     //****************************
-    void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
+    void initialize(unsigned long microseconds=1000) __attribute__((always_inline)) {
       // turn off split mode (enabled at startup on TCA0 for MegaCoreX).
       // Ensure timer is stopped for this:
       TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
@@ -163,6 +171,16 @@ class TimerCounter
     }
 
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
+
+      if (_current_microseconds == microseconds)
+      {
+        // nothing to do - timer is already set for the correct
+        // period, and it will just wrap and repeat and retrigger
+        // the interrupt anyway
+        return;
+      }
+
+      _current_microseconds = microseconds;
 
       //DSBOTTOM: the counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2
       //const unsigned long cycles = (F_CPU / 1000000) * microseconds;
