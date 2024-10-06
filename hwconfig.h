@@ -33,31 +33,9 @@
     //#error This chip does not support Softwire. Please undefine Use_SoftWire
   #endif  
   
-                          //
-                          // PATCH PROCERURE NEEDED FOR NANO EVERY AND THINARY TO SWAP TIMERS AND AVOID HANGING
-                          //
-                          // In C:\Users\Rafael\AppData\Local\Arduino15\packages\arduino\hardware\megaavr\1.8.4
-                          // change .\variants\nona4809\timers.h , .\variants\nona4809\variant.c , .\cores\arduino\wiring.c
-                          //
-                          // In C:\Users\Rafael\AppData\Local\Arduino15\packages\thinary\hardware\avr\1.0.0
-                          // change .\variants\nona4808\timers.h , .\variants\nona4808\variant.c , .\cores\arduino\wiring.c
-                          //
-                          // Needs 2 patches, check your version:
-                          //
-                          // SDFat 20150201 (old and very slow):
-                          // 1. In SdFatConfig.h change line 84 #define SD_SPI_CONFIGURATION 0
-                          //    with: #define SD_SPI_CONFIGURATION 1
-                          // 2. In SdSpi.h change line 292 #ifdef __AVR__
-                          //    with: #if defined(__AVR__) && not defined(__AVR_ATmega4809__)&& not defined(__AVR_ATmega4808__)
-                          //
-                          // SDFat 1.1.0 (faster and recommended):
-                          // 1. In SdFatConfig.h change line 216 #elif defined(__AVR__)\
-                          //    with: #elif defined(__AVR__) && not defined(__AVR_ATmega4809__)&& not defined(__AVR_ATmega4808__)\
-                          //
-                          // 2. In SpiDriver/SdSpiDriver.h change line 374 #ifdef __AVR__
-                          //    with: #if defined(__AVR__) && not defined(__AVR_ATmega4809__)&& not defined(__AVR_ATmega4808__)
+  // FOR NANO EVERY AND THINARY , PLEASE USE MEGACOREX WHICH SUPPORTS THIS BOARD CORRECTLY BECAUSE IT
+  // CONFIGURES THE SYSTEM TIMERS TO NOT USE TC0 TIMER (MEANING, MAXDUINO WORKS WITHOUT PATCHING CORE LIBRARY)
                          
-  //#define TimerOne 
 #elif defined(__arm__) && defined(__STM32F1__)
   #ifdef Use_SoftI2CMaster
     #undef Use_SoftI2CMaster

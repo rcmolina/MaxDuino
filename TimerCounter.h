@@ -143,7 +143,17 @@ class TimerCounter
     //  Configuration
     //****************************
     void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
-      TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_DSBOTTOM_gc;        // set mode as DSBOTTOM, stop the timer
+      // turn off split mode (enabled at startup on TCA0 for MegaCoreX).
+      // Ensure timer is stopped for this:
+      TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
+      TCA0.SPLIT.CTRLD &= ~(TCA_SINGLE_SPLITM_bm);
+      TCA0.SINGLE.INTCTRL = 0; // Disable all interrupts on timer A
+      TCA0.SINGLE.EVCTRL &= ~(TCA_SINGLE_CNTEI_bm); // disable event counting
+      TCA0.SINGLE.CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
+
+      TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_NORMAL_gc; // set mode as NORMAL, stop the timer
+      //TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_DSBOTTOM_gc;        // set mode as DSBOTTOM, stop the timer
+
       //TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_SINGLESLOPE_gc;        // set mode as SINGLESLOPE, stop the timer
       //TCA0.SINGLE.CTRLA |= (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
       //TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
@@ -153,9 +163,13 @@ class TimerCounter
     }
 
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
-      //const unsigned long cycles = 16 * microseconds;  //WGMODE_NORMAL
+
       //DSBOTTOM: the counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2
-      const unsigned long cycles = (F_CPU / 2000000) * microseconds;
+      //const unsigned long cycles = (F_CPU / 1000000) * microseconds;
+
+      //NORMAL: the counter runs to TOP, interrupt is at TOP
+      const unsigned long cycles = (F_CPU / 1000000) * microseconds;
+
       /*
         if (cycles < TIMER1_RESOLUTION * 1) {
           clockSelectBits = TCA_SINGLE_CLKSEL_DIV1_gc;    
@@ -216,7 +230,6 @@ class TimerCounter
       //TCA0.SINGLE.PER = cycles / 64;
                                             // set clock source and start timer
       TCA0.SINGLE.CTRLA = clockSelectBits | TCA_SINGLE_ENABLE_bm;
-      //TCA0.SINGLE.INTCTRL |= (TCA_SINGLE_OVF_bm); // Enable timer interrupts on overflow on timer A   
     }
 
     //****************************
