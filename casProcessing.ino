@@ -11,7 +11,7 @@ void wave()
 {
   if(isStopped==0)
   {
-    switch(wbuffer[pos][working]) {
+    switch(wbuffer[pos][workingBuffer]) {
       case 0:
         if(pass == 0 || pass == 1) {
           if (out == LOW) WRITE_LOW;    
@@ -51,7 +51,7 @@ void wave()
       if(pos >= buffsize) 
       {
         pos = 0;
-        working ^=1;
+        workingBuffer ^=1;
         morebuff = true;
       }
     }
@@ -410,7 +410,7 @@ void casduinoLoop()
       // casduino isn't just true/false - it's the number of bits (8 or 11)
       for(int t=0; t<(byte)casduino; t++)
       {
-        wbuffer[btemppos][working ^ 1] = bits[t];
+        wbuffer[btemppos][workingBuffer ^ 1] = bits[t];
         btemppos+=1;         
       }        
     }

@@ -62,7 +62,7 @@ volatile byte pass = 0;
 volatile byte pos = 0;
 volatile byte wbuffer[buffsize][2];
 volatile bool morebuff = true;
-volatile byte working=0;
+volatile byte workingBuffer=0;
 volatile byte isStopped=false;
 
 //Main Variables
@@ -208,7 +208,6 @@ bool AMScdt = false;
 volatile byte pinState=LOW;
 volatile bool isPauseBlock = false;
 volatile bool wasPauseBlock = false;
-volatile byte workingBuffer=0;
 
 union {
   byte outbyte;
