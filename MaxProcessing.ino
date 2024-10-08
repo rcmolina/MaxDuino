@@ -45,7 +45,7 @@ void UniPlay(){
     passforZero=2;
     passforOne=4;
     reset_output_state();
-    Timer.initialize(1000); //100ms pause prevents anything bad happening before we're ready
+    Timer.initialize(100000); //100ms pause prevents anything bad happening before we're ready
     Timer.attachInterrupt(wave2);
   }
 }
