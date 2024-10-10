@@ -151,6 +151,7 @@ enum class BLOCKTASK : byte
   SYNC2,
   TDATA,
   PAUSE,
+  ID15_TDATA, // special for ID15 performance reasons only
 
   // TZX tasks for ORIC
   NEWPARAM,

@@ -88,6 +88,15 @@ void TZXLoop() {
     copybuff=false;
   }
 
+  if(currentBlockTask == BLOCKTASK::ID15_TDATA && btemppos+16<buffsize && bytesToRead>=16)
+  {
+    // shortcut for ID15 handler for performance
+    // write 8 input bytes (=16 output bytes to buffer)
+    // ALSO: skips the lcd updates (SHOW_CNTR, SHOW_PCT) entirely
+    writeDataDirect16();
+    return;
+  }
+
   if(btemppos<buffsize){                    // Keep filling until full
     TZXProcess();                           //generate the next period to add to the buffer
     if(currentPeriod>0) {
@@ -110,6 +119,13 @@ void TZXLoop() {
 }
 
 void TZXProcess() {
+  if(currentBlockTask==BLOCKTASK::ID15_TDATA)
+  {
+    // shortcut for ID15 handler for performance
+    writeDataDirect();
+    return;
+  }
+
   currentPeriod = 0;
   if(currentTask == TASK::GETFILEHEADER) {
     //grab 7 byte string
@@ -544,7 +560,7 @@ void TZXProcess() {
             // Uncomment next line for testing to force id error
             //currentID=0x9A;
           }            
-          currentBlockTask=BLOCKTASK::TDATA;
+          currentBlockTask=BLOCKTASK::ID15_TDATA;
 
           // and write the sample period information to the output using this format:
           // 011sssssssssssss  = 0x6000 + S
@@ -1663,7 +1679,10 @@ void writeDataDirect() {
   // that encapsulates the DirectRecording mode (plus an extra entry at the
   // start to indicate the sample period))
   if (!getNextDataByte()) // false == no more bytes
+  {
+    currentPeriod = 0;
     return;
+  }
 
   // 010xxbbbbbbbbiii = 0x4000 + (B<<3) + I
   // |||\/\______/\_/
@@ -1677,6 +1696,34 @@ void writeDataDirect() {
 
   // process 8 bits (or, all currentBit #bits), in one go, to reduce overhead here
   currentPeriod = (1<<14) + (currentByte << 3) + (currentBit-1);
+}
+
+void writeDataDirect16() {
+  // Push byte from file into the buffer, with even less processing.
+  // This is equivalent to call writeDataDirect 8 times (which generates
+  // 8 words i.e. 16 bytes in the wbuffer)
+  // This actually bypasses several passes of the TZXLoop / TZXProcess steps
+  // This will only be called if there are > 8 more bytes still to read AND
+  // space in the output buffer to write 16 bytes without hitting buffsize
+  for(byte iter=8; iter>0; --iter)
+  {
+    if (!getNextDataByte()) // false == no more bytes
+    {
+      currentPeriod = 0;
+      return;
+    }
+
+    // process 8 bits in one go
+    // 010xxbbbbbbbbiii = 0x4000 + (B<<3) + I
+    //              \_/ <-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits'
+    // (I must be 7 because we already checked we're not on the last byte)
+    currentPeriod = (1<<14) + (currentByte << 3) + 7;
+    noInterrupts();                       //Pause interrupts while we add a period to the buffer
+    wbuffer[btemppos][workingBuffer ^ 1] = currentPeriod /256;   //add period to the buffer
+    wbuffer[btemppos+1][workingBuffer ^ 1] = currentPeriod %256;   //add period to the buffer
+    interrupts();
+    btemppos+=2;
+  }
 }
 #endif
 
