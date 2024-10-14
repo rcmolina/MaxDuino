@@ -79,14 +79,14 @@ void TZXPause() {
 
 void TZXLoop() {   
   noInterrupts();                           //Pause interrupts to prevent var reads and copy values out
-  copybuff = morebuff;
-  morebuff = false;
   isStopped = pauseOn;
-  interrupts();
-  if(copybuff) {
-    btemppos=0;                             //Buffer has swapped, start from the beginning of the new page
-    copybuff=false;
+  if(morebuff)
+  {
+    //Buffer has swapped, start from the beginning of the new page
+    btemppos=0;
+    morebuff=false;    
   }
+  interrupts();
 
   if(currentBlockTask == BLOCKTASK::ID15_TDATA && btemppos+16<buffsize && bytesToRead>=16)
   {
@@ -100,11 +100,15 @@ void TZXLoop() {
   if(btemppos<buffsize){                    // Keep filling until full
     TZXProcess();                           //generate the next period to add to the buffer
     if(currentPeriod>0) {
+      //add period to the buffer
+      const byte _b1 = currentPeriod /256;
+      const byte _b2 = currentPeriod %256;
+      volatile byte * _wb = writeBuffer+btemppos;
       noInterrupts();                       //Pause interrupts while we add a period to the buffer
-      wbuffer[btemppos][workingBuffer ^ 1] = currentPeriod /256;   //add period to the buffer
-      wbuffer[btemppos+1][workingBuffer ^ 1] = currentPeriod %256;   //add period to the buffer
+      *_wb = _b1;
+      *(_wb+1) = _b2;
       interrupts();
-      btemppos+=2;        
+      btemppos+=2;
     }
   } else {
     if (!pauseOn) {
@@ -1684,18 +1688,18 @@ void writeDataDirect() {
     return;
   }
 
-  // 010xxbbbbbbbbiii = 0x4000 + (B<<3) + I
-  // |||\/\______/\_/
-  // ||| |   |     |
-  // ||| |   |     +-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits', 0 means 'just use one bit'
-  // ||| |   +-- B = 8 bits (leftmost bit next)
+  // 010xxiiibbbbbbbb = 0x4000 + (I<<8) + B
+  // |||\/\_/\______/
+  // ||| | |    |
+  // ||| | |    +-- B = 8 bits (leftmost bit next)
+  // ||| | +-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits', 0 means 'just use one bit'
   // ||| +-- X = unused
   // ||+-- always 0
   // |+-- always 1
   // +-- always 0
 
   // process 8 bits (or, all currentBit #bits), in one go, to reduce overhead here
-  currentPeriod = (1<<14) + (currentByte << 3) + (currentBit-1);
+  currentPeriod = (1<<14) + ((currentBit-1)<<8) + currentByte;
 }
 
 void writeDataDirect16() {
@@ -1714,13 +1718,29 @@ void writeDataDirect16() {
     }
 
     // process 8 bits in one go
-    // 010xxbbbbbbbbiii = 0x4000 + (B<<3) + I
-    //              \_/ <-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits'
+    // 010xxiiibbbbbbbb = 0x4000 + (I<<8) + B
+    //      \_/ <-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits'
     // (I must be 7 because we already checked we're not on the last byte)
-    currentPeriod = (1<<14) + (currentByte << 3) + 7;
+    //
+    // so:
+    //     currentPeriod = (1<<14) + (7<<8) + currentByte;
+    // and then:
+    //     writeBuffer[btemppos] = currentPeriod /256;   //add period to the buffer
+    //     writeBuffer[btemppos+1] = currentPeriod %256;   //add period to the buffer
+    //
+    // but we don't even need to use currentPeriod variable for this, we can do directly:
+    // Also note that the following code takes as much as possible out of the noInterrupts section;
+    // on Nano328p there are only 2 assembly instructions between noInterrupts() and interrupts())
+    // 5e7a:	f8 94       	cli
+    // 5e7c:	20 82       	st	Z, r2
+    // 5e7e:	81 83       	std	Z+1, r24	; 0x01
+    // 5e80:	78 94       	sei
+
+    const byte _b1 = currentByte;
+    volatile byte * _wb = writeBuffer+btemppos;
     noInterrupts();                       //Pause interrupts while we add a period to the buffer
-    wbuffer[btemppos][workingBuffer ^ 1] = currentPeriod /256;   //add period to the buffer
-    wbuffer[btemppos+1][workingBuffer ^ 1] = currentPeriod %256;   //add period to the buffer
+    *_wb = 0x47; // = ((1<<14) + (7<<8))>>8
+    *(_wb+1) = _b1;
     interrupts();
     btemppos+=2;
   }
@@ -1884,7 +1904,7 @@ void FlushBuffer(long newcount) {
 void wave2() {
   //ISR Output routine
 //  unsigned long zeroTime = micros();
-  word workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
+  word workingPeriod = word(readBuffer[pos], readBuffer[pos+1]);
   byte pauseFlipBit = false;
   unsigned long newTime;
   #ifdef DIRECT_RECORDING
@@ -1918,19 +1938,22 @@ void wave2() {
       if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
       {
         pos = 0;
-        workingBuffer^=1;
+        // swap read and write buffers
+        volatile byte * tmp = readBuffer;
+        readBuffer = writeBuffer;
+        writeBuffer = tmp;
         morebuff = true;                  //Request more data to fill inactive page
       } 
-      workingPeriod = word(wbuffer[pos][workingBuffer], wbuffer[pos+1][workingBuffer]);  
+      workingPeriod = word(readBuffer[pos], readBuffer[pos+1]);
     }
     newTime = directSampleLength;
 
-    // 010xxbbbbbbbbiii
-    //      ^
-    //      |
-    //      +-- this is bit 10
+    // 010xxiiibbbbbbbb
+    //         ^
+    //         |
+    //         +-- this is bit 7
     //
-    if bitRead(workingPeriod, 10) {
+    if bitRead(workingPeriod, 7) {
       pinState = !LOW;
       WRITE_HIGH;
     } else {
@@ -1938,15 +1961,16 @@ void wave2() {
       WRITE_LOW;
     }
     
-    if (workingPeriod & 7)
+    if (workingPeriod & 0x0700)
     {
       // more bits remaining
       // do two things at once:  shift the bbbbbbbb left one bit (we drop the lefthand bit
-      // so we only need to mask 7 bits not 8, so 0x03f8 gets us 000000bbbbbbb000 )
+      // so we can actually just mask the lowest 7 bits)
       // and decrement the iii by 1 (and we knowing iii > 0 because we just checked that)
-      workingPeriod = (1<<14) + ((workingPeriod & 0x03f8) << 1) + (workingPeriod & 7) - 1;
-      wbuffer[pos][workingBuffer] = workingPeriod /256;
-      wbuffer[pos+1][workingBuffer] = workingPeriod  %256;
+      // Decrementing iii by 1 is the same as decrementing workingPeriod by 0x0100
+      // Please note: we write this back into the READ buffer = the buffer that the ISR reads from
+      readBuffer[pos] = (workingPeriod>>8)-1;
+      readBuffer[pos+1] = (workingPeriod&0x7f)<<1;
       goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
     }
     else
@@ -1983,8 +2007,8 @@ void wave2() {
         workingPeriod = 0;           
       }
 
-      wbuffer[pos][workingBuffer] = workingPeriod /256;  //reduce pause by 1ms as we've already pause for 1.5ms
-      wbuffer[pos+1][workingBuffer] = workingPeriod  %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
+      readBuffer[pos] = workingPeriod /256;  //reduce pause by 1ms as we've already pause for 1.5ms
+      readBuffer[pos+1] = workingPeriod  %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
       pauseFlipBit=false;
       goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
 
@@ -2005,7 +2029,10 @@ _next:
   if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
   {
     pos = 0;
-    workingBuffer^=1;
+    // swap read and write buffers
+    volatile byte * tmp = readBuffer;
+    readBuffer = writeBuffer;
+    writeBuffer = tmp;
     morebuff = true;                  //Request more data to fill inactive page
   } 
 
@@ -2073,8 +2100,8 @@ void clearBuffer()
 
   for(byte i=0;i<buffsize;i++)
   {
-    wbuffer[i][0]=fill;
-    wbuffer[i][1]=fill;
+    wbuffer[0][i]=fill;
+    wbuffer[1][i]=fill;
   } 
 }
 
