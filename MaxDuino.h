@@ -60,15 +60,15 @@ CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
 //ISR Variables
 volatile byte pass = 0;
 volatile byte pos = 0;
-volatile byte wbuffer[buffsize][2];
+volatile byte wbuffer[2][buffsize];
 volatile bool morebuff = true;
-volatile byte working=0;
+volatile byte * writeBuffer=wbuffer[0];
+volatile byte * readBuffer=wbuffer[1];
 volatile byte isStopped=false;
 
 //Main Variables
 volatile long count = 0;
 byte btemppos = 0;
-bool copybuff = false;
 byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
 byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
 unsigned long bytesRead=0;
@@ -151,6 +151,7 @@ enum class BLOCKTASK : byte
   SYNC2,
   TDATA,
   PAUSE,
+  ID15_TDATA, // special for ID15 performance reasons only
 
   // TZX tasks for ORIC
   NEWPARAM,
@@ -208,7 +209,6 @@ bool AMScdt = false;
 volatile byte pinState=LOW;
 volatile bool isPauseBlock = false;
 volatile bool wasPauseBlock = false;
-volatile byte workingBuffer=0;
 
 union {
   byte outbyte;

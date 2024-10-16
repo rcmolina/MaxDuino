@@ -138,12 +138,30 @@ class TimerCounter
 
 class TimerCounter
 {
+  unsigned long _current_microseconds;
+
   public:
+  
+    TimerCounter()
+    {
+      _current_microseconds = 0;
+    }
+
     //****************************
     //  Configuration
     //****************************
-    void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
-      TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_DSBOTTOM_gc;        // set mode as DSBOTTOM, stop the timer
+    void initialize(unsigned long microseconds=1000) __attribute__((always_inline)) {
+      // turn off split mode (enabled at startup on TCA0 for MegaCoreX).
+      // Ensure timer is stopped for this:
+      TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
+      TCA0.SPLIT.CTRLD &= ~(TCA_SINGLE_SPLITM_bm);
+      TCA0.SINGLE.INTCTRL = 0; // Disable all interrupts on timer A
+      TCA0.SINGLE.EVCTRL &= ~(TCA_SINGLE_CNTEI_bm); // disable event counting
+      TCA0.SINGLE.CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
+
+      TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_NORMAL_gc; // set mode as NORMAL, stop the timer
+      //TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_DSBOTTOM_gc;        // set mode as DSBOTTOM, stop the timer
+
       //TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_SINGLESLOPE_gc;        // set mode as SINGLESLOPE, stop the timer
       //TCA0.SINGLE.CTRLA |= (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
       //TCA0.SINGLE.CTRLA &= ~(TCA_SINGLE_ENABLE_bm);     //stop the timer   
@@ -153,9 +171,23 @@ class TimerCounter
     }
 
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
-      //const unsigned long cycles = 16 * microseconds;  //WGMODE_NORMAL
+
+      if (_current_microseconds == microseconds)
+      {
+        // nothing to do - timer is already set for the correct
+        // period, and it will just wrap and repeat and retrigger
+        // the interrupt anyway
+        return;
+      }
+
+      _current_microseconds = microseconds;
+
       //DSBOTTOM: the counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2
-      const unsigned long cycles = (F_CPU / 2000000) * microseconds;
+      //const unsigned long cycles = (F_CPU / 1000000) * microseconds;
+
+      //NORMAL: the counter runs to TOP, interrupt is at TOP
+      const unsigned long cycles = (F_CPU / 1000000) * microseconds;
+
       /*
         if (cycles < TIMER1_RESOLUTION * 1) {
           clockSelectBits = TCA_SINGLE_CLKSEL_DIV1_gc;    
@@ -216,7 +248,6 @@ class TimerCounter
       //TCA0.SINGLE.PER = cycles / 64;
                                             // set clock source and start timer
       TCA0.SINGLE.CTRLA = clockSelectBits | TCA_SINGLE_ENABLE_bm;
-      //TCA0.SINGLE.INTCTRL |= (TCA_SINGLE_OVF_bm); // Enable timer interrupts on overflow on timer A   
     }
 
     //****************************
@@ -422,9 +453,11 @@ ISR(TIMER1_OVF_vect)
   
 class TimerCounter
 {
+  unsigned long _current_microseconds;
   public:
     TimerCounter()
     {
+      _current_microseconds = 0;
       TC3_callback = NULL;
     }
     
@@ -461,6 +494,33 @@ class TimerCounter
     void _setPeriod_TIMER_TC3(unsigned long microseconds)
     {
       TcCount16* _Timer = SAMD_TC3;
+      if (_current_microseconds == microseconds)
+      {
+        // nothing to do - timer is already set for the correct
+        // period, and it will just wrap and repeat and retrigger
+        // the interrupt anyway
+        return;
+      }
+
+      // adjust microseconds if out of bounds:
+      // 1. impose some kind of minimum cycle time, to avoid deadlock
+      if (microseconds < 20)
+      {
+        microseconds = 20;
+      }
+      // 2. avoid wraparound for periods longer than the maximum permitted with the widest prescaler
+      if (microseconds > 1398080)
+      {
+        microseconds = 1398080;
+      }
+      // if the adjusted microseconds matches what we previously configured
+      // then again nothing to do, timer will repeat as planned
+      if (_current_microseconds == microseconds)
+        return;
+
+      // otherwise, set new timer registers
+      
+      _current_microseconds = microseconds;
       
       bool ctrla_enabled = _Timer->CTRLA.reg & TC_CTRLA_ENABLE;
       
@@ -469,17 +529,6 @@ class TimerCounter
 
       _Timer->CTRLA.reg &= ~(TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCALER_DIV256 | TC_CTRLA_PRESCALER_DIV64 | TC_CTRLA_PRESCALER_DIV16 | TC_CTRLA_PRESCALER_DIV8 | TC_CTRLA_PRESCALER_DIV4 | TC_CTRLA_PRESCALER_DIV2 | TC_CTRLA_PRESCALER_DIV1);
       while (_Timer->STATUS.bit.SYNCBUSY);
-
-      // impose some kind of minimum cycle time, to avoid deadlock
-      if (microseconds < 20)
-      {
-        microseconds = 20;
-      }
-      // avoid wraparound for periods longer than the maximum permitted with the widest prescaler
-      if (microseconds > 1398080)
-      {
-        microseconds = 1398080;
-      }
 
       uint32_t cycles = (TIMER_HZ/1000000) * microseconds;
       if (cycles > (65535*256)) 
