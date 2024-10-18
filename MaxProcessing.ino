@@ -65,7 +65,7 @@ void TZXStop() {
   seekFile(); 
   bytesRead=0;                                // reset read bytes PlayBytes
 #ifdef AYPLAY
-  AYPASS = AYPASS_STEP::NONE;                                 // reset AY flag
+  AYPASS_hdrptr = AYPASS_STEP::HDRSTART; // reset AY flag
 #endif
 #ifdef Use_CAS
   casduino = CASDUINO_FILETYPE::NONE;
@@ -941,18 +941,14 @@ void TZXProcess() {
               zeroPulse = ZEROPULSE;
               onePulse = ONEPULSE;
               currentBlockTask = BLOCKTASK::PILOT;    // now send pilot, SYNC1, SYNC2 and TDATA (writeheader() from String Vector on 1st pass then writeData() on second)
-              if (AYPASS==AYPASS_STEP::NONE) {
-                AYPASS = AYPASS_STEP::WRITE_HEADER;     // Set AY TAP data read flag only if first run
+              bitChecksum = 0;
+              bytesRead = 0;
+              if (AYPASS_hdrptr == AYPASS_STEP::HDRSTART){
                 pilotPulses = PILOTNUMBERL + 1;
-              }
-              else {
+              } else {
+                // already sent header, so now send data block (shorter pilot)
                 pilotPulses = PILOTNUMBERH + 1;
-                if (AYPASS == AYPASS_STEP::DONE_HEADER) {           // If we have already sent TAP header
-                  bitChecksum = 0;  
-                  bytesRead = 0;
-                  bytesToRead = filesize+5;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
-                  AYPASS = AYPASS_STEP::WRITE_FLAG_BYTE;                 // reset flag to read from file and output header 0xFF byte and end chksum
-                }
+                bytesToRead = filesize+5;   // set length of file to be read plus data byte and CHKSUM (and 2 block LEN bytes)
               }
               usedBitsInLastByte=8;
               break;
@@ -1278,16 +1274,16 @@ void StandardBlock() {
       currentBlockTask = BLOCKTASK::TDATA;
       break;
     
-    case BLOCKTASK::TDATA:  
+    case BLOCKTASK::TDATA:
       //Data Playback
 #ifdef AYPLAY
-      if ((AYPASS==AYPASS_STEP::NONE)||(AYPASS==AYPASS_STEP::WRITE_FLAG_BYTE)||(AYPASS==AYPASS_STEP::WRITE_CHECKSUM))
+      if (currentID==AYO && AYPASS_hdrptr <= AYPASS_STEP::HDREND)
       {
-        writeData();   // Check if we are playing from file or Vector String and we need to send first 0xFF byte or checksum byte at EOF
+        writeHeader2(); // write TAP Header data from String Vector
       }
       else
       {
-        writeHeader2();            // write TAP Header data from String Vector (AYPASS=AYPASS_STEP::WRITE_HEADER)
+        writeData();
       }
 #else
       writeData();
@@ -1603,9 +1599,9 @@ bool getNextDataByte() {
   if(ReadByte()) {            //Read in a byte
     currentByte = outByte;
     #ifdef AYPLAY
-    if (AYPASS==AYPASS_STEP::WRITE_FLAG_BYTE) {
+    if (AYPASS_hdrptr == AYPASS_STEP::WRITE_FLAG_BYTE) {
       currentByte = 0xFF;                 // Only insert first DATA byte if sending AY TAP DATA Block and don't decrement counter
-      AYPASS = AYPASS_STEP::WRITE_CHECKSUM; // set Checksum flag to be sent when EOF reached
+      AYPASS_hdrptr = AYPASS_STEP::WRITE_CHECKSUM; // set Checksum flag to be sent when EOF reached
       bytesRead += -1;                    // rollback ptr and compensate for dummy read byte
       bytesToRead += 2;                   // add 2 bytes to read as we send 0xFF (data flag header byte) and chksum at the end of the block
     } else {
@@ -1632,11 +1628,11 @@ bool getNextDataByte() {
     
   #ifdef AYPLAY
     // Check if need to send checksum
-    if (AYPASS==AYPASS_STEP::WRITE_CHECKSUM)
+    if (AYPASS_hdrptr == AYPASS_STEP::WRITE_CHECKSUM)
     {
       currentByte = bitChecksum;          // send calculated chksum
       bytesToRead += 1;                   // add one byte to read
-      AYPASS = AYPASS_STEP::NONE;         // Reset flag to end block
+      AYPASS_hdrptr = AYPASS_STEP::FINISHED; // Reset flag to end block
     }
     else
   #endif
@@ -2054,35 +2050,31 @@ _set_period:
 void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
   if(currentBit==0) {                         //Check for byte end/new byte                         
-    if(hdrptr==19) {              // If we've reached end of header block send checksum byte
+    if(AYPASS_hdrptr==AYPASS_STEP::HDREND) { // If we've reached end of header block send checksum byte
       currentByte = bitChecksum;
-      AYPASS = AYPASS_STEP::DONE_HEADER;     // set flag to Stop playing from header in RAM 
+      AYPASS_hdrptr = AYPASS_STEP::WRITE_FLAG_BYTE; // for next TDATA section we'll write the 0xFF flag before the AY data
       currentBlockTask = BLOCKTASK::PAUSE;   // we've finished outputting the TAP header so now PAUSE and send DATA block normally from file
       return;
     }
-    hdrptr += 1;                   // increase header string vector pointer
-    if(hdrptr<20) {                     //Read a byte until we reach end of tap header
-      currentByte = pgm_read_byte(TAPHdr+hdrptr);
-      if (hdrptr>=3 && hdrptr<=12) {
-        if (hdrptr-3 < strlen(fileName)) {
-          currentByte = fileName[hdrptr-3];
-          if (currentByte<0x20 || currentByte>0x7f) {
-            currentByte = '?';
-          }
-        } else {
-          currentByte = ' ';
+    ++AYPASS_hdrptr;                 // increase header string vector pointer
+    currentByte = pgm_read_byte(TAPHdr+AYPASS_hdrptr);
+    if (AYPASS_hdrptr>=AYPASS_STEP::FILENAME_START && AYPASS_hdrptr<=AYPASS_STEP::FILENAME_END) {
+      if (AYPASS_hdrptr-AYPASS_STEP::FILENAME_START < strlen(fileName)) {
+        currentByte = fileName[AYPASS_hdrptr-AYPASS_STEP::FILENAME_START];
+        if (currentByte<0x20 || currentByte>0x7f) {
+          currentByte = '?';
         }
+      } else {
+        currentByte = ' ';
       }
-      else if(hdrptr==13){                           // insert calculated block length minus LEN bytes
-        currentByte = lowByte(filesize);
-      } else if(hdrptr==14){
-        currentByte = highByte(filesize);
-      }
-      bitChecksum ^= currentByte;    // Keep track of Chksum
-      currentBit=8;
-    } else {
-      currentBit=usedBitsInLastByte;          //Otherwise only play back the bits needed
-    }   
+    }
+    else if(AYPASS_hdrptr==AYPASS_STEP::LEN_LOW_BYTE){ // insert calculated block length minus LEN bytes
+      currentByte = lowByte(filesize);
+    } else if(AYPASS_hdrptr==AYPASS_STEP::LEN_HIGH_BYTE){
+      currentByte = highByte(filesize);
+    }
+    bitChecksum ^= currentByte;    // Keep track of Chksum
+    currentBit=8;
     pass=0; 
   } //End if currentBit == 0
 

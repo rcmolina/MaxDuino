@@ -193,18 +193,20 @@ PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
 
 #ifdef AYPLAY
 // AY Header offset start
-#define HDRSTART              0
-PROGMEM const byte AYFile[8] = {'Z','X','A','Y','E','M','U','L'};           // added additional AY file header check
-PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','F','i','l','e',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
-enum class AYPASS_STEP : byte {
-  NONE = 0,
-  WRITE_HEADER = 1,
-  DONE_HEADER = 2,
-  WRITE_FLAG_BYTE = 5,
-  WRITE_CHECKSUM = 4,
+PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','E','M','U','L',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
+PROGMEM const byte * const AYFile = TAPHdr+3;  // added additional AY file header check
+enum AYPASS_STEP : byte {
+  HDRSTART = 0,
+  FILENAME_START = 3,
+  FILENAME_END = 12,
+  LEN_LOW_BYTE = 13,
+  LEN_HIGH_BYTE = 14,
+  HDREND = 19,
+  WRITE_FLAG_BYTE = 20,
+  WRITE_CHECKSUM = 21,
+  FINISHED = 22,
 };
-AYPASS_STEP AYPASS = AYPASS_STEP::NONE;
-byte hdrptr = 0;
+byte AYPASS_hdrptr = AYPASS_STEP::HDRSTART;
 #endif
 
 bool EndOfFile=false;
