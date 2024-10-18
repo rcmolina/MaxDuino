@@ -727,7 +727,7 @@ void TZXProcess() {
           break;
 
         case ID33:
-          //Process ID32 - Archive Info
+          //Process ID33 - Machine Info
           //Block Skipped until larger screen used         
           if(ReadByte()) {
             bytesRead += (long(outByte) * 3);
@@ -847,6 +847,12 @@ void TZXProcess() {
           }
           break; // Case_ID4B
 
+        case ID5A:
+          // Glue block; nothing to do (skip it)
+          bytesRead += 9;
+          currentTask = TASK::GETID;
+          break;
+        
         case TAP:
           //Pure Tap file block
           switch(currentBlockTask) {
