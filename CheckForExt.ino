@@ -28,7 +28,7 @@ void checkForEXT(const char * const filenameExt) {
   else if (!strcasecmp_P(filenameExt, PSTR("ay"))) {
     currentTask=TASK::GETAYHEADER;
     currentID=AYO;
-    AYPASS = 0;
+    AYPASS = AYPASS_STEP::NONE;
     hdrptr = HDRSTART;
   }
 #endif
