@@ -88,7 +88,7 @@ void TZXLoop() {
   }
   interrupts();
 
-  if(currentBlockTask == BLOCKTASK::ID15_TDATA && btemppos+16<buffsize && bytesToRead>=16)
+  if(currentBlockTask == BLOCKTASK::ID15_TDATA && btemppos+16<=buffsize && bytesToRead>=16)
   {
     // shortcut for ID15 handler for performance
     // write 8 input bytes (=16 output bytes to buffer)
