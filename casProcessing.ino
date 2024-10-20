@@ -7,119 +7,180 @@ void casPause()
   interrupts();
 }
 
-void wave()
+void bits_to_pulses()
 {
-  if(isStopped==0)
+  // converts from a packed representation of bits to output (bitword)
+  // into a sequence of high and low output levels to emit
+  //
+  // needs some explanation:
+  // bitword will either be 0x8000 to indicate "output silence"
+  // or a set of bits (usually 8 or 11 bits), LSB first,
+  // e.g. xxxxx11101010100
+  //
+  // A bit (0 or 1) will be mapped to a set of pulses:
+  // 0: a "0" is output as one long pulse        ___/"""
+  // 1: a "1" is output as two short pulses      _/"\_/"
+  //    or if file is a DRAGONMODE file
+  //    then ONE short pulse                     _/"
+  //
+  // However, note that all the above are inverted for DRAGNOMODE
+  // 0:                                          """\___
+  // 1:                                          "\_
+  //
+  // lastly, silence (instead of a bit) is output as a continuous low value
+  // repeated for 4 half-periods:                ________
+  //
+  // or, for DRAGONMODE, as a high value:        """"""""
+  //
+  //
+  // This function packs the output levels as 1s and 0s (highs and lows respectively)
+  // into the same format used by the ID15/Direct mode of wave2:
+  //
+  // 010xxiiibbbbbbbb = 0x4000 + (I<<8) + B
+  // |||\/\_/\______/
+  // ||| | |    |
+  // ||| | |    +-- B = 8 bits (leftmost bit next)
+  // ||| | +-- I = 0..7 = number of remaining b bits (minus 1). i.e. 7 means 'use all 8 bits', 0 means 'just use one bit'
+  // ||| +-- X = unused, set to zero
+  // ||+-- always 0
+  // |+-- always 1
+  // +-- always 0
+
+  byte val;
+  byte bits = 0;
+  byte bitpos = 1<<7;
+  byte nbits = 0;
+  while(bitpos>0 && currentBit!=0)
   {
-    switch(readBuffer[readpos]) {
-      case 0:
-        if(cas_pass == 0 || cas_pass == 1) {
-          if (!out) WRITE_LOW;    
-          else WRITE_HIGH;
-        } else {
-          if (!out) WRITE_HIGH;    
-          else WRITE_LOW; 
-        }
-        break;
-
-      case 1:
-        if(cas_pass==0 || cas_pass==2) {
-          if (!out) WRITE_LOW;    
-          else WRITE_HIGH;
-        } else {
-          if (!out) WRITE_HIGH;    
-          else WRITE_LOW;
-        }
-        #if defined(Use_DRAGON)
-        if(casduino == CASDUINO_FILETYPE::DRAGONMODE && cas_pass == 1) {
-          cas_pass=3;
-        }
-        #endif
-        break;
-
-      case 2:
-        if (!out) WRITE_LOW;
-        else WRITE_HIGH;
-        break;
-    }
-  
-    cas_pass = cas_pass + 1;
-    if(cas_pass == 4) 
+    while (pass<4 && bitpos>0)
     {
-      cas_pass=0;
-      readpos += 1;
-      if(readpos >= buffsize) 
+      if (bitword & 0x8000)
       {
-        readpos = 0;
-        // swap read and write buffers
-        volatile byte * tmp = readBuffer;
-        readBuffer = writeBuffer;
-        writeBuffer = tmp;
-        morebuff = true;
+        // signifies 'force low', rather than a bit to be output as a pattern
+        if (invert) bits |= bitpos;
+      }
+      else
+      {
+        switch (bitword & 0x0001) {
+          case 0:
+            if(pass==0 || pass==1) {
+              if (invert) bits |= bitpos;
+            } else {
+              if (!invert) bits |= bitpos;
+            }
+            break;
+
+          case 1:
+            if(pass==0 || pass==2) {
+              if (invert) bits |= bitpos;
+            } else {
+              if (!invert) bits |= bitpos;
+            }
+            #if defined(Use_DRAGON)
+            if(casduino == CASDUINO_FILETYPE::DRAGONMODE && pass == 1) {
+              pass=3;
+            }
+            #endif
+            break;
+        }
+      }
+
+      bitpos>>=1;
+      nbits++;
+      pass++;
+    }
+
+    if(pass==4)
+    {
+      pass=0;
+      if (currentBit)
+      {
+        currentBit--;
+        if (!(bitword & 0x8000))
+          bitword >>= 1;
       }
     }
-  } else {
-    WRITE_LOW;
+  }
+
+  if (nbits)
+  {
+    // we have >0 (at most 8) pulse levels for some bits(s), so put this in the output buffer
+    // and move on to the next bit(s)
+    volatile byte * _wb = writeBuffer+writepos;
+    noInterrupts();                       //Pause interrupts while we add a period to the buffer
+    *_wb = 0x40 + (nbits-1); // = (1<<14)>>8;
+    *(_wb+1) = bits;
+    interrupts();
+    writepos+=2;
   }
 }
 
 void writeByte(byte b)
 {
-  byte * _pbits = bits;
+  // writeByte, writeSilence and writeHeader all put some packed data into
+  // a single word, using the format:
+  // bitword = 1000000000000000   // means "output only silence"
+  // bitword = 0bbbbbbbbbbbbbbb   // means "output the long/short pulses corresponding to bits bbbb"
+  //                          ^
+  //                          |
+  //                           bits bbbb are little-endian , so this lowest bit will be output next
+  //
+  // The variable "casduino" indicates how many bits in bitword are remaining to emit
+  // bitword then gets shifted right when generating pulses (see bits_to_pulses)
+
+  // 'casduino' holds the number of bits: 8 (DRAGON) or 11 (CAS)
+  currentBit = (byte)casduino;
 #if defined(Use_DRAGON)
   if(casduino == CASDUINO_FILETYPE::CASDUINO)
 #endif
   {
-    *_pbits++ = 0; // 1 start bit
+    // bitword = xxxxx11bbbbbbbb0
+    //                ^^\______/^
+    //                 |  data  |
+    //                 |        |
+    //                 2 stop   1 start
+    //                   bits     bit
+    //                   = 11     = 0
+    //
+    bitword = (((word)b)<<1) + 0x0600;
   }
-
-  for(int i=0;i<8;i++)
-  {
-    *_pbits++ = (b&1);
-    b >>= 1;
-  }
-
 #if defined(Use_DRAGON)
-  if(casduino == CASDUINO_FILETYPE::CASDUINO)
-#endif
+  else
   {
-    // 2 stop bits
-    *_pbits++ = 1;
-    *_pbits++ = 1;
+    // bitword = xxxxxxxxbbbbbbbb
+    //                   \______/
+    //                     data
+    bitword = b;
   }
+#endif
 }
 
 void writeSilence()
 {
-  for(int i=0;i<11;i++)
-  {
-    bits[i]=2;
-  }
+  // write a 'low' output
+  bitword = 0x8000;
+  currentBit = (byte)casduino;
 }
 
 void writeHeader()
 {
-  for(int i=0;i<11;i++)
-  {
-    bits[i]=1;
-  }
+  // write a header of 1 bits
+  bitword = 0x07ff;  // 11 1's i.e. 0b0000011111111111
+  currentBit = (byte)casduino;
 }
 
 void process()
 {
-//  byte r=0;
   if(cas_currentType==CAS_TYPE::typeEOF)
   {
-//    if(!count==0) {
     if(count) {
       writeSilence();
-      count+=-1;  
+      count--;
     } else stopFile();    
     return;
   }
   if(currentTask==TASK::GETFILEHEADER || currentTask==TASK::CAS_wData)
   {
-//    if((r=readfile(8,bytesRead))==8)
     if(readfile(8,bytesRead))
     {
       if(!memcmp_P(filebuffer, HEADER,8)) {
@@ -134,8 +195,6 @@ void process()
         if(cas_currentType==CAS_TYPE::Nothing) fileStage=1;
         bytesRead+=8;
       }
-      
-//    } else if(r==0)
     } else
     {
       cas_currentType=CAS_TYPE::typeEOF;
@@ -169,11 +228,10 @@ void process()
 
   if(currentTask==TASK::CAS_wSilence)
   {
-//    if(!count==0)
     if(count)
     {
       writeSilence();
-      count+=-1;
+      count--;
     } else 
     {
       currentTask=TASK::CAS_wHeader;
@@ -196,11 +254,10 @@ void process()
   }
   if(currentTask==TASK::CAS_wHeader)
   {
-//    if(!count==0)
     if(count)
     {
       writeHeader();
-      count+=-1;
+      count--;
     } else
     {
       currentTask=TASK::CAS_wData;
@@ -311,7 +368,6 @@ void processDragon()
       }
 */
     } else if(currentTask==TASK::CAS_wSync) { 
-//      if(!count==0) {
       if(count) {
         writeByte(filebuffer[0]);
         bytesRead+=1;
@@ -324,7 +380,6 @@ void processDragon()
       }
  
     } else if(currentTask==TASK::CAS_wNameFileBlk) { 
-//      if(!count==0) {
       if(count) {
         writeByte(filebuffer[0]);
         bytesRead+=1;
@@ -379,7 +434,6 @@ void processDragon()
       currentTask=TASK::CAS_wSilence;
     }    
     if(currentTask==TASK::CAS_wSilence) {
-//      if(!count==0) {
       if(count) {
         writeSilence();
         count--;
@@ -393,38 +447,43 @@ void processDragon()
 
 void casduinoLoop()
 {
-  noInterrupts();
-  isStopped=pauseOn;
-  if(morebuff)
+  if (writepos<buffsize)
   {
-    //Buffer has swapped, start from the beginning of the new page
-    writepos=0;
-    morebuff=false;    
-  }
-  interrupts();
+    // first time, set sample period (like ID15)
+    if(currentTask==TASK::INIT)
+    {
+      currentTask=TASK::GETFILEHEADER;
 
-  if(writepos<buffsize)
-  { 
-#if defined(Use_DRAGON)
-    if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
-      processDragon();
+      const word _currentPeriod = period | 0x6000;
+      const byte _b1 = _currentPeriod /256;
+      const byte _b2 = _currentPeriod %256;
+      volatile byte * _wb = writeBuffer+writepos;
+      noInterrupts();                       //Pause interrupts while we add a period to the buffer
+      *_wb = _b1;
+      *(_wb+1) = _b2;
+      interrupts();
+      writepos+=2;
     }
     else
-#endif
     {
-      process();      
+      if(currentBit==0)
+      { 
+    #if defined(Use_DRAGON)
+        if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
+          processDragon();
+        }
+        else
+    #endif
+        {
+          process();      
+        }
+      }
+  
+      bits_to_pulses();
     }
-
-    if(writepos<buffsize)
-    {
-      // casduino isn't just true/false - it's the number of bits (8 or 11)
-      for(int t=0; t<(byte)casduino; t++)
-      {
-        writeBuffer[writepos] = bits[t];
-        writepos+=1;         
-      }        
-    }
-  } else {
+  }
+  else
+  {
     if (!pauseOn) {      
     #if defined(SHOW_CNTR)
       lcdTime();          

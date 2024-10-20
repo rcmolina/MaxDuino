@@ -4,17 +4,12 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-/* Buffer overflow detected by David Hooper
-   buffsize must be both a multiple of 11 (for MSX processing) and a multiple of 8 (for Dragon processing)
-   it also needs to be a mutiple of 2 (for TZX processing) but being a multiple of 8, it will already be a multple of 2.
-   We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
-   as a buffersize because it is a multiple of 8 and a multiple of 11...
+/* With latest casprocessing logic, buffsize can be any multiple of 2.
 */
-
 #ifdef LARGEBUFFER
-  #define buffsize 208  // factors of this value are: 11 for MSX and 8 for DRAGON
+  #define buffsize 254
 #else
-  #define buffsize 176  // factors of this value are: 11 for MSX and 8 for DRAGON
+  #define buffsize 176
 #endif
 
 #if defined(XY2) && not defined(DoubleFont)
@@ -33,7 +28,7 @@ const byte CAS_ASCII = 0xEA;
 const byte CAS_BINF = 0xD0;
 const byte CAS_BASIC = 0xD3;
 
-byte bits[11];
+word bitword;
 byte fileStage=0;
 enum class CASDUINO_FILETYPE : byte {
   NONE = 0,
@@ -41,7 +36,7 @@ enum class CASDUINO_FILETYPE : byte {
   DRAGONMODE = 8, // number of bits
 };
 CASDUINO_FILETYPE casduino = CASDUINO_FILETYPE::NONE;
-bool out=false;
+bool invert=false;
 
 enum class CAS_TYPE : byte {
   Nothing=0,
@@ -58,17 +53,17 @@ CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
 
 
 //ISR Variables
-volatile byte cas_pass = 0;
 byte readpos = 0; // only used within the ISR, never accessed outside, so doesn't need to be volatile
 volatile byte wbuffer[2][buffsize];
-volatile bool morebuff = true;
+volatile bool morebuff = false;
 volatile byte * volatile writeBuffer=wbuffer[0]; // the pointer itself is volatile (since the ISR can swap readBuffer/writeBuffer)
 volatile byte * readBuffer=wbuffer[1];
 volatile byte isStopped=false;
 
 //Main Variables
-volatile long count = 0;
+long count = 0;
 byte pass = 0;
+byte currentBit=0;
 byte writepos = 0;
 byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
 byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
@@ -78,8 +73,6 @@ byte currpct = 100;
 byte newpct = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
-
-byte currentBit=0;
 
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
@@ -125,6 +118,9 @@ enum BLOCKID
 
 enum class TASK : byte
 {
+  // basic initialisation when start playing a file
+  INIT,
+
   //TZX File Tasks
   GETFILEHEADER,
   GETID,

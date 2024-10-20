@@ -21,33 +21,26 @@ void UniPlay(){
   block=0;                                    // Initial block when starting
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
   bytesRead=0;                                //start of file
-  currentTask=TASK::GETFILEHEADER;                  //First task: search for header
+  currentTask=TASK::INIT;                     //
   const char * filenameExt = strrchr(fileName,'.') + 1;
   checkForEXT(filenameExt);
   isStopped=false;
   
   clearBuffer();
 
-#ifdef Use_CAS 
-  if (casduino!=CASDUINO_FILETYPE::NONE) { // CAS or DRAGON
-    cas_currentType=CAS_TYPE::Nothing;
-    currentTask=TASK::GETFILEHEADER;
-    fileStage=0;
-    Timer.initialize(period);
-    Timer.attachInterrupt(wave);
-  }
-  else 
-#endif
-  {
-    currentBlockTask = BLOCKTASK::READPARAM;               //First block task is to read in parameters
-    count = 255;                                //End of file buffer flush 
-    EndOfFile=false;
-    passforZero=2;
-    passforOne=4;
-    reset_output_state();
-    Timer.initialize(100000); //100ms pause prevents anything bad happening before we're ready
-    Timer.attachInterrupt(wave2);
-  }
+  // for CAS/DRAGON:
+  cas_currentType=CAS_TYPE::Nothing;
+  fileStage=0;
+  // for TZX/UEF/etc:
+  currentBlockTask = BLOCKTASK::READPARAM;    //First block task is to read in parameters
+  count = 255;                                //End of file buffer flush 
+  EndOfFile=false;
+  passforZero=2;
+  passforOne=4;
+
+  reset_output_state();
+  Timer.initialize(100000); //100ms pause prevents anything bad happening before we're ready
+  Timer.attachInterrupt(wave2);
 }
 
 void reset_output_state() {
@@ -78,16 +71,6 @@ void TZXPause() {
 }
 
 void TZXLoop() {   
-  noInterrupts();                           //Pause interrupts to prevent var reads and copy values out
-  isStopped = pauseOn;
-  if(morebuff)
-  {
-    //Buffer has swapped, start from the beginning of the new page
-    writepos=0;
-    morebuff=false;    
-  }
-  interrupts();
-
   if(currentBlockTask == BLOCKTASK::ID15_TDATA && writepos+16<=buffsize && bytesToRead>=16)
   {
     // shortcut for ID15 handler for performance
@@ -132,6 +115,10 @@ void TZXProcess() {
 
   currentPeriod = 0;
   switch (currentTask) {
+    case TASK::INIT:
+      //First task: search for header
+      currentTask = TASK::GETFILEHEADER;
+      break;
   
     case TASK::GETFILEHEADER:
       //grab 7 byte string
@@ -2094,21 +2081,13 @@ void writeHeader2() {
 
 void clearBuffer()
 {
-#ifdef Use_CAS
-  const byte fill = (casduino==CASDUINO_FILETYPE::NONE)?0:2;
-#else
-  const byte fill = 0;
-#endif
-
   noInterrupts();
   for(byte i=0;i<buffsize;i++)
   {
-    wbuffer[0][i]=fill;
-    wbuffer[1][i]=fill;
+    wbuffer[0][i]=0;
+    wbuffer[1][i]=0;
   }
-
   pass=0;
-  cas_pass=0;
   interrupts();
 }
 
@@ -2151,6 +2130,20 @@ void setBaud()
 
 
 void uniLoop() {
+  bool _copybuff;
+  noInterrupts();
+  //Pause interrupts to prevent var reads and copy values out
+  isStopped = pauseOn;
+  _copybuff = morebuff;
+  morebuff = false;
+  interrupts();
+
+  if(_copybuff)
+  {
+    //Buffer has swapped, start from the beginning of the new page
+    writepos=0;
+  }
+
  #ifdef Use_CAS
     if (casduino!=CASDUINO_FILETYPE::NONE)
     {

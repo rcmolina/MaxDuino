@@ -40,11 +40,11 @@ void checkForEXT(const char * const filenameExt) {
 #ifdef Use_CAS
   else if (!strcasecmp_P(filenameExt, PSTR("cas"))) {
     casduino = CASDUINO_FILETYPE::CASDUINO;
-    out=false;
+    invert=false;
     #if defined(Use_DRAGON)
       readfile(1,bytesRead);
       if (filebuffer[0] == 0x55) {
-        out=true;
+        invert=true;
         casduino = CASDUINO_FILETYPE::DRAGONMODE;
         period=249;
         count=255;
