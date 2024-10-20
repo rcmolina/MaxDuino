@@ -59,10 +59,10 @@ CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
 
 //ISR Variables
 volatile byte pass = 0;
-volatile byte readpos = 0;
+byte readpos = 0; // only used within the ISR, never accessed outside, so doesn't need to be volatile
 volatile byte wbuffer[2][buffsize];
 volatile bool morebuff = true;
-volatile byte * writeBuffer=wbuffer[0];
+volatile byte * volatile writeBuffer=wbuffer[0]; // the pointer itself is volatile (since the ISR can swap readBuffer/writeBuffer)
 volatile byte * readBuffer=wbuffer[1];
 volatile byte isStopped=false;
 
