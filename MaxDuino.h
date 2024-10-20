@@ -83,39 +83,44 @@ byte currentBit=0;
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
 //TZX block list - uncomment as supported
-#define ID10                0x10    //Standard speed data block
-#define ID11                0x11    //Turbo speed data block
-#define ID12                0x12    //Pure tone
-#define ID13                0x13    //Sequence of pulses of various lengths
-#define ID14                0x14    //Pure data block
-#define ID15                0x15    //Direct recording block -- TBD - curious to load OTLA files using direct recording (22KHz)
-//#define ID18                0x18    //CSW recording block
-#define ID19                0x19    //Generalized data block hacked for zx81
-#define ID20                0x20    //Pause (silence) or 'Stop the tape' command
-#define ID21                0x21    //Group start
-#define ID22                0x22    //Group end
-#define ID23                0x23    //Jump to block
-#define ID24                0x24    //Loop start
-#define ID25                0x25    //Loop end
-#define ID26                0x26    //Call sequence
-#define ID27                0x27    //Return from sequence
-#define ID28                0x28    //Select block
-#define ID2A                0x2A    //Stop the tape if in 48K mode
-#define ID2B                0x2B    //Set signal level
-#define ID30                0x30    //Text description
-#define ID31                0x31    //Message block
-#define ID32                0x32    //Archive info
-#define ID33                0x33    //Hardware type
-#define ID35                0x35    //Custom info block
-#define ID4B                0x4B    //Kansas City block (MSX/BBC/Acorn/...)
-#define IDPAUSE             0x59    //Custom Pause processing
-#define ID5A                0x5A    //Glue block (90 dec, ASCII Letter 'Z')
-#define ORIC                0xFA    //Oric Tap File
-#define AYO                 0xFB    //AY file
-#define ZXO                 0xFC    //ZX80 O file
-#define ZXP                 0xFD    //ZX81 P File
-#define TAP                 0xFE    //Tap File Mode
-#define IDEOF               0xFF    //End of file
+enum BLOCKID
+{
+  UNKNOWN = 0x00, // not a block ID / not initialized yet or trigger an error
+  ID10 = 0x10,    //Standard speed data block
+  ID11 = 0x11,    //Turbo speed data block
+  ID12 = 0x12,    //Pure tone
+  ID13 = 0x13,    //Sequence of pulses of various lengths
+  ID14 = 0x14,    //Pure data block
+  ID15 = 0x15,    //Direct recording block
+//  ID18 = 0x18,    //CSW recording block
+  ID19 = 0x19,    //Generalized data block (NB hacked for zx81 only, will not work for anything else)
+  ID20 = 0x20,    //Pause (silence) or 'Stop the tape' command
+  ID21 = 0x21,    //Group start
+  ID22 = 0x22,    //Group end
+  ID23 = 0x23,    //Jump to block
+  ID24 = 0x24,    //Loop start
+  ID25 = 0x25,    //Loop end
+  ID26 = 0x26,    //Call sequence
+  ID27 = 0x27,    //Return from sequence
+  ID28 = 0x28,    //Select block
+  ID2A = 0x2A,    //Stop the tape if in 48K mode
+  ID2B = 0x2B,    //Set signal level
+  ID30 = 0x30,    //Text description
+  ID31 = 0x31,    //Message block
+  ID32 = 0x32,    //Archive info
+  ID33 = 0x33,    //Hardware type
+  ID35 = 0x35,    //Custom info block
+  ID4B = 0x4B,    //Kansas City block (MSX/BBC/Acorn/...)
+  ID5A = 0x5A,    //Glue block (90 dec, ASCII Letter 'Z')
+  IDPAUSE = 0x80, //Custom Pause processing
+  UEF = 0xF9,     //UEF file
+  ORIC = 0xFA,    //Oric Tap File
+  AYO = 0xFB,     //AY file
+  ZXO = 0xFC,     //ZX80 O file
+  ZXP = 0xFD,     //ZX81 P File
+  TAP = 0xFE,     //Tap File Mode
+  IDEOF = 0xFF,   //End of file
+};
 
 enum class TASK : byte
 {
@@ -162,7 +167,7 @@ enum class BLOCKTASK : byte
 };
 
 //Keep track of which ID, Task, and Block Task we're dealing with
-byte currentID = 0;
+byte currentID=BLOCKID::UNKNOWN;
 TASK currentTask=TASK::GETFILEHEADER;
 BLOCKTASK currentBlockTask = BLOCKTASK::READPARAM;
 
@@ -283,7 +288,6 @@ byte oldMinBlock = 0;
 
 #ifdef Use_UEF
 PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
-#define UEF                 0xFA    //UEF file for ID list
 // UEF chunks
 #define ID0000              0x0000 // origin information chunk
 #define ID0100              0x0100 // implicit start/stop bit tape data block
