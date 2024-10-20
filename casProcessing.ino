@@ -13,7 +13,7 @@ void wave()
   {
     switch(readBuffer[readpos]) {
       case 0:
-        if(pass == 0 || pass == 1) {
+        if(cas_pass == 0 || cas_pass == 1) {
           if (!out) WRITE_LOW;    
           else WRITE_HIGH;
         } else {
@@ -23,7 +23,7 @@ void wave()
         break;
 
       case 1:
-        if(pass==0 || pass==2) {
+        if(cas_pass==0 || cas_pass==2) {
           if (!out) WRITE_LOW;    
           else WRITE_HIGH;
         } else {
@@ -31,8 +31,8 @@ void wave()
           else WRITE_LOW;
         }
         #if defined(Use_DRAGON)
-        if(casduino == CASDUINO_FILETYPE::DRAGONMODE && pass == 1) {
-          pass=3;
+        if(casduino == CASDUINO_FILETYPE::DRAGONMODE && cas_pass == 1) {
+          cas_pass=3;
         }
         #endif
         break;
@@ -43,10 +43,10 @@ void wave()
         break;
     }
   
-    pass = pass + 1;
-    if(pass == 4) 
+    cas_pass = cas_pass + 1;
+    if(cas_pass == 4) 
     {
-      pass=0;
+      cas_pass=0;
       readpos += 1;
       if(readpos >= buffsize) 
       {

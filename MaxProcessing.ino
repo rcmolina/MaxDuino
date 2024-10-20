@@ -2100,11 +2100,16 @@ void clearBuffer()
   const byte fill = 0;
 #endif
 
+  noInterrupts();
   for(byte i=0;i<buffsize;i++)
   {
     wbuffer[0][i]=fill;
     wbuffer[1][i]=fill;
-  } 
+  }
+
+  pass=0;
+  cas_pass=0;
+  interrupts();
 }
 
 void UniSetup() {
