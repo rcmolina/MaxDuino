@@ -14,20 +14,20 @@ void wave()
     switch(readBuffer[pos]) {
       case 0:
         if(pass == 0 || pass == 1) {
-          if (out == LOW) WRITE_LOW;    
+          if (!out) WRITE_LOW;    
           else WRITE_HIGH;
         } else {
-          if (out == LOW) WRITE_HIGH;    
+          if (!out) WRITE_HIGH;    
           else WRITE_LOW; 
         }
         break;
 
       case 1:
         if(pass==0 || pass==2) {
-          if (out == LOW) WRITE_LOW;    
+          if (!out) WRITE_LOW;    
           else WRITE_HIGH;
         } else {
-          if (out == LOW) WRITE_HIGH;    
+          if (!out) WRITE_HIGH;    
           else WRITE_LOW;
         }
         #if defined(Use_DRAGON)
@@ -38,7 +38,7 @@ void wave()
         break;
 
       case 2:
-        if (out == LOW) WRITE_LOW;
+        if (!out) WRITE_LOW;
         else WRITE_HIGH;
         break;
     }
@@ -154,13 +154,13 @@ void process()
 //    if((r=readfile(10,bytesRead))==10)
     if((readfile(10,bytesRead))==10)
     {
-      if(!memcmp_P(filebuffer, ASCII, 10))
+      if(cas_file_match(CAS_ASCII))
       {
         cas_currentType = CAS_TYPE::Ascii;
-      }else if(!memcmp_P(filebuffer, BINF, 10))
+      }else if(cas_file_match(CAS_BINF))
       {
         cas_currentType = CAS_TYPE::Binf;
-      }else if(!memcmp_P(filebuffer, BASIC, 10))
+      }else if(cas_file_match(CAS_BASIC))
       {
         cas_currentType = CAS_TYPE::Basic;
       }
@@ -218,6 +218,14 @@ void process()
   if(currentTask==TASK::GETFILEHEADER || currentTask==TASK::CAS_lookType || currentTask==TASK::CAS_wData) bytesRead+=1; 
 }
 
+bool cas_file_match(const byte matchval)
+{
+  // simply return true if all bytes between filebuffer and filebuffer+9
+  // match the matchval
+  for (byte i=9; i>=0; --i)
+    if (filebuffer[i] != matchval) return false;
+  return true;
+}
 
 #if defined(Use_DRAGON)
 void processDragon()
