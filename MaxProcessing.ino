@@ -83,12 +83,12 @@ void TZXLoop() {
   if(morebuff)
   {
     //Buffer has swapped, start from the beginning of the new page
-    btemppos=0;
+    writepos=0;
     morebuff=false;    
   }
   interrupts();
 
-  if(currentBlockTask == BLOCKTASK::ID15_TDATA && btemppos+16<=buffsize && bytesToRead>=16)
+  if(currentBlockTask == BLOCKTASK::ID15_TDATA && writepos+16<=buffsize && bytesToRead>=16)
   {
     // shortcut for ID15 handler for performance
     // write 8 input bytes (=16 output bytes to buffer)
@@ -97,18 +97,18 @@ void TZXLoop() {
     return;
   }
 
-  if(btemppos<buffsize){                    // Keep filling until full
+  if(writepos<buffsize){                    // Keep filling until full
     TZXProcess();                           //generate the next period to add to the buffer
     if(currentPeriod>0) {
       //add period to the buffer
       const byte _b1 = currentPeriod /256;
       const byte _b2 = currentPeriod %256;
-      volatile byte * _wb = writeBuffer+btemppos;
+      volatile byte * _wb = writeBuffer+writepos;
       noInterrupts();                       //Pause interrupts while we add a period to the buffer
       *_wb = _b1;
       *(_wb+1) = _b2;
       interrupts();
-      btemppos+=2;
+      writepos+=2;
     }
   } else {
     if (!pauseOn) {
@@ -1728,8 +1728,8 @@ void writeDataDirect16() {
     // so:
     //     currentPeriod = (1<<14) + (7<<8) + currentByte;
     // and then:
-    //     writeBuffer[btemppos] = currentPeriod /256;   //add period to the buffer
-    //     writeBuffer[btemppos+1] = currentPeriod %256;   //add period to the buffer
+    //     writeBuffer[writeppos] = currentPeriod /256;   //add period to the buffer
+    //     writeBuffer[writepos+1] = currentPeriod %256;   //add period to the buffer
     //
     // but we don't even need to use currentPeriod variable for this, we can do directly:
     // Also note that the following code takes as much as possible out of the noInterrupts section;
@@ -1740,12 +1740,12 @@ void writeDataDirect16() {
     // 5e80:	78 94       	sei
 
     const byte _b1 = currentByte;
-    volatile byte * _wb = writeBuffer+btemppos;
+    volatile byte * _wb = writeBuffer+writepos;
     noInterrupts();                       //Pause interrupts while we add a period to the buffer
     *_wb = 0x47; // = ((1<<14) + (7<<8))>>8
     *(_wb+1) = _b1;
     interrupts();
-    btemppos+=2;
+    writepos+=2;
   }
 }
 #endif
@@ -1907,7 +1907,7 @@ void FlushBuffer(long newcount) {
 void wave2() {
   //ISR Output routine
 //  unsigned long zeroTime = micros();
-  word workingPeriod = word(readBuffer[pos], readBuffer[pos+1]);
+  word workingPeriod = word(readBuffer[readpos], readBuffer[readpos+1]);
   byte pauseFlipBit = false;
   unsigned long newTime;
   #ifdef DIRECT_RECORDING
@@ -1947,17 +1947,17 @@ void wave2() {
     {
       // this signifies the start of a direct recording block, where we encode the sample period
       directSampleLength = workingPeriod & 0x1fff;
-      pos += 2;
-      if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
+      readpos += 2;
+      if(readpos >= buffsize)                  //Swap buffer pages if we've reached the end
       {
-        pos = 0;
+        readpos = 0;
         // swap read and write buffers
         volatile byte * tmp = readBuffer;
         readBuffer = writeBuffer;
         writeBuffer = tmp;
         morebuff = true;                  //Request more data to fill inactive page
       } 
-      workingPeriod = word(readBuffer[pos], readBuffer[pos+1]);
+      workingPeriod = word(readBuffer[readpos], readBuffer[readpos+1]);
     }
     newTime = directSampleLength;
 
@@ -1982,9 +1982,9 @@ void wave2() {
       // and decrement the iii by 1 (and we knowing iii > 0 because we just checked that)
       // Decrementing iii by 1 is the same as decrementing workingPeriod by 0x0100
       // Please note: we write this back into the READ buffer = the buffer that the ISR reads from
-      readBuffer[pos] = (workingPeriod>>8)-1;
-      readBuffer[pos+1] = (workingPeriod&0x7f)<<1;
-      goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
+      readBuffer[readpos] = (workingPeriod>>8)-1;
+      readBuffer[readpos+1] = (workingPeriod&0x7f)<<1;
+      goto _set_period;  // skips the part where we move readpos += 2 because we're using the same readpos now
     }
     else
     {
@@ -2014,10 +2014,10 @@ void wave2() {
       pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;   
       // reduce pause by 1ms as we've already pause for 1.5ms
       workingPeriod = workingPeriod - 1;
-      readBuffer[pos] = workingPeriod /256;
-      readBuffer[pos+1] = workingPeriod  %256;                
+      readBuffer[readpos] = workingPeriod /256;
+      readBuffer[readpos+1] = workingPeriod  %256;                
       pauseFlipBit=false;
-      goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
+      goto _set_period;  // skips the part where we move readpos += 2 because we're using the same readpos now
     } else {
       newTime = ((unsigned long)workingPeriod)*1000ul; //Set pause length in microseconds
       isPauseBlock=false;
@@ -2031,10 +2031,10 @@ void wave2() {
   }
   
 _next:
-  pos += 2;
-  if(pos >= buffsize)                  //Swap buffer pages if we've reached the end
+  readpos += 2;
+  if(readpos >= buffsize)                  //Swap buffer pages if we've reached the end
   {
-    pos = 0;
+    readpos = 0;
     // swap read and write buffers
     volatile byte * tmp = readBuffer;
     readBuffer = writeBuffer;

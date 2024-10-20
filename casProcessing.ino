@@ -11,7 +11,7 @@ void wave()
 {
   if(isStopped==0)
   {
-    switch(readBuffer[pos]) {
+    switch(readBuffer[readpos]) {
       case 0:
         if(pass == 0 || pass == 1) {
           if (!out) WRITE_LOW;    
@@ -47,10 +47,10 @@ void wave()
     if(pass == 4) 
     {
       pass=0;
-      pos += 1;
-      if(pos >= buffsize) 
+      readpos += 1;
+      if(readpos >= buffsize) 
       {
-        pos = 0;
+        readpos = 0;
         // swap read and write buffers
         volatile byte * tmp = readBuffer;
         readBuffer = writeBuffer;
@@ -398,12 +398,12 @@ void casduinoLoop()
   if(morebuff)
   {
     //Buffer has swapped, start from the beginning of the new page
-    btemppos=0;
+    writepos=0;
     morebuff=false;    
   }
   interrupts();
 
-  if(btemppos<buffsize)
+  if(writepos<buffsize)
   { 
 #if defined(Use_DRAGON)
     if(casduino == CASDUINO_FILETYPE::DRAGONMODE) {
@@ -415,13 +415,13 @@ void casduinoLoop()
       process();      
     }
 
-    if(btemppos<buffsize)
+    if(writepos<buffsize)
     {
       // casduino isn't just true/false - it's the number of bits (8 or 11)
       for(int t=0; t<(byte)casduino; t++)
       {
-        writeBuffer[btemppos] = bits[t];
-        btemppos+=1;         
+        writeBuffer[writepos] = bits[t];
+        writepos+=1;         
       }        
     }
   } else {
