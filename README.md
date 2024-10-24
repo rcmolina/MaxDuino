@@ -3,6 +3,7 @@
 
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
+* V2.03 OTLA working with tzx id15
 * V2.02 Oled driver optimizations.
 * V2.01 aka "San Fermin". Fixed oled corruption and new cartoon8x16 font.
 * V2.00.x New maxduino stable and tested reference version.
