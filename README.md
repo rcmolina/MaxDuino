@@ -4,7 +4,7 @@
 https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
 * V2.03 OTLA working with tzx id15
-  My own otla of HoH at 12600 bauds (33s) vs old turbo at 5800 bauds with z802tzx using compression zx7b (62s). More or less half of time as expected:
+  My own otla of HoH at 12600 bauds (33s) vs old turbo at 5800 bauds with z802tzx using compression zx7b (62s). About half of time as expected:
   https://github.com/rcmolina/otla_tzx/blob/main/hoh6_zx.zip
   https://github.com/rcmolina/z802tzx3/blob/master/HoH8%5B5800%5D.tzx
 
