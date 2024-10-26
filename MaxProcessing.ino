@@ -1919,11 +1919,21 @@ void wave2() {
 
   if bitRead(workingPeriod, 15)          
   {
+    bitClear(workingPeriod,15);         //Clear pause block flag
+
+    //Handle special 'ending' pause
+    if (bitRead(workingPeriod, 13)) {
+      bitClear(workingPeriod,13);
+      newTime = workingPeriod;
+      pinState = LOW;
+      WRITE_LOW;
+      goto _next;
+    }   
+ 
     //If bit 15 of the current period is set we're about to run a pause
     //Pauses start with a 1.5ms where the output is untouched after which the output is set LOW
     //Pause block periods are stored in milliseconds not microseconds
     isPauseBlock = true;
-    bitClear(workingPeriod,15);         //Clear pause block flag
     if (!wasPauseBlock)
       pauseFlipBit = true;
   }
@@ -1998,22 +2008,15 @@ void wave2() {
     if(pauseFlipBit)
     {
       newTime = 1500;                     //Set 1.5ms initial pause block
-      pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;
-      workingPeriod = workingPeriod - 1; 
-      if (bitRead(workingPeriod, 13)) {
-        bitClear(workingPeriod,13);                       
-        pinState = LOW;          
-        newTime = workingPeriod;                             
-        workingPeriod = 0;           
-      }
-
-      readBuffer[pos] = workingPeriod /256;  //reduce pause by 1ms as we've already pause for 1.5ms
-      readBuffer[pos+1] = workingPeriod  %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
+      pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;   
+      // reduce pause by 1ms as we've already pause for 1.5ms
+      workingPeriod = workingPeriod - 1;
+      readBuffer[pos] = workingPeriod /256;
+      readBuffer[pos+1] = workingPeriod  %256;                
       pauseFlipBit=false;
       goto _set_period;  // skips the part where we move pos += 2 because we're using the same pos now
-
     } else {
-      newTime = long(workingPeriod)*1000; //Set pause length in microseconds
+      newTime = ((unsigned long)workingPeriod)*1000ul; //Set pause length in microseconds
       isPauseBlock=false;
       wasPauseBlock=true;
     }
