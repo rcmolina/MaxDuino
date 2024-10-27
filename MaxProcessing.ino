@@ -546,6 +546,7 @@ void TZXProcess() {
       case ID15:
         //process ID15 - Direct Recording          
         if(currentBlockTask==BLOCKTASK::READPARAM) {
+          block_mem_oled();
           currentBit = 0;
           if(ReadWord()) {     
             SampleLength = TickToUs(outWord);

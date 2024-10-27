@@ -1582,7 +1582,10 @@ void GetAndPlayBlock()
                     break;
 
         case ID15:  bytesRead+=5;
-                    if(ReadLong()) bytesRead += outLong; 
+                    if(ReadLong()) bytesRead += outLong;
+                    #if defined(OLEDBLKMATCH)
+                      i++;
+                    #endif                     
                     break;
 
         case ID19:  if(ReadDword()) bytesRead += outLong;
