@@ -1,4 +1,4 @@
-const char P_PRODUCT_NAME[] PROGMEM = "new MaxDuino";
+const char P_PRODUCT_NAME[] PROGMEM = "MaxDuino OTLA";
 
 #include "version.h"
 #define XXSTR(a) XSTR(a)
