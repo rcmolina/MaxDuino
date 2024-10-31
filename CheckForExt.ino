@@ -8,44 +8,43 @@ void checkForEXT(const char * const filenameExt) {
 
   if (!strcasecmp_P(filenameExt, PSTR("tap"))) {
     currentTask=TASK::PROCESSID;
-    currentID=TAP;
+    currentID=BLOCKID::TAP;
     #ifdef tapORIC
       readfile(1,bytesRead);
       if (filebuffer[0] == 0x16) {
-        currentID=ORIC;
+        currentID=BLOCKID::ORIC;
       }
     #endif
   }
   else if (!strcasecmp_P(filenameExt, PSTR("p"))) {
     currentTask=TASK::PROCESSID;
-    currentID=ZXP;
+    currentID=BLOCKID::ZXP;
   }
   else if (!strcasecmp_P(filenameExt, PSTR("o"))) {
     currentTask=TASK::PROCESSID;
-    currentID=ZXO;
+    currentID=BLOCKID::ZXO;
   }
 #ifdef AYPLAY  
   else if (!strcasecmp_P(filenameExt, PSTR("ay"))) {
     currentTask=TASK::GETAYHEADER;
-    currentID=AYO;
-    AYPASS = 0;
-    hdrptr = HDRSTART;
+    currentID=BLOCKID::AYO;
+    AYPASS_hdrptr = AYPASS_STEP::HDRSTART;
   }
 #endif
 #ifdef Use_UEF
   else if (!strcasecmp_P(filenameExt, PSTR("uef"))) {
     currentTask=TASK::GETUEFHEADER;
-    currentID=UEF;
+    currentID=BLOCKID::UEF;
   }
 #endif
 #ifdef Use_CAS
   else if (!strcasecmp_P(filenameExt, PSTR("cas"))) {
     casduino = CASDUINO_FILETYPE::CASDUINO;
-    out=LOW;
+    invert=false;
     #if defined(Use_DRAGON)
       readfile(1,bytesRead);
       if (filebuffer[0] == 0x55) {
-        out=HIGH;
+        invert=true;
         casduino = CASDUINO_FILETYPE::DRAGONMODE;
         period=249;
         count=255;

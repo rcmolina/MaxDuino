@@ -4,17 +4,12 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-/* Buffer overflow detected by David Hooper
-   buffsize must be both a multiple of 11 (for MSX processing) and a multiple of 8 (for Dragon processing)
-   it also needs to be a mutiple of 2 (for TZX processing) but being a multiple of 8, it will already be a multple of 2.
-   We used to have special logic for handling Dragon (and only using the first 8*N bytes of the buffer) but 176 is convenient
-   as a buffersize because it is a multiple of 8 and a multiple of 11...
+/* With latest casprocessing logic, buffsize can be any multiple of 2.
 */
-
 #ifdef LARGEBUFFER
-  #define buffsize 208  // factors of this value are: 11 for MSX and 8 for DRAGON
+  #define buffsize 254
 #else
-  #define buffsize 176  // factors of this value are: 11 for MSX and 8 for DRAGON
+  #define buffsize 176
 #endif
 
 #if defined(XY2) && not defined(DoubleFont)
@@ -29,11 +24,11 @@ PROGMEM const byte HEX_CHAR[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', 
 /* Header Definitions */
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
 //PROGMEM const byte DRAGON[8] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55 };
-PROGMEM const byte ASCII[10] = { 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA };
-PROGMEM const byte BINF[10]  =  { 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0 };
-PROGMEM const byte BASIC[10] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 };
+const byte CAS_ASCII = 0xEA;
+const byte CAS_BINF = 0xD0;
+const byte CAS_BASIC = 0xD3;
 
-byte bits[11];
+word bitword;
 byte fileStage=0;
 enum class CASDUINO_FILETYPE : byte {
   NONE = 0,
@@ -41,7 +36,7 @@ enum class CASDUINO_FILETYPE : byte {
   DRAGONMODE = 8, // number of bits
 };
 CASDUINO_FILETYPE casduino = CASDUINO_FILETYPE::NONE;
-byte out=LOW;
+bool invert=false;
 
 enum class CAS_TYPE : byte {
   Nothing=0,
@@ -58,17 +53,18 @@ CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
 
 
 //ISR Variables
-volatile byte pass = 0;
-volatile byte pos = 0;
+byte readpos = 0; // only used within the ISR, never accessed outside, so doesn't need to be volatile
 volatile byte wbuffer[2][buffsize];
-volatile bool morebuff = true;
-volatile byte * writeBuffer=wbuffer[0];
+volatile bool morebuff = false;
+volatile byte * volatile writeBuffer=wbuffer[0]; // the pointer itself is volatile (since the ISR can swap readBuffer/writeBuffer)
 volatile byte * readBuffer=wbuffer[1];
 volatile byte isStopped=false;
 
 //Main Variables
-volatile long count = 0;
-byte btemppos = 0;
+long count = 0;
+byte pass = 0;
+byte currentBit=0;
+byte writepos = 0;
 byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
 byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
 unsigned long bytesRead=0;
@@ -78,47 +74,53 @@ byte newpct = 0;
 unsigned long timeDiff2 = 0;
 unsigned int lcdsegs = 0;
 
-byte currentBit=0;
-
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
 //TZX block list - uncomment as supported
-#define ID10                0x10    //Standard speed data block
-#define ID11                0x11    //Turbo speed data block
-#define ID12                0x12    //Pure tone
-#define ID13                0x13    //Sequence of pulses of various lengths
-#define ID14                0x14    //Pure data block
-#define ID15                0x15    //Direct recording block -- TBD - curious to load OTLA files using direct recording (22KHz)
-//#define ID18                0x18    //CSW recording block
-#define ID19                0x19    //Generalized data block hacked for zx81
-#define ID20                0x20    //Pause (silence) or 'Stop the tape' command
-#define ID21                0x21    //Group start
-#define ID22                0x22    //Group end
-#define ID23                0x23    //Jump to block
-#define ID24                0x24    //Loop start
-#define ID25                0x25    //Loop end
-#define ID26                0x26    //Call sequence
-#define ID27                0x27    //Return from sequence
-#define ID28                0x28    //Select block
-#define ID2A                0x2A    //Stop the tape if in 48K mode
-#define ID2B                0x2B    //Set signal level
-#define ID30                0x30    //Text description
-#define ID31                0x31    //Message block
-#define ID32                0x32    //Archive info
-#define ID33                0x33    //Hardware type
-#define ID35                0x35    //Custom info block
-#define ID4B                0x4B    //Kansas City block (MSX/BBC/Acorn/...)
-#define IDPAUSE             0x59    //Custom Pause processing
-#define ID5A                0x5A    //Glue block (90 dec, ASCII Letter 'Z')
-#define ORIC                0xFA    //Oric Tap File
-#define AYO                 0xFB    //AY file
-#define ZXO                 0xFC    //ZX80 O file
-#define ZXP                 0xFD    //ZX81 P File
-#define TAP                 0xFE    //Tap File Mode
-#define IDEOF               0xFF    //End of file
+enum BLOCKID
+{
+  UNKNOWN = 0x00, // not a block ID / not initialized yet or trigger an error
+  ID10 = 0x10,    //Standard speed data block
+  ID11 = 0x11,    //Turbo speed data block
+  ID12 = 0x12,    //Pure tone
+  ID13 = 0x13,    //Sequence of pulses of various lengths
+  ID14 = 0x14,    //Pure data block
+  ID15 = 0x15,    //Direct recording block
+//  ID18 = 0x18,    //CSW recording block
+  ID19 = 0x19,    //Generalized data block (NB hacked for zx81 only, will not work for anything else)
+  ID20 = 0x20,    //Pause (silence) or 'Stop the tape' command
+  ID21 = 0x21,    //Group start
+  ID22 = 0x22,    //Group end
+  ID23 = 0x23,    //Jump to block
+  ID24 = 0x24,    //Loop start
+  ID25 = 0x25,    //Loop end
+  ID26 = 0x26,    //Call sequence
+  ID27 = 0x27,    //Return from sequence
+  ID28 = 0x28,    //Select block
+  ID2A = 0x2A,    //Stop the tape if in 48K mode
+  ID2B = 0x2B,    //Set signal level
+  ID30 = 0x30,    //Text description
+  ID31 = 0x31,    //Message block
+  ID32 = 0x32,    //Archive info
+  ID33 = 0x33,    //Hardware type
+  ID35 = 0x35,    //Custom info block
+  ID4B = 0x4B,    //Kansas City block (MSX/BBC/Acorn/...)
+  ID5A = 0x5A,    //Glue block (90 dec, ASCII Letter 'Z')
+  IDPAUSE = 0x80, //Custom Pause processing
+  UEF = 0xF9,     //UEF file
+  ORIC = 0xFA,    //Oric Tap File
+  AYO = 0xFB,     //AY file
+  ZXO = 0xFC,     //ZX80 O file
+  ZXP = 0xFD,     //ZX81 P File
+  TAP = 0xFE,     //Tap File Mode
+  IDEOF = 0xFF,   //End of file
+};
 
 enum class TASK : byte
 {
+  // basic initialisation when start playing a file
+  INIT,
+
   //TZX File Tasks
   GETFILEHEADER,
   GETID,
@@ -162,7 +164,7 @@ enum class BLOCKTASK : byte
 };
 
 //Keep track of which ID, Task, and Block Task we're dealing with
-byte currentID = 0;
+byte currentID=BLOCKID::UNKNOWN;
 TASK currentTask=TASK::GETFILEHEADER;
 BLOCKTASK currentBlockTask = BLOCKTASK::READPARAM;
 
@@ -193,11 +195,20 @@ PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
 
 #ifdef AYPLAY
 // AY Header offset start
-#define HDRSTART              0
-PROGMEM const byte AYFile[8] = {'Z','X','A','Y','E','M','U','L'};           // added additional AY file header check
-PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','F','i','l','e',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
-byte AYPASS = 0;
-byte hdrptr = 0;
+PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','E','M','U','L',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
+PROGMEM const byte * const AYFile = TAPHdr+3;  // added additional AY file header check
+enum AYPASS_STEP : byte {
+  HDRSTART = 0,
+  FILENAME_START = 3,
+  FILENAME_END = 12,
+  LEN_LOW_BYTE = 13,
+  LEN_HIGH_BYTE = 14,
+  HDREND = 19,
+  WRITE_FLAG_BYTE = 20,
+  WRITE_CHECKSUM = 21,
+  FINISHED = 22,
+};
+byte AYPASS_hdrptr = AYPASS_STEP::HDRSTART;
 #endif
 
 bool EndOfFile=false;
@@ -274,7 +285,6 @@ byte oldMinBlock = 0;
 
 #ifdef Use_UEF
 PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
-#define UEF                 0xFA    //UEF file for ID list
 // UEF chunks
 #define ID0000              0x0000 // origin information chunk
 #define ID0100              0x0100 // implicit start/stop bit tape data block
