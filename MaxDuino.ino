@@ -188,7 +188,7 @@ SdFat sd;                           //Initialise Sd card
 SdBaseFile _tmpdirs[2]; // internal file pointers.  (*currentDir points to either _tmpdirs[0] or _tmpdirs[1] and the other is 'scratch')
 SdBaseFile *currentDir = &_tmpdirs[0];  // SD card directory
 SdBaseFile entry;  // SD card file
-char _alt_tmp_dir = 1; // which of the _tmpdirs is scratch (we flip this between 0 and 1)
+byte _alt_tmp_dir = 1; // which of the _tmpdirs is scratch (we flip this between 0 and 1)
 
 #ifdef FREERAM
   #define filenameLength 160
@@ -1101,27 +1101,19 @@ void scrollText(char* text){
   //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
   if(scrollPos<0) scrollPos=0;
   char outtext[17];
-  if(isDir) { outtext[0]= 0x3E; 
-    for(int i=1;i<16;i++)
+  byte i=0;
+  byte p=scrollPos;
+  if(isDir) {
+    outtext[0]='>';
+    i++;
+  }
+  for(;i<16;i++,p++)
+  {
+    if(p<strlen(text)) 
     {
-      int p=i+scrollPos-1;
-      if(p<strlen(text)) 
-      {
-        outtext[i]=text[p];
-      } else {
-        outtext[i]='\0';
-      }
-    }
-  } else { 
-    for(int i=0;i<16;i++)
-    {
-      int p=i+scrollPos;
-      if(p<strlen(text)) 
-      {
-        outtext[i]=text[p];
-      } else {
-        outtext[i]='\0';
-      }
+      outtext[i]=text[p];
+    } else {
+      outtext[i]='\0';
     }
   }
   outtext[16]='\0';
@@ -1132,27 +1124,19 @@ void scrollText(char* text){
   //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
   if(scrollPos<0) scrollPos=0;
   char outtext[17];
-  if(isDir) { outtext[0]= 0x3E; 
-    for(int i=1;i<16;i++)
+  byte i=0;
+  byte p=scrollPos;
+  if(isDir) {
+    outtext[0]='>';
+    i++;
+  }
+  for(;i<16;i++,p++)
+  {
+    if(p<strlen(text)) 
     {
-      int p=i+scrollPos-1;
-      if(p<strlen(text)) 
-      {
-        outtext[i]=text[p];
-      } else {
-        outtext[i]='\0';
-      }
-    }
-  } else { 
-    for(int i=0;i<16;i++)
-    {
-      int p=i+scrollPos;
-      if(p<strlen(text)) 
-      {
-        outtext[i]=text[p];
-      } else {
-        outtext[i]='\0';
-      }
+      outtext[i]=text[p];
+    } else {
+      outtext[i]='\0';
     }
   }
   outtext[16]='\0';
@@ -1160,33 +1144,22 @@ void scrollText(char* text){
   #endif
 
   #ifdef P8544
-  //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
-  if(scrollPos<0) {
-    scrollPos=0;
-  }
+  //Text scrolling routine.  Setup for P8544 screen so will only display 14 chars
+  if(scrollPos<0) scrollPos=0;
   char outtext[15];
+  byte i=0;
+  byte p=scrollPos;
   if(isDir) {
-    outtext[0]= 0x3E; 
-    for(int i=1;i<14;i++)
+    outtext[0]='>';
+    i++;
+  }
+  for(;i<14;i++,p++)
+  {
+    if(p<strlen(text)) 
     {
-      int p=i+scrollPos-1;
-      if(p<strlen(text)) 
-      {
-        outtext[i]=text[p];
-      } else {
-        outtext[i]='\0';
-      }
-    }
-  } else { 
-    for(int i=0;i<14;i++)
-    {
-      int p=i+scrollPos;
-      if(p<strlen(text)) 
-      {
-        outtext[i]=text[p];
-      } else {
-        outtext[i]='\0';
-      }
+      outtext[i]=text[p];
+    } else {
+      outtext[i]='\0';
     }
   }
   outtext[14]='\0';
@@ -1284,7 +1257,7 @@ void printtextF(const char* text, int l) {  //Print text to screen.
    
 }
 
-void printtext(char* text, int l) {  //Print text to screen. 
+void printtext(const char* text, int l) {  //Print text to screen. 
   
   #ifdef SERIALSCREEN
     Serial.println(text);
@@ -1293,12 +1266,15 @@ void printtext(char* text, int l) {  //Print text to screen.
   #ifdef LCDSCREEN16x2
     lcd.setCursor(0,l);
     char ch;
-    const char len = strlen(text);
-    for(char x=0;x<16;x++) {
-      if(x<len) {
-        ch=text[x];
-      } else {
-        ch=0x20;
+    bool end=false;
+    for(byte i=0;i<16;i++) {
+      if(!end)
+        if(text[i]=='\0')
+          end=true;
+      if(!end)
+        ch=text[i];
+      else
+        ch=' ';
       }
       lcd.print(ch); 
     }
@@ -1306,30 +1282,32 @@ void printtext(char* text, int l) {  //Print text to screen.
 
   #ifdef OLED1306
     #ifdef XY2
-      for(int i=0;i<16;i++)
-      {
-        if(i<strlen(text)) {
+      bool end=false;
+      for(byte i=0;i<16;i++) {
+        if(!end)
+          if(text[i]=='\0')
+            end=true;
+        if(!end)
           fline[i]=text[i];
-        }
-        else {
-          fline[i]=0x20;
-        }
+        else
+          fline[i]=' ';
       }    
       sendStrXY(fline,0,l);
     #endif
     
     #ifdef XY
       setXY(0,l); 
-
       char ch;
-      const char len = strlen(text);
-      for(char x=0;x<16;x++)
-      {
-        if(x<len) {
-          ch=text[x];
+      bool end=false;
+      for(byte i=0;i<16;i++) {
+        if(!end)
+          if(text[i]=='\0')
+            end=true;
+        if(!end)
+          ch=text[i];
         }
         else {
-          ch=0x20;
+          ch=' ';
         }
         sendChar(ch);
       }       
@@ -1337,19 +1315,19 @@ void printtext(char* text, int l) {  //Print text to screen.
   #endif
 
   #ifdef P8544
-    for(int i=0;i<14;i++)
-    {
-      if(i<strlen(text)) {
+    bool end=false;
+    for(byte i=0;i<16;i++) {
+      if(!end)
+        if(text[i]=='\0')
+          end=true;
+      if(!end)
         fline[i]=text[i];
-      }
-      else {
-        fline[i]=0x20;
-      }
+      else
+        fline[i]=' ';
     }  
     lcd.setCursor(0,l);
     lcd.print(fline);
   #endif 
-   
 }
 
 #if defined(OLED1306)
@@ -1687,14 +1665,14 @@ void GetAndPlayBlock()
   SetPlayBlock(); 
 }
 
-void str4cpy (char *dest, char *src)
+void str4cpy(char *dest, const char *src)
 {
-  char x =0;
+  byte x=0;
   while (*(src+x) && (x<4)) {
-       dest[x] = src[x];
-       x++;
+    dest[x] = src[x];
+    x++;
   }
-  for(x; x<4; x++) dest[x]=' ';
+  for(; x<4; x++) dest[x]=' ';
   dest[4]=0; 
 }
 
