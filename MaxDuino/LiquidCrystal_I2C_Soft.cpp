@@ -1,16 +1,15 @@
+#include "configs.h"
+
 #ifdef LCDSCREEN16x2
 // Based on the work by DFRobot
 
+#include "Arduino.h"
 #include "LiquidCrystal_I2C_Soft.h"
+#include "i2c.h"
 #include <inttypes.h>
+
 #if defined(ARDUINO) && ARDUINO >= 100
 
-#include "Arduino.h"
-#if defined(Use_SoftI2CMaster)
-  #define printIIC(args)  i2c_write(args)
-#else 
-  #define printIIC(args)	Wire.write(args)
-#endif
 inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 	send(value, Rs);
 	return 1;
@@ -19,54 +18,10 @@ inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 #else
 #include "WProgram.h"
 
-#define printIIC(args)	Wire.send(args)
 inline void LiquidCrystal_I2C::write(uint8_t value) {
 	send(value, Rs);
 }
 
-#endif
-
-#if defined(Use_SoftI2CMaster) && defined(__AVR_ATmega2560__) 
-  #define SDA_PORT PORTD
-  #define SDA_PIN 1 
-  #define SCL_PORT PORTD
-  #define SCL_PIN 0 
-  #include <SoftI2CMaster.h>         
-#elif defined(Use_SoftI2CMaster) && defined(__AVR_ATmega32U4__) 
-  #define SDA_PORT PORTD
-  #define SDA_PIN 1 
-  #define SCL_PORT PORTD
-  #define SCL_PIN 0 
-  #include <SoftI2CMaster.h> 
-#elif defined(Use_SoftI2CMaster) 
-  #define SDA_PORT PORTC
-  #define SDA_PIN 4 
-  #define SCL_PORT PORTC
-  #define SCL_PIN 5 
-  #include <SoftI2CMaster.h>        
-#elif defined(Use_SoftWire) && defined(__AVR_ATmega2560__) 
-  #define SDA_PORT PORTD
-  #define SDA_PIN 1 
-  #define SCL_PORT PORTD
-  #define SCL_PIN 0 
-  #include <SoftWire.h>
-  SoftWire Wire = SoftWire();
- #elif defined(Use_SoftWire) && defined(__AVR_ATmega32U4__) 
-  #define SDA_PORT PORTD
-  #define SDA_PIN 1 
-  #define SCL_PORT PORTD
-  #define SCL_PIN 0 
-  #include <SoftWire.h>
-  SoftWire Wire = SoftWire();  
-#elif defined(Use_SoftWire) 
-  #define SDA_PORT PORTC
-  #define SDA_PIN 4 
-  #define SCL_PORT PORTC
-  #define SCL_PIN 5 
-  #include <SoftWire.h>
-  SoftWire Wire = SoftWire();  
-#else
-  #include <Wire.h>
 #endif
 
 // When the display powers up, it is configured as follows:
@@ -90,10 +45,10 @@ inline void LiquidCrystal_I2C::write(uint8_t value) {
 
 LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows)
 {
-  _Addr = lcd_Addr;
-  _cols = lcd_cols;
-  _rows = lcd_rows;
-  _backlightval = LCD_NOBACKLIGHT;
+	_Addr = lcd_Addr;
+	_cols = lcd_cols;
+	_rows = lcd_rows;
+	_backlightval = LCD_NOBACKLIGHT;
 }
 
 void LiquidCrystal_I2C::init(){
@@ -102,16 +57,9 @@ void LiquidCrystal_I2C::init(){
 
 void LiquidCrystal_I2C::init_priv()
 {
-  #if defined(Use_SoftI2CMaster)
-    i2c_init();
-    _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-    begin(_cols, _rows);  
-  #else   
-  	Wire.begin();
-    Wire.setClock(I2CCLOCK);
-  	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-  	begin(_cols, _rows);
-  #endif  
+	mx_i2c_init();
+	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+	begin(_cols, _rows);  
 }
 
 void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
@@ -138,21 +86,20 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 	// this is according to the hitachi HD44780 datasheet
 	// figure 24, pg 46
 	
-	  // we start in 8bit mode, try to set 4 bit mode
-   write4bits(0x03 << 4);
-   delayMicroseconds(4500); // wait min 4.1ms
+	// we start in 8bit mode, try to set 4 bit mode
+	write4bits(0x03 << 4);
+	delayMicroseconds(4500); // wait min 4.1ms
    
-   // second try
-   write4bits(0x03 << 4);
-   delayMicroseconds(4500); // wait min 4.1ms
+	// second try
+	write4bits(0x03 << 4);
+	delayMicroseconds(4500); // wait min 4.1ms
    
-   // third go!
-   write4bits(0x03 << 4); 
-   delayMicroseconds(150);
+	// third go!
+	write4bits(0x03 << 4); 
+	delayMicroseconds(150);
    
-   // finally, set to 4-bit interface
-   write4bits(0x02 << 4); 
-
+	// finally, set to 4-bit interface
+	write4bits(0x02 << 4); 
 
 	// set # lines, font size, etc.
 	command(LCD_FUNCTIONSET | _displayfunction);  
@@ -171,7 +118,6 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 	command(LCD_ENTRYMODESET | _displaymode);
 	
 	home();
-  
 }
 
 /********** high level commands, for the user! */
@@ -260,13 +206,8 @@ void LiquidCrystal_I2C::noAutoscroll(void) {
 void LiquidCrystal_I2C::createChar(uint8_t location, uint8_t charmap[]) {
 	location &= 0x7; // we only have 8 locations 0-7
 	command(LCD_SETCGRAMADDR | (location << 3));
-	for (int i=0; i<8; i++) {
-    #if defined(Use_SoftI2CMaster)
-      i2c_write(charmap[i]);    
-    #else 
-		  write(charmap[i]);
-    #endif
-	}
+	for (byte i=0; i<8; i++)
+		mx_i2c_write(charmap[i]);
 }
 
 // Turn the (optional) backlight off/on
@@ -295,7 +236,7 @@ inline void LiquidCrystal_I2C::command(uint8_t value) {
 void LiquidCrystal_I2C::send(uint8_t value, uint8_t mode) {
 	uint8_t highnib=value&0xf0;
 	uint8_t lownib=(value<<4)&0xf0;
-       write4bits((highnib)|mode);
+	write4bits((highnib)|mode);
 	write4bits((lownib)|mode); 
 }
 
@@ -305,15 +246,9 @@ void LiquidCrystal_I2C::write4bits(uint8_t value) {
 }
 
 void LiquidCrystal_I2C::expanderWrite(uint8_t _data){                                        
-  #if defined(Use_SoftI2CMaster)
-    i2c_start((_Addr<<1)|I2C_WRITE);
-    printIIC((int)(_data) | _backlightval);
-    i2c_stop();  
-  #else 
-  	Wire.beginTransmission(_Addr);
-  	printIIC((int)(_data) | _backlightval);
-  	Wire.endTransmission(); 
-  #endif  
+	mx_i2c_start(Addr);
+	mx_i2c_write(data | _backlightval);
+	mx_i2c_end();
 }
 
 void LiquidCrystal_I2C::pulseEnable(uint8_t _data){

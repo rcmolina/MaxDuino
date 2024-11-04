@@ -3,6 +3,8 @@
 #ifndef EEPROM_H_INCLUDED
 #define EEPROM_H_INCLUDED
 
+#include "Arduino.h"
+
 #if defined(__AVR__)
   #include <EEPROM.h>
   #define EEPROM_put EEPROM.put

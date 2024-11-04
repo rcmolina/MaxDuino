@@ -1,3 +1,8 @@
+#ifndef FONTS_H_INCLUDED
+#define FONTS_H_INCLUDED
+
+#include "configs.h"
+
 #ifdef OLED1306
 /* Clairsys font */
 #ifdef ClairsysFont
@@ -3942,4 +3947,4 @@ const unsigned char myFont[][16] PROGMEM = {
 #endif
 //==========================================================//
 
-
+#endif // FONTS_H_INCLUDED

@@ -1,5 +1,9 @@
+#include "configs.h"
+#include "Arduino.h"
 #include "buttons.h"
 #include "pinSetup.h"
+
+bool lastbtn=true;
 
 #if defined(BUTTON_ADC)
 
@@ -113,4 +117,10 @@ void debouncemax(bool (*button_fn)())
     if (!button_fn()) break;
     delay(50);
   }
+}
+
+void checkLastButton()
+{
+  if(!button_down() && !button_up() && !button_play() && !button_stop()) lastbtn=false; 
+  delay(50);
 }

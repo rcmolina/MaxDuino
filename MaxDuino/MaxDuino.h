@@ -1,81 +1,18 @@
+#ifndef MAXDUINO_H_INCLUDED
+#define MAXDUINO_H_INCLUDED
+
+#include "Arduino.h"
+
 #define SHORT_SILENCE       122
 #define LONG_SILENCE        SHORT_SILENCE*2
 
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
-/* With latest casprocessing logic, buffsize can be any multiple of 2.
-*/
-#ifdef LARGEBUFFER
-  #define buffsize 254
-#else
-  #define buffsize 176
-#endif
+// processing.cpp can call stopFile and seekFile, which are defined in MaxDuino.ino
+void stopFile();
+void seekFile();
 
-#if defined(XY2) && not defined(DoubleFont)
-PROGMEM  const byte DFONT[16] = { 0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F, 0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF };
-#endif
-
-#if defined(OLED1306) && defined(OLEDPRINTBLOCK) 
-PROGMEM const byte HEX_CHAR[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-#endif
-
-#ifdef Use_CAS
-/* Header Definitions */
-PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
-//PROGMEM const byte DRAGON[8] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55 };
-const byte CAS_ASCII = 0xEA;
-const byte CAS_BINF = 0xD0;
-const byte CAS_BASIC = 0xD3;
-
-word bitword;
-byte fileStage=0;
-enum class CASDUINO_FILETYPE : byte {
-  NONE = 0,
-  CASDUINO = 11, // number of bits
-  DRAGONMODE = 8, // number of bits
-};
-CASDUINO_FILETYPE casduino = CASDUINO_FILETYPE::NONE;
-bool invert=false;
-
-enum class CAS_TYPE : byte {
-  Nothing=0,
-  Ascii,
-  Binf,
-  Basic,
-  Unknown,
-  typeEOF,
-};
-CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
-
-#endif // Use_CAS
-
-
-
-//ISR Variables
-byte readpos = 0; // only used within the ISR, never accessed outside, so doesn't need to be volatile
-volatile byte wbuffer[2][buffsize];
-volatile bool morebuff = false;
-volatile byte * volatile writeBuffer=wbuffer[0]; // the pointer itself is volatile (since the ISR can swap readBuffer/writeBuffer)
-volatile byte * readBuffer=wbuffer[1];
-volatile byte isStopped=false;
-
-//Main Variables
-long count = 0;
-byte pass = 0;
-byte currentBit=0;
-byte writepos = 0;
-byte input[7]; // only used for temporary string manipulation, sized for the longest string operation (which is concatenating "1200 *" for displaying selected baud) 
-byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
-unsigned long bytesRead=0;
-byte lastByte;
-byte currpct = 100;
-byte newpct = 0;
-unsigned long timeDiff2 = 0;
-unsigned int lcdsegs = 0;
-
-//Temporarily store for a pulse period before loading it into the buffer.
-word currentPeriod=1;
 //TZX block list - uncomment as supported
 enum BLOCKID
 {
@@ -163,11 +100,6 @@ enum class BLOCKTASK : byte
   NAME00,
 };
 
-//Keep track of which ID, Task, and Block Task we're dealing with
-byte currentID=BLOCKID::UNKNOWN;
-TASK currentTask=TASK::GETFILEHEADER;
-BLOCKTASK currentBlockTask = BLOCKTASK::READPARAM;
-
 //Spectrum Standards
 #define PILOTLENGTH           619
 #define SYNCFIRST             191
@@ -178,177 +110,26 @@ BLOCKTASK currentBlockTask = BLOCKTASK::READPARAM;
 #define PILOTNUMBERH          3223
 #define PAUSELENGTH           1000   
 
-//ZX81 Standards
-#define ZX80PULSE                 160
-#define ZX80TURBOPULSE            120
-
-#define ZX80BITGAP                1442
-#define ZX80TURBOBITGAP           500
-
-//ZX81 Pulse Patterns - Zero Bit  - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
-//                    - One Bit   - HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, GAP
-
-PROGMEM const byte TZXTape[7] = {'Z','X','T','a','p','e','!'};
-PROGMEM const byte ZX81Filename[9] = {'T','Z','X','D','U','I','N','O',0x9D};
-
 //Main Variables
-
-#ifdef AYPLAY
-// AY Header offset start
-PROGMEM const byte TAPHdr[20] = {0x0,0x0,0x3,'Z','X','A','Y','E','M','U','L',' ',' ',0x1A,0xB,0x0,0xC0,0x0,0x80,0x6E}; // 
-PROGMEM const byte * const AYFile = TAPHdr+3;  // added additional AY file header check
-enum AYPASS_STEP : byte {
-  HDRSTART = 0,
-  FILENAME_START = 3,
-  FILENAME_END = 12,
-  LEN_LOW_BYTE = 13,
-  LEN_HIGH_BYTE = 14,
-  HDREND = 19,
-  WRITE_FLAG_BYTE = 20,
-  WRITE_CHECKSUM = 21,
-  FINISHED = 22,
-};
-byte AYPASS_hdrptr = AYPASS_STEP::HDRSTART;
-#endif
-
-bool EndOfFile=false;
-
-#ifdef ID11CDTspeedup
-bool AMScdt = false;
-#endif
-
-volatile byte pinState=LOW;
-volatile bool isPauseBlock = false;
-volatile bool wasPauseBlock = false;
-
-union {
-  byte outbyte;
-  word outword;
-  unsigned long outlong=0;
-} readout;
-
-#define outByte readout.outbyte
-#define outWord readout.outword
-#define outLong readout.outlong
-
-word pauseLength=0;
-unsigned long bytesToRead=0;
-word pilotPulses=0;
-word pilotLength=0;
-word sync1Length=0;
-word sync2Length=0;
-word zeroPulse=0;
-word onePulse=0;
-byte passforZero=2;
-byte passforOne=4;
-word BAUDRATE = DEFAULT_BAUDRATE;
-byte scale; // gets set when you call setBaud
-byte period; // gets set when you call setBaud
-
-byte oneBitPulses = 4;
-byte zeroBitPulses = 2;
-byte startBitPulses = 2;
-byte startBitValue = 0;
-byte stopBitPulses = 8;
-byte stopBitValue = 1;
-byte endianness = 0;      //0:LSb 1:MSb (default:0)
-byte parity = 0 ;        //0:NoParity 1:ParityOdd 2:ParityEven (default:0)
-byte bitChecksum = 0;     // For oric and uef:  0:Even 1:Odd number of one bits  For AY: checksum byte
-
-#ifdef DIRECT_RECORDING
-word SampleLength=0;
-#endif
-
-byte usedBitsInLastByte=8;
-word loopCount=0;
-byte seqPulses=0;
-word temppause=0;
-bool forcePause0 = false;
-bool firstBlockPause = false;
-unsigned long loopStart=0;
-byte currentChar=0;
-byte currentByte=0;
+extern bool pauseOn;                   //Pause state
+extern byte start;                     //Currently playing flag
 
 #ifdef BLKBIGSIZE
-  word block = 0;
+  extern word block;
 #else
-  byte block = 0;
+  extern byte block;
 #endif
 
-byte jblks = 1;
-byte oldMinBlock = 0;
+extern byte jblks;
+extern byte oldMinBlock;
 #ifdef BLOCK_EEPROM_PUT
-  byte oldMaxBlock = 99;
+  extern byte oldMaxBlock;
 #else
-  byte oldMaxBlock = 19;
+  extern byte oldMaxBlock;
 #endif
-
-#ifdef Use_UEF
-PROGMEM const char UEFFile[9] = {'U','E','F',' ','F','i','l','e','!'};
-// UEF chunks
-#define ID0000              0x0000 // origin information chunk
-#define ID0100              0x0100 // implicit start/stop bit tape data block
-#define ID0104              0x0104 // defined tape format data block: data bits per packet/parity/stop bits
-#define ID0110              0x0110 // carrier tone (previously high tone) 
-#define ID0111              0x0111 // carrier tone (previously high tone) with dummy byte at byte
-#define ID0112              0x0112 // Integer gap: cycles = (this.baud/1000)*2*n
-#define ID0114              0x0114 // Security Cycles replaced with carrier tone
-#define ID0116              0x0116 // floating point gap: cycles = floatGap * this.baud
-#define ID0117              0x0117 // data encoding format change for 300 bauds
-#define IDCHUNKEOF          0xffff
-
-// UEF stuff
-// For 1200 baud zero is 416us, one is 208us
-// For 1500 baud zero is 333us, one is 166us
-// For 1550 baud zero is 322us, one is 161us
-// For 1600 baud zero is 313us, one is 156us
-
-// STANDARD 1200 baud UEF
-#define UEFPILOTPULSES           outWord<<2
-#define UEFPILOTLENGTH           208
-#define UEFZEROPULSE             416
-#define UEFONEPULSE              208
-
-#if defined(TURBOBAUD1500)
-  #define UEFTURBOPILOTPULSES       outWord<<2
-  #define UEFTURBOPILOTLENGTH       156
-  #define UEFTURBOZEROPULSE         332
-  #define UEFTURBOONEPULSE          166
-#elif defined(TURBOBAUD1550)
-  #define UEFTURBOPILOTPULSES       320
-  #define UEFTURBOPILOTLENGTH       161
-  #define UEFTURBOZEROPULSE         322
-  #define UEFTURBOONEPULSE          161
-#elif defined(TURBOBAUD1600)
-  #define UEFTURBOPILOTPULSES       320
-  #define UEFTURBOPILOTLENGTH       156
-  #define UEFTURBOZEROPULSE         313
-  #define UEFTURBOONEPULSE          156
-#endif
-
-word chunkID = 0;
-byte UEFPASS = 0;
-
-#ifdef Use_c116
-float outFloat;
-#endif
-
-#endif // USE_Uef
 
 #define DEBUG 0
 
+void block_mem_oled();
 
-#define ORICZEROLOWPULSE  208
-#define ORICZEROHIGHPULSE 416
-#define ORICONEPULSE      208
-
-#define ORICTURBOZEROLOWPULSE  60
-#define ORICTURBOZEROHIGHPULSE 470
-#define ORICTURBOONEPULSE      60
-
-bool TSXCONTROLzxpolarityUEFSWITCHPARITY = DEFAULT_TSXzxpUEF;
-bool skip2A = DEFAULT_SKIP2A;
-
-// TODO really the following should only be defined ifndef NO_MOTOR
-// but the order of #includes is wrong and we only define NO_MOTOR later :-/
-bool mselectMask = DEFAULT_MSELECTMASK;
+#endif // MAXDUINO_H_INCLUDED

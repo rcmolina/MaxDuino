@@ -1,4 +1,13 @@
+#include "configs.h"
+#include "pinSetup.h"  // for BUTTON_ADC but then really that should move to configs.h ?
+
 #ifdef SOFT_POWER_OFF
+
+#include "Arduino.h"
+#include "Display.h"
+#include "buttons.h"
+#include "power.h"
+#include "file_utils.h"
 
 unsigned long soft_poweroff_timer = 0;
 unsigned long poweroff_millis = 0;
@@ -17,6 +26,8 @@ bool b_poweroff_key_detected = false;
 #endif
 
 #include "power_logos.h"
+
+static void device_power_off();
 
 static void show_power_off_logo()
 {

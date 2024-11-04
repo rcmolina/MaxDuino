@@ -14,33 +14,14 @@
  any redistribution
 *********************************************************************/
 
+#include "configs.h"
+
 #ifdef USB_STORAGE_ENABLED
 
 #include "Adafruit_TinyUSB.h"
+#include "file_utils.h"
 
 Adafruit_USBD_MSC usb_msc;
-
-void setup_usb_storage()
-{
-  // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
-  usb_msc.setID("MaxDuino", "SD Card", "1.0");
-
-  // Set read write callback
-  usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
-
-  // Still initialize MSC but tell usb stack that MSC is not ready to read/write
-  // If we don't initialize, board will be enumerated as CDC only
-  usb_msc.setUnitReady(false);
-  usb_msc.begin();
-
-  uint32_t sector_count = sd.card()->sectorCount();
-
-  // Set disk size, SD block size is always 512
-  usb_msc.setCapacity(sector_count, 512);
-
-  // MSC is ready for read/write
-  usb_msc.setUnitReady(true);
-}
 
 // Callback invoked when received READ10 command.
 // Copy disk's data to buffer (up to bufsize) and
@@ -77,6 +58,28 @@ void usb_retach()
 {
   //usb_msc.retach();
   USBDevice.attach();
+}
+
+void setup_usb_storage()
+{
+  // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
+  usb_msc.setID("MaxDuino", "SD Card", "1.0");
+
+  // Set read write callback
+  usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
+
+  // Still initialize MSC but tell usb stack that MSC is not ready to read/write
+  // If we don't initialize, board will be enumerated as CDC only
+  usb_msc.setUnitReady(false);
+  usb_msc.begin();
+
+  uint32_t sector_count = sd.card()->sectorCount();
+
+  // Set disk size, SD block size is always 512
+  usb_msc.setCapacity(sector_count, 512);
+
+  // MSC is ready for read/write
+  usb_msc.setUnitReady(true);
 }
 
 #endif

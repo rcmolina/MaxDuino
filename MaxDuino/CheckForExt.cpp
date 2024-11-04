@@ -1,3 +1,11 @@
+#include "configs.h"
+#include "constants.h"
+#include "compat.h"
+#include "processing_state.h"
+#include "file_utils.h"
+#include "ayplay.h"
+#include "casProcessing.h"
+#include "MaxProcessing.h"
 
 void checkForEXT(const char * const filenameExt) {
   //Check for .xxx file extension as these have no header
@@ -47,7 +55,7 @@ void checkForEXT(const char * const filenameExt) {
         invert=true;
         casduino = CASDUINO_FILETYPE::DRAGONMODE;
         period=249;
-        count=255;
+        count_r=255;
       }
     #endif         
   }

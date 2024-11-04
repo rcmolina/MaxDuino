@@ -1,3 +1,15 @@
+#include "configs.h"
+#include "Arduino.h"
+#include "Display.h"
+#include "utils.h"
+#include "file_utils.h"
+
+byte currpct = 100;
+unsigned int lcdsegs = 0;
+
+static unsigned long timeDiff2 = 0;
+static byte newpct = 0;
+
 void lcdTime() {
   if (millis() - timeDiff2 > 1000) {   // check switch every second 
     timeDiff2 = millis();           // get current millisecond count
@@ -123,7 +135,7 @@ void lcdTime() {
   }
 }
 
-void lcdPercent() {  
+void lcdPercent() {
   newpct=(100 * bytesRead)/filesize;                   
   if (currpct==100) {
       currpct= 0;

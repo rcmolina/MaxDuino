@@ -1,10 +1,36 @@
+#include "configs.h"
+#include "Arduino.h"
+#include "compat.h"
+#include "CounterPercent.h"
+#include "constants.h"
+#include "file_utils.h"
+#include "isr.h"
+#include "casProcessing.h"
+#include "buffer.h"
+#include "processing_state.h"
+#include "current_settings.h"
+#include "TimerCounter.h"
+
 #ifdef Use_CAS
 
-void casPause()
+word bitword;
+byte fileStage=0;
+CASDUINO_FILETYPE casduino = CASDUINO_FILETYPE::NONE;
+bool invert=false;
+CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
+
+byte scale; // gets set when you call setBaud
+byte period; // gets set when you call setBaud
+
+PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
+
+bool cas_file_match(const byte matchval)
 {
-  noInterrupts();
-  isStopped=pauseOn;
-  interrupts();
+  // simply return true if all bytes between filebuffer and filebuffer+9
+  // match the matchval
+  for (byte i=9; i>=0; --i)
+    if (filebuffer[i] != matchval) return false;
+  return true;
 }
 
 void bits_to_pulses()
@@ -46,7 +72,6 @@ void bits_to_pulses()
   // |+-- always 1
   // +-- always 0
 
-  byte val;
   byte bits = 0;
   byte bitpos = 1<<7;
   byte nbits = 0;
@@ -173,9 +198,9 @@ void process()
 {
   if(cas_currentType==CAS_TYPE::typeEOF)
   {
-    if(count) {
+    if(count_r) {
       writeSilence();
-      count--;
+      count_r--;
     } else stopFile();    
     return;
   }
@@ -190,7 +215,7 @@ void process()
         } else
         {
           currentTask = TASK::CAS_wSilence;
-          count=SHORT_SILENCE*scale;
+          count_r=SHORT_SILENCE*scale;
         }
         if(cas_currentType==CAS_TYPE::Nothing) fileStage=1;
         bytesRead+=8;
@@ -199,7 +224,7 @@ void process()
     {
       cas_currentType=CAS_TYPE::typeEOF;
       currentTask=TASK::CAS_wClose;
-      count=LONG_SILENCE*scale;
+      count_r=LONG_SILENCE*scale;
     }
      
   }
@@ -207,7 +232,7 @@ void process()
   if(currentTask==TASK::CAS_lookType)
   {
     currentTask = TASK::CAS_wSilence;
-    count = LONG_SILENCE*scale;
+    count_r = LONG_SILENCE*scale;
     fileStage=1;       
     cas_currentType = CAS_TYPE::Unknown;
 //    if((r=readfile(10,bytesRead))==10)
@@ -228,22 +253,22 @@ void process()
 
   if(currentTask==TASK::CAS_wSilence)
   {
-    if(count)
+    if(count_r)
     {
       writeSilence();
-      count--;
+      count_r--;
     } else 
     {
       currentTask=TASK::CAS_wHeader;
       if(fileStage==1) 
       {
-        //count=LONG_HEADER*scale;
-        count=LONG_HEADER; 
+        //count_r=LONG_HEADER*scale;
+        count_r=LONG_HEADER; 
         fileStage+=1;
       } else 
       {
-        count=SHORT_HEADER*scale;
-        //count=SHORT_HEADER;
+        count_r=SHORT_HEADER*scale;
+        //count_r=SHORT_HEADER;
         if(cas_currentType==CAS_TYPE::Ascii) {
           fileStage+=1;
         } else {
@@ -254,10 +279,10 @@ void process()
   }
   if(currentTask==TASK::CAS_wHeader)
   {
-    if(count)
+    if(count_r)
     {
       writeHeader();
-      count--;
+      count_r--;
     } else
     {
       currentTask=TASK::CAS_wData;
@@ -275,15 +300,6 @@ void process()
   if(currentTask==TASK::GETFILEHEADER || currentTask==TASK::CAS_lookType || currentTask==TASK::CAS_wData) bytesRead+=1; 
 }
 
-bool cas_file_match(const byte matchval)
-{
-  // simply return true if all bytes between filebuffer and filebuffer+9
-  // match the matchval
-  for (byte i=9; i>=0; --i)
-    if (filebuffer[i] != matchval) return false;
-  return true;
-}
-
 #if defined(Use_DRAGON)
 void processDragon()
 {
@@ -297,43 +313,43 @@ void processDragon()
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
-       count--;
+       count_r--;
       } else {
        //currentTask=TASK::CAS_wHeader;
-        if(count>=0) {
+        if(count_r>=0) {
           writeByte(0x55);
-          count--;
+          count_r--;
         } else {    
           if (fileStage > 0) currentTask=TASK::CAS_wData;
           else {
-            count =19;
+            count_r =19;
             currentTask=TASK::CAS_wNameFileBlk;
           }
         }       
       }
 /*
     } else if(currentTask==TASK::CAS_wHeader) {
-        if(count>=0) {
+        if(count_r>=0) {
           writeByte(0x55);
-          count--;
+          count_r--;
         } else {    
           if (fileStage > 0) currentTask=TASK::CAS_wData;
           else {
-            count =19;
+            count_r =19;
             currentTask=TASK::CAS_wNameFileBlk;
           }
         }
 */
     } else if(currentTask==TASK::CAS_wNameFileBlk) {
-//        if(!count==0) {
-        if(count) {
+//        if(!count_r==0) {
+        if(count_r) {
             writeByte(filebuffer[0]);
             bytesRead+=1;
-            count--;            
+            count_r--;            
         } else {            
             fileStage=1;
             currentTask=TASK::GETFILEHEADER;
-            count=255;
+            count_r=255;
         }
     } else {        
   #endif
@@ -344,63 +360,63 @@ void processDragon()
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
-       count--;
+       count_r--;
       } else {
        //currentTask=TASK::CAS_wHeader;
-        if(count>=0) {
+        if(count_r>=0) {
           writeByte(0x55);
-          count--;
+          count_r--;
         } else {
-          //count= 119;
-          count = 2;      
+          //count_r= 119;
+          count_r = 2;      
           currentTask=TASK::CAS_wSync;
         }       
       }
 /*
     } else if(currentTask==TASK::CAS_wHeader) {
-      if(count>=0) {
+      if(count_r>=0) {
         writeByte(0x55);
-        count--;
+        count_r--;
       } else {
-        //count= 119;
-        count = 2;      
+        //count_r= 119;
+        count_r = 2;      
         currentTask=TASK::CAS_wSync;
       }
 */
     } else if(currentTask==TASK::CAS_wSync) { 
-      if(count) {
+      if(count_r) {
         writeByte(filebuffer[0]);
         bytesRead+=1;
-        count--;
+        count_r--;
       } else {
         writeByte(filebuffer[0]);            // block length
         bytesRead+=1;
         currentTask=TASK::CAS_wNameFileBlk;
-        count=filebuffer[0]++;                   
+        count_r=filebuffer[0]++;                   
       }
  
     } else if(currentTask==TASK::CAS_wNameFileBlk) { 
-      if(count) {
+      if(count_r) {
         writeByte(filebuffer[0]);
         bytesRead+=1;
-        count--;
+        count_r--;
       } else {
         writeByte(filebuffer[0]);            //Si no cierras el FileNmae block con el primer 0x55 se desincroniza
         bytesRead+=1;            
         currentTask=TASK::CAS_lookLeader;
-        count=255;                 
+        count_r=255;                 
       }
           
     } else if(currentTask==TASK::CAS_lookLeader) { 
       if(filebuffer[0] == 0x55) {
         writeByte(0x55); 
         bytesRead+=1;
-        count--;
+        count_r--;
       } else {
         //currentTask=TASK::CAS_wNewLeader;
-        if(count>=0) {
+        if(count_r>=0) {
           writeByte(0x55);
-          count--;
+          count_r--;
         } else {   
           currentTask=TASK::CAS_wData;
         }
@@ -408,9 +424,9 @@ void processDragon()
       }
 /*
     } else if(currentTask==TASK::CAS_wNewLeader) {
-      if(count>=0) {
+      if(count_r>=0) {
         writeByte(0x55);
-        count--;
+        count_r--;
       } else {   
         currentTask=TASK::CAS_wData;
       }
@@ -430,13 +446,13 @@ void processDragon()
        if(lastByte != 0x55) {
           writeByte(0x55);
       }      
-      count = 54;
+      count_r = 54;
       currentTask=TASK::CAS_wSilence;
     }    
     if(currentTask==TASK::CAS_wSilence) {
-      if(count) {
+      if(count_r) {
         writeSilence();
-        count--;
+        count_r--;
       } else {
         stopFile();
       }
@@ -493,6 +509,43 @@ void casduinoLoop()
     #endif        
     }
   } 
+}
+
+void setBaud()
+{
+  switch(BAUDRATE) {
+    case 1200:
+      scale=1;
+      period=208;
+      break;
+    case 2400:
+      scale=1;
+      period=104;
+      break;
+    case 3150:
+      scale=1;
+      period=80;
+      break;
+    case 3600:
+      //scale=2713/1200;
+      scale=2;
+      //period=93; //2700 baudios
+      //period = TickToUs(243);
+      period=70; //3571 bauds=1000000/4/70 con period 70us, 3675 baudios con period=68 
+      break;      
+    case 3850:
+      scale=2;
+      period = 65; //3850 baudios con period=65
+      break;
+  }
+  Timer.stop();
+}
+
+#else
+
+void setBaud()
+{
+  // a no-op, since only CasProcessing uses this
 }
 
 #endif

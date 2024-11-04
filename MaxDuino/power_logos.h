@@ -1,3 +1,6 @@
+#ifndef POWER_LOGOS_H_INCLUDED
+#define POWER_LOGOS_H_INCLUDED
+
 #if POWER_OFF_LOGO == DEFAULT
 const byte power_logo[] = {
 // please improve this default poweroff logo
@@ -207,3 +210,4 @@ const byte power_logo[] = {
 #error POWER_OFF_LOGO Unknown
 #endif
 
+#endif // POWER_LOGOS_H_INCLUDED

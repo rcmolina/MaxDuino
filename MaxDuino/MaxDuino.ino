@@ -1,10 +1,3 @@
-const char P_PRODUCT_NAME[] PROGMEM = "MaxDuino OTLA";
-
-#include "version.h"
-#define XXSTR(a) XSTR(a)
-#define XSTR(a) #a
-const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
-
 // ---------------------------------------------------------------------------------
 // USE CLASS-4 AND CLASS-10 CARDS on this project WITH SDFAT2 FOR BETTER ACCESS SPEED
 // ---------------------------------------------------------------------------------
@@ -150,44 +143,37 @@ const char P_VERSION[] PROGMEM = XXSTR(_VERSION);
  //               V2.01 aka "San Fermin". Fixed oled corruption and new cartoon8x16 font
  //               V2.02 Oled driver optimizations
  //
-#if defined(__AVR_ATmega2560__)
-  #include "userMAXconfig.h"
-#elif defined(__AVR_ATmega4809__) || defined(__AVR_ATmega4808__)
-  #include "userEVERYconfig.h"
-#elif defined(__arm__) && defined(__STM32F1__)
-  #include "userSTM32config.h"  
-#elif defined(SEEED_XIAO_M0)
-  #include "userSEEEDUINO_XIAO_M0config.h"
-#elif defined(ARDUINO_XIAO_ESP32C3)
-#include "userSEEEDUINO_XIAO_ESP32C3.h"
-#elif defined(ARDUINO_ESP8266_WEMOS_D1MINI)
-  #include "userARDUINO_ESP8266_WEMOS_D1MINI.h"
-#else //__AVR_ATmega328P__
-  #include "userconfig.h"
-#endif
 
-#ifndef lineaxy
-#if defined(XY)
-#define lineaxy 1
-#elif defined(XY2)
-#define lineaxy 2
-#endif
-#endif
-
+#include "product_strings.h"
+#include "preferences.h"
+#include "configs.h"
+#include "current_settings.h"
+#include "Display.h"
 #include "MaxDuino.h"
 #include "hwconfig.h"
 #include "buttons.h"
+#include "sdfat_config.h"
+#include <SdFat.h>
+#include "TimerCounter.h"
+#include "menu.h"
+#include "constants.h"
+#include "file_utils.h"
+#include "buffer.h"
+#include "MaxProcessing.h"
+#include "CounterPercent.h"
+#include "processing_state.h"
+#include "casProcessing.h"
+#include "pinSetup.h"
+#include "USBStorage.h"
+#include "power.h"
 
-#if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO) || defined(LOAD_EEPROM_SETTINGS)
-#include "EEPROM.h"
+#ifdef BLOCK_EEPROM_PUT
+#include "EEPROM_wrappers.h"
 #endif
-
-char fline[17];
 
 SdFat sd;                           //Initialise Sd card 
 SdBaseFile _tmpdirs[2]; // internal file pointers.  (*currentDir points to either _tmpdirs[0] or _tmpdirs[1] and the other is 'scratch')
 SdBaseFile *currentDir = &_tmpdirs[0];  // SD card directory
-SdBaseFile entry;  // SD card file
 byte _alt_tmp_dir = 1; // which of the _tmpdirs is scratch (we flip this between 0 and 1)
 
 #ifdef FREERAM
@@ -202,11 +188,6 @@ char fileName[filenameLength + 1];    //Current filename
 char prevSubDir[SCREENSIZE+1];
 uint16_t DirFilePos[nMaxPrevSubDirs];  //File Positions in Directory to be restored (also, history of subdirectories)
 byte subdir = 0;
-unsigned long filesize;             // filesize used for dimensioning AY files
-
-byte scrollPos = 0;                 //Stores scrolling text position
-//unsigned long scrollTime = millis() + scrollWait;
-unsigned long scrollTime = 0;
 
 #ifndef NO_MOTOR
 byte motorState = 1;                //Current motor control state
@@ -243,7 +224,21 @@ unsigned long blockOffset[maxblock];
 byte blockID[maxblock];
 #endif
 
-byte lastbtn=true;
+#ifdef BLKBIGSIZE
+  word block = 0;
+#else
+  byte block = 0;
+#endif
+
+byte jblks = 1;
+byte oldMinBlock = 0;
+#ifdef BLOCK_EEPROM_PUT
+  byte oldMaxBlock = 99;
+#else
+  byte oldMaxBlock = 19;
+#endif
+
+bool firstBlockPause = false;
 
 #if (SPLASH_SCREEN && TIMEOUT_RESET)
     void(* resetFunc) (void) = 0;//declare reset function at adress 0
@@ -254,8 +249,7 @@ byte lastbtn=true;
 #endif
 
 void setup() {
-
-  #include "pinSetup.h"
+  pinsetup();
   pinMode(chipSelect, OUTPUT);      //Setup SD card chipselect pin
 
   #ifdef LCDSCREEN16x2
@@ -275,8 +269,6 @@ void setup() {
   #endif
   
   #ifdef OLED1306
-    #include "i2c.h"
-    mx_i2c_init();
     init_OLED();
     #if (!SPLASH_SCREEN)
       #if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
@@ -365,29 +357,15 @@ void loop(void) {
   if(start==1)
   {
     //TZXLoop only runs if a file is playing, and keeps the buffer full.
-    uniLoop();
+    UniLoop();
   } else {
     WRITE_LOW;    
   }
   
-  if((millis()>=scrollTime) && start==0 && (strlen(fileName)> SCREENSIZE)) {
+  if(start==0 && (strlen(fileName)> SCREENSIZE)) {
     //Filename scrolling only runs if no file is playing to prevent I2C writes 
     //conflicting with the playback Interrupt
-    
-    //default values in hwconfig.h: scrollSpeed=250 and scrollWait=3000
-    //scrollTime = millis()+scrollSpeed;
-    //if (scrollPos ==0) scrollTime+=(scrollWait-scrollSpeed);
-    scrollTime = millis();
-    scrollTime+= (scrollPos? scrollSpeed : scrollWait);
-    scrollText(fileName);
-    scrollPos = (scrollPos+1) %strlen(fileName) ;
- /*   
-    if(scrollPos>strlen(fileName)) {
-      scrollPos=0;
-      scrollTime=millis()+scrollWait;
-      scrollText(fileName);
-    }
- */
+    scrollText(fileName, isDir);
   }
 
   #ifndef NO_MOTOR
@@ -607,8 +585,7 @@ void loop(void) {
         printtextF(PSTR(""),1);
       #endif      
       
-      scrollPos=0;
-      scrollText(fileName);
+      scrollText(fileName, isDir, 0);
     #elif defined(RECORD_EEPROM_LOGO)
       init_OLED();
       delay(1500);              // Show logo
@@ -617,7 +594,7 @@ void loop(void) {
       delay(500);
       strcpy_P(PlayBytes, P_PRODUCT_NAME);
       printtextF(P_PRODUCT_NAME, 0);
-      #if defined(OSTATUSLINE)
+      #if defined(OLED1306) && defined(OSTATUSLINE)
         OledStatusLine();
       #endif
     #else             
@@ -700,8 +677,7 @@ void loop(void) {
       timeout_reset = TIMEOUT_RESET;
     #endif
     //Move up a file in the directory
-    scrollTime=millis()+scrollWait;
-    scrollPos=0;
+    scrollTextReset();
     upFile();
     debouncemax(button_up);
   }
@@ -712,8 +688,7 @@ void loop(void) {
         timeout_reset = TIMEOUT_RESET;
       #endif
       //Move up a file in the directory
-      scrollTime=millis()+scrollWait;
-      scrollPos=0;
+      scrollTextReset();
       upHalfSearchFile();
       debounce(button_up);
     }
@@ -822,8 +797,7 @@ void loop(void) {
       timeout_reset = TIMEOUT_RESET;
     #endif
     //Move down a file in the directory
-    scrollTime=millis()+scrollWait;
-    scrollPos=0;
+    scrollTextReset();
     downFile();
     debouncemax(button_down);
   }
@@ -834,10 +808,8 @@ void loop(void) {
         timeout_reset = TIMEOUT_RESET;
       #endif
       //Move down a file in the directory
-      scrollTime=millis()+scrollWait;
-      scrollPos=0;
+      scrollTextReset();
       downHalfSearchFile();
-      
       debounce(button_down);
     }
   #endif
@@ -848,16 +820,13 @@ void loop(void) {
       //Motor control works by pulling the btnMotor pin to ground to play, and NC to stop
       if(motorState==1 && !pauseOn) {
         printtext2F(PSTR("PAUSED  "),0);
-        scrollPos=0;
-        scrollText(fileName);
         pauseOn = true;
       } 
       if(motorState==0 && pauseOn) {
         printtext2F(PSTR("PLAYing "),0);
-        scrollPos=0;
-        scrollText(fileName);
         pauseOn = false;
       }
+      scrollText(fileName, isDir, 0);
       oldMotorState=motorState;
     }
   #endif
@@ -967,16 +936,14 @@ void seekFile() {
   }
 
   printtext(PlayBytes,0);
-  
-  scrollPos=0;
-  scrollText(fileName);
+  scrollText(fileName, isDir, 0);
   #ifdef SERIALSCREEN
     Serial.println(fileName);
   #endif
 }
 
 void stopFile() {
-  TZXStop();
+  UniStop();
   if(start==1){
     printtextF(PSTR("Stopped"),0);
     #ifdef P8544
@@ -995,9 +962,8 @@ void playFile() {
   else if (!dirEmpty) 
   {
     printtextF(PSTR("Playing"),0);
-    scrollPos=0;
     pauseOn = false;
-    scrollText(fileName);
+    scrollText(fileName, isDir, 0);
     currpct=100;
     lcdsegs=0;
     UniPlay();
@@ -1095,310 +1061,6 @@ void changeDirRoot()
   currentDir->close();
   currentDir->open("/", O_RDONLY);                    //set SD to root directory
 }
-
-void scrollText(char* text){
-  #ifdef LCDSCREEN16x2
-  //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
-  if(scrollPos<0) scrollPos=0;
-  char outtext[17];
-  byte i=0;
-  byte p=scrollPos;
-  if(isDir) {
-    outtext[0]='>';
-    i++;
-  }
-  for(;i<16;i++,p++)
-  {
-    if(p<strlen(text)) 
-    {
-      outtext[i]=text[p];
-    } else {
-      outtext[i]='\0';
-    }
-  }
-  outtext[16]='\0';
-  printtext(outtext,1);
-  #endif
-
-  #ifdef OLED1306
-  //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
-  if(scrollPos<0) scrollPos=0;
-  char outtext[17];
-  byte i=0;
-  byte p=scrollPos;
-  if(isDir) {
-    outtext[0]='>';
-    i++;
-  }
-  for(;i<16;i++,p++)
-  {
-    if(p<strlen(text)) 
-    {
-      outtext[i]=text[p];
-    } else {
-      outtext[i]='\0';
-    }
-  }
-  outtext[16]='\0';
-  printtext(outtext,lineaxy);
-  #endif
-
-  #ifdef P8544
-  //Text scrolling routine.  Setup for P8544 screen so will only display 14 chars
-  if(scrollPos<0) scrollPos=0;
-  char outtext[15];
-  byte i=0;
-  byte p=scrollPos;
-  if(isDir) {
-    outtext[0]='>';
-    i++;
-  }
-  for(;i<14;i++,p++)
-  {
-    if(p<strlen(text)) 
-    {
-      outtext[i]=text[p];
-    } else {
-      outtext[i]='\0';
-    }
-  }
-  outtext[14]='\0';
-  printtext(outtext,1);
-  #endif
-}
-
-void printtext2F(const char* text, int l) {  //Print text to screen. 
-  
-  #ifdef SERIALSCREEN
-  Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
-  #endif
-  
-  #ifdef LCDSCREEN16x2
-    lcd.setCursor(0,l);
-    char x = 0;
-    while (char ch=pgm_read_byte(text+x)) {
-      lcd.print(ch);
-      x++;
-    }
-  #endif
-
-  #ifdef OLED1306
-    #ifdef XY2
-      strncpy_P(fline, text, 16);
-      sendStrXY(fline,0,l);
-    #endif
-     
-    #ifdef XY 
-      setXY(0,l);
-      char x = 0;
-      while (char ch=pgm_read_byte(text+x)) {
-        sendChar(ch);
-        x++;
-      }
-    #endif
-  #endif
-
-  #ifdef P8544
-    strncpy_P(fline, text, 14);
-    lcd.setCursor(0,l);
-    lcd.print(fline);
-  #endif 
-   
-}
-
-void printtextF(const char* text, int l) {  //Print text to screen. 
-  
-  #ifdef SERIALSCREEN
-    Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
-  #endif
-  
-  #ifdef LCDSCREEN16x2
-    lcd.setCursor(0,l);
-    char x = 0;
-    while (char ch=pgm_read_byte(text+x)) {
-      lcd.print(ch);
-      x++;
-    }
-    for(x; x<16; x++) {
-      lcd.print(' ');
-    }
-  #endif
-
-  #ifdef OLED1306
-    #ifdef XY2
-      strncpy_P(fline, text, 16);
-      for(int i=strlen(fline);i<16;i++) {
-        fline[i]=0x20;
-      }
-      sendStrXY(fline,0,l);
-    #endif
-     
-    #ifdef XY 
-      setXY(0,l);
-      char x = 0;
-      while (char ch=pgm_read_byte(text+x)) {
-        sendChar(ch);
-        x++;
-      }
-      for(x; x<16; x++) {
-        sendChar(' ');
-      }
-     #endif
-  #endif
-
-  #ifdef P8544
-    strncpy_P(fline, text, 14);
-    for(int i=strlen(fline);i<14;i++) {
-      fline[i]=0x20;
-    }
-    lcd.setCursor(0,l);
-    lcd.print(fline);
-  #endif 
-   
-}
-
-void printtext(const char* text, int l) {  //Print text to screen. 
-  
-  #ifdef SERIALSCREEN
-    Serial.println(text);
-  #endif
-  
-  #ifdef LCDSCREEN16x2
-    lcd.setCursor(0,l);
-    char ch;
-    bool end=false;
-    for(byte i=0;i<16;i++) {
-      if(!end)
-        if(text[i]=='\0')
-          end=true;
-      if(!end)
-        ch=text[i];
-      else
-        ch=' ';
-      }
-      lcd.print(ch); 
-    }
-  #endif
-
-  #ifdef OLED1306
-    #ifdef XY2
-      bool end=false;
-      for(byte i=0;i<16;i++) {
-        if(!end)
-          if(text[i]=='\0')
-            end=true;
-        if(!end)
-          fline[i]=text[i];
-        else
-          fline[i]=' ';
-      }    
-      sendStrXY(fline,0,l);
-    #endif
-    
-    #ifdef XY
-      setXY(0,l); 
-      char ch;
-      bool end=false;
-      for(byte i=0;i<16;i++) {
-        if(!end)
-          if(text[i]=='\0')
-            end=true;
-        if(!end)
-          ch=text[i];
-        }
-        else {
-          ch=' ';
-        }
-        sendChar(ch);
-      }       
-    #endif
-  #endif
-
-  #ifdef P8544
-    bool end=false;
-    for(byte i=0;i<16;i++) {
-      if(!end)
-        if(text[i]=='\0')
-          end=true;
-      if(!end)
-        fline[i]=text[i];
-      else
-        fline[i]=' ';
-    }  
-    lcd.setCursor(0,l);
-    lcd.print(fline);
-  #endif 
-}
-
-#if defined(OLED1306)
-void OledStatusLine() {
-  #ifdef XY
-    setXY(4,2);
-    sendStr("ID:   BLK:");
-    #ifdef OLED1306_128_64
-      setXY(0,7);
-      utoa(BAUDRATE,(char *)input,10);
-      sendStr((char *)input);
-
-      #ifndef NO_MOTOR       
-        setXY(5,7);
-        if(mselectMask) {
-          sendStr(" M:ON");
-        } else {
-          sendStr("m:off");
-        }
-      #endif    
-
-      setXY(11,7); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
-        sendStr(" %^ON");
-      } else {
-        sendStr("%^off");
-      }
-
-    #else // OLED1306_128_64 not defined
-
-      setXY(0,3);
-      utoa(BAUDRATE,(char *)input,10);sendStr((char *)input);
-      #ifndef NO_MOTOR        
-        setXY(5,3);
-        if(mselectMask) {
-          sendStr(" M:ON");
-        } else {
-          sendStr("m:off");
-        }
-      #endif    
-      setXY(11,3); 
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
-        sendStr(" %^ON");
-      } else {
-        sendStr("%^off");
-      }
-    #endif
-  #endif
-  
-  #ifdef XY2                        // Y with double value
-    #ifdef OLED1306_128_64          // 8 rows supported
-      sendStrXY("ID:   BLK:",4,4);        
-      utoa(BAUDRATE,(char *)input,10);
-      sendStrXY((char *)input,0,6);
-      #ifndef NO_MOTOR       
-        if(mselectMask) {
-          sendStrXY(" M:ON",5,6);
-        } else {
-          sendStrXY("m:off",5,6);
-        }
-      #endif      
-      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
-        sendStrXY(" %^ON",11,6);
-      } else {
-        sendStrXY("%^off",11,6);
-      }
-    #endif      
-  #endif  
-
-}
-#endif // defined(OLED1306)
 
 void SetPlayBlock()
 {
@@ -1512,7 +1174,7 @@ void GetAndPlayBlock()
     if (currentID!=BLOCKID::TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
 
     #ifdef BLKBIGSIZE
-      int i = 0;
+      unsigned int i = 0;
     #else
       byte i = 0;
     #endif      
@@ -1684,4 +1346,68 @@ void GetFileName(uint16_t pos)
     entry.getName(fileName,filenameLength);
   }
   entry.close();
+}
+
+void block_mem_oled()
+{
+  #ifdef BLOCKID_INTO_MEM
+    blockOffset[block%maxblock] = bytesRead;
+    blockID[block%maxblock] = currentID;
+  #endif
+  #ifdef BLOCK_EEPROM_PUT
+    EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+    EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
+  #endif
+
+  #if defined(OLED1306) && defined(OLEDPRINTBLOCK) 
+    #ifdef XY
+      setXY(7,2);
+      sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+      setXY(14,2);
+      if ((block%10) == 0) sendChar('0'+(block/10)%10);  
+      setXY(15,2);
+      sendChar('0'+block%10);
+    #endif
+    #if defined(XY2) && not defined(OLED1306_128_64)
+      setXY(9,1);
+      sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+      setXY(12,1);
+      if ((block%10) == 0) sendChar('0'+(block/10)%10);
+      setXY(13,1);sendChar('0'+block%10);
+    #endif
+    #if defined(XY2) && defined(OLED1306_128_64)
+      #ifdef XY2force
+        input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
+        input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+        input[2]=0;
+        sendStrXY((char *)input,7,4);
+        if ((block%10) == 0) {
+          utoa((block/10)%10,(char *)input,10);
+          sendStrXY((char *)input,14,4);
+        }
+        input[0]='0'+block%10;
+        input[1]=0;
+        sendStrXY((char *)input,15,4);
+      #else                      
+        setXY(7,4);
+        sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+        setXY(14,4);
+        if ((block%10) == 0) sendChar('0'+(block/10)%10);
+        setXY(15,4);
+        sendChar('0'+block%10);
+      #endif
+    #endif                    
+  #endif
+
+  #if defined(BLOCKID_INTO_MEM)
+    if (block < maxblock) block++;
+    else block = 0;
+  #endif
+  #if defined(BLOCK_EEPROM_PUT) 
+    if (block < 99) block++;
+    else block = 0; 
+  #endif
+  #if defined(BLOCKID_NOMEM_SEARCH) 
+    block++;
+  #endif             
 }

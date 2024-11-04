@@ -1,12 +1,32 @@
+#include "configs.h"
+#include "compat.h"
+#include "Arduino.h"
 #include "Fonts.h"
 #include "Logos.h"
+#include "Display.h"
+#include "i2c.h"
+#include "preferences.h"
+#include "current_settings.h"
 
-#if defined(OLED1306)
-  #include "i2c.h"
+#if defined(RECORD_EEPROM_LOGO) || defined(LOAD_EEPROM_LOGO)
+#include "EEPROM_wrappers.h"
+#endif
+
+#ifdef LCDSCREEN16x2
+
+  LiquidCrystal_I2C lcd(LCD_I2C_ADDR,16,2); // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+#elif defined(OLED1306)
+
+  PROGMEM const byte HEX_CHAR[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+  #if defined(LOAD_EEPROM_LOGO)
+    #include "EEPROM_wrappers.h"
+  #endif
 
   //==========================================================//
   // Used to send commands to the display.
-  static void sendcommand(unsigned char com)
+  void sendcommand(unsigned char com)
   {
     mx_i2c_start(OLED_address); //begin transmitting
     mx_i2c_write(0x80); //command mode
@@ -17,7 +37,7 @@
   //==========================================================//
   // Actually this sends a byte, not a char to draw in the display.
   // Display's chars uses 8 byte font
-  static void SendByte(unsigned char data)
+  void SendByte(unsigned char data)
   {
     mx_i2c_start(OLED_address); //begin transmitting
     mx_i2c_write(0x40); //data mode
@@ -29,7 +49,7 @@
   // Prints a display char (not just a byte)
   // being multiples of 8. This means we have 16 COLS (0-15)
   // and 8 ROWS (0-7).
-  static void sendChar(unsigned char data)
+  void sendChar(unsigned char data)
   {
     mx_i2c_start(OLED_address);
     mx_i2c_write(0x40);
@@ -41,7 +61,7 @@
 
   //==========================================================//
   // Set the cursor position in a 16 COL * 2 ROW map.
-  static void setXY(unsigned char col,unsigned char row)
+  void setXY(unsigned char col,unsigned char row)
   {
     mx_i2c_start(OLED_address);
     mx_i2c_write(0x80);  
@@ -64,7 +84,7 @@
 
   //==========================================================//
   // Prints a string regardless the cursor position.
-  static void sendStr(const char *string)
+  void sendStr(const char *string)
   {
     unsigned char i=0;
     while(*string)
@@ -93,7 +113,7 @@
   //==========================================================//
   // Prints a string in coordinates X Y, being multiples of 8.
   // This means we have 16 COLS (0-15) and 8 ROWS (0-7).
-  static void sendStrXY(const char *string, int X, int Y)
+  void sendStrXY(const char *string, int X, int Y)
   {
     #ifdef XY
       setXY(X,Y);
@@ -222,7 +242,7 @@
 
   //==========================================================//
   // Resets display depending on the actual mode.
-  static void reset_display(void)
+  void reset_display(void)
   {
     displayOff();
     clear_display();  
@@ -251,7 +271,7 @@
 
   //==========================================================//
   // Clears the display by sending 0 to all the screen map.
-  static void clear_display(void)
+  void clear_display(void)
   {
     unsigned char i,k;
     #if defined(OLED1306_128_64) || defined(video64text32)
@@ -272,8 +292,10 @@
     
   //==========================================================//
   // Inits oled and draws logo at startup
-  static void init_OLED(void)
+  void init_OLED(void)
   {
+    mx_i2c_init();
+
     /*
     sequence := { direct_value | escape_sequence }
     direct_value := 0..254
@@ -399,8 +421,11 @@
         #endif   
 
         #if defined(LOAD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
-          EEPROM_get(j*128+i, outByte);
-          SendByte(outByte);
+        {
+          byte t;
+          EEPROM_get(j*128+i, t);
+          SendByte(t);
+        }
         #endif
 
         #if defined(LOAD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
@@ -456,6 +481,8 @@
 
 #elif defined(P8544)
 
+  pcd8544 lcd(dc_pin, reset_pin, cs_pin);
+
   void bitmap2(uint8_t bdata[], uint8_t rows, uint8_t columns)
   {
     uint8_t row, column;
@@ -470,7 +497,7 @@
     }
   }
 
-  static void P8544_splash (void)
+  void P8544_splash (void)
   {
     lcd.gotoRc(0, 0);
     bitmap2(logo, 6,84);
@@ -479,3 +506,334 @@
   }
 
 #endif // defined(P8544)
+
+
+byte scrollPos = 0;                 //Stores scrolling text position
+//unsigned long scrollTime = millis() + scrollWait;
+unsigned long scrollTime = 0;
+
+void scrollText(char* text, bool is_dir){
+  if(millis()<scrollTime)
+    return;
+
+  #ifdef LCDSCREEN16x2
+  //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
+  if(scrollPos<0) scrollPos=0;
+  char outtext[17];
+  byte i=0;
+  byte p=scrollPos;
+  if(is_dir) {
+    outtext[0]='>';
+    i++;
+  }
+  for(;i<16;i++,p++)
+  {
+    if(p<strlen(text)) 
+    {
+      outtext[i]=text[p];
+    } else {
+      outtext[i]='\0';
+    }
+  }
+  outtext[16]='\0';
+  printtext(outtext,1);
+  #endif
+
+  #ifdef OLED1306
+  //Text scrolling routine.  Setup for 16x2 screen so will only display 16 chars
+  if(scrollPos<0) scrollPos=0;
+  char outtext[17];
+  byte i=0;
+  byte p=scrollPos;
+  if(is_dir) {
+    outtext[0]='>';
+    i++;
+  }
+  for(;i<16;i++,p++)
+  {
+    if(p<strlen(text)) 
+    {
+      outtext[i]=text[p];
+    } else {
+      outtext[i]='\0';
+    }
+  }
+  outtext[16]='\0';
+  printtext(outtext,lineaxy);
+  #endif
+
+  #ifdef P8544
+  //Text scrolling routine.  Setup for P8544 screen so will only display 14 chars
+  if(scrollPos<0) scrollPos=0;
+  char outtext[15];
+  byte i=0;
+  byte p=scrollPos;
+  if(is_dir) {
+    outtext[0]='>';
+    i++;
+  }
+  for(;i<14;i++,p++)
+  {
+    if(p<strlen(text)) 
+    {
+      outtext[i]=text[p];
+    } else {
+      outtext[i]='\0';
+    }
+  }
+  outtext[14]='\0';
+  printtext(outtext,1);
+  #endif
+
+  scrollTime = millis();
+  scrollTime += (scrollPos? scrollSpeed : scrollWait);
+  scrollPos = (scrollPos+1) %strlen(text);
+}
+
+void scrollText(char* text, bool is_dir, byte scroll_pos) {
+  // this variant resets the scroll position and timer, so printing is immediate
+  scrollPos = scroll_pos;
+  scrollTime = 0;
+  scrollText(text, is_dir);
+}
+
+char fline[17];
+
+void printtext2F(const char* text, int l) {  //Print text to screen. 
+  
+  #ifdef SERIALSCREEN
+  Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
+  #endif
+  
+  #ifdef LCDSCREEN16x2
+    lcd.setCursor(0,l);
+    char x = 0;
+    while (char ch=pgm_read_byte(text+x)) {
+      lcd.print(ch);
+      x++;
+    }
+  #endif
+
+  #ifdef OLED1306
+    #ifdef XY2
+      strncpy_P(fline, text, 16);
+      sendStrXY(fline,0,l);
+    #endif
+     
+    #ifdef XY 
+      setXY(0,l);
+      char x = 0;
+      while (char ch=pgm_read_byte(text+x)) {
+        sendChar(ch);
+        x++;
+      }
+    #endif
+  #endif
+
+  #ifdef P8544
+    strncpy_P(fline, text, 14);
+    lcd.setCursor(0,l);
+    lcd.print(fline);
+  #endif 
+   
+}
+
+void printtextF(const char* text, int l) {  //Print text to screen. 
+  
+  #ifdef SERIALSCREEN
+    Serial.println(reinterpret_cast <const __FlashStringHelper *> (text));
+  #endif
+  
+  #ifdef LCDSCREEN16x2
+    lcd.setCursor(0,l);
+    char x = 0;
+    while (char ch=pgm_read_byte(text+x)) {
+      lcd.print(ch);
+      x++;
+    }
+    for(x; x<16; x++) {
+      lcd.print(' ');
+    }
+  #endif
+
+  #ifdef OLED1306
+    #ifdef XY2
+      strncpy_P(fline, text, 16);
+      for(int i=strlen(fline);i<16;i++) {
+        fline[i]=0x20;
+      }
+      sendStrXY(fline,0,l);
+    #endif
+     
+    #ifdef XY 
+      setXY(0,l);
+      char x = 0;
+      while (char ch=pgm_read_byte(text+x)) {
+        sendChar(ch);
+        x++;
+      }
+      for(x; x<16; x++) {
+        sendChar(' ');
+      }
+     #endif
+  #endif
+
+  #ifdef P8544
+    strncpy_P(fline, text, 14);
+    for(int i=strlen(fline);i<14;i++) {
+      fline[i]=0x20;
+    }
+    lcd.setCursor(0,l);
+    lcd.print(fline);
+  #endif 
+   
+}
+
+void printtext(char* text, int l) {  //Print text to screen. 
+  
+  #ifdef SERIALSCREEN
+    Serial.println(text);
+  #endif
+  
+  #ifdef LCDSCREEN16x2
+    lcd.setCursor(0,l);
+    char ch;
+    bool end=false;
+    for(byte i=0;i<16;i++) {
+      if(!end)
+        if(text[i]=='\0')
+          end=true;
+      if(!end)
+        ch=text[i];
+      else
+        ch=' ';
+      }
+      lcd.print(ch); 
+    }
+  #endif
+
+  #ifdef OLED1306
+    #ifdef XY2
+      bool end=false;
+      for(byte i=0;i<16;i++) {
+        if(!end)
+          if(text[i]=='\0')
+            end=true;
+        if(!end)
+          fline[i]=text[i];
+        else
+          fline[i]=' ';
+      }    
+      sendStrXY(fline,0,l);
+    #endif
+    
+    #ifdef XY
+      setXY(0,l); 
+      char ch;
+      bool end=false;
+      for(byte i=0;i<16;i++) {
+        if(!end)
+          if(text[i]=='\0')
+            end=true;
+        if(!end)
+          ch=text[i];
+        }
+        else {
+          ch=' ';
+        }
+        sendChar(ch);
+      }       
+    #endif
+  #endif
+
+  #ifdef P8544
+    bool end=false;
+    for(byte i=0;i<16;i++) {
+      if(!end)
+        if(text[i]=='\0')
+          end=true;
+      if(!end)
+        fline[i]=text[i];
+      else
+        fline[i]=' ';
+    }  
+    lcd.setCursor(0,l);
+    lcd.print(fline);
+  #endif 
+}
+
+#if defined(OLED1306)
+void OledStatusLine() {
+  #ifdef XY
+    setXY(4,2);
+    sendStr("ID:   BLK:");
+    #ifdef OLED1306_128_64
+      setXY(0,7);
+      utoa(BAUDRATE,(char *)fline,10);
+      sendStr((char *)fline);
+
+      #ifndef NO_MOTOR       
+        setXY(5,7);
+        if(mselectMask) {
+          sendStr(" M:ON");
+        } else {
+          sendStr("m:off");
+        }
+      #endif    
+
+      setXY(11,7); 
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
+        sendStr(" %^ON");
+      } else {
+        sendStr("%^off");
+      }
+
+    #else // OLED1306_128_64 not defined
+
+      setXY(0,3);
+      utoa(BAUDRATE,(char *)fline,10);sendStr((char *)fline);
+      #ifndef NO_MOTOR        
+        setXY(5,3);
+        if(mselectMask) {
+          sendStr(" M:ON");
+        } else {
+          sendStr("m:off");
+        }
+      #endif    
+      setXY(11,3); 
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
+        sendStr(" %^ON");
+      } else {
+        sendStr("%^off");
+      }
+    #endif
+  #endif
+  
+  #ifdef XY2                        // Y with double value
+    #ifdef OLED1306_128_64          // 8 rows supported
+      sendStrXY("ID:   BLK:",4,4);        
+      utoa(BAUDRATE,(char *)fline,10);
+      sendStrXY((char *)fline,0,6);
+      #ifndef NO_MOTOR       
+        if(mselectMask) {
+          sendStrXY(" M:ON",5,6);
+        } else {
+          sendStrXY("m:off",5,6);
+        }
+      #endif      
+      if (TSXCONTROLzxpolarityUEFSWITCHPARITY) {
+        sendStrXY(" %^ON",11,6);
+      } else {
+        sendStrXY("%^off",11,6);
+      }
+    #endif      
+  #endif  
+
+}
+#endif // defined(OLED1306)
+
+void scrollTextReset()
+{
+  scrollTime=millis()+scrollWait;
+  scrollPos=0;
+}
