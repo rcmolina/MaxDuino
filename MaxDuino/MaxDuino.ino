@@ -1169,8 +1169,8 @@ void GetAndPlayBlock()
     EEPROM_get(BLOCK_EEPROM_START+4+5*block, currentID);
   #endif
   #ifdef BLOCKID_NOMEM_SEARCH 
-    unsigned long oldbytesRead;           //TAP
-    bytesRead=0;                          //TAP 
+    unsigned long oldbytesRead=0;
+    bytesRead=0;
     if (currentID!=BLOCKID::TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
 
     #ifdef BLKBIGSIZE
@@ -1181,7 +1181,7 @@ void GetAndPlayBlock()
 
     while (i<= block) {
       if(ReadByte()) {
-        oldbytesRead = bytesRead-1;
+        oldbytesRead=bytesRead-1;
         if (currentID!=BLOCKID::TAP) currentID = outByte;  //TZX with blocks GETID
         if (currentID==BLOCKID::TAP) bytesRead--;
       }
