@@ -14,7 +14,7 @@
 
 #ifdef LCDSCREEN16x2
 
-  LiquidCrystal_I2C lcd(LCD_I2C_ADDR,16,2); // set the LCD address to 0x27 for a 16 chars and 2 line display
+  LiquidCrystal_I2C lcd(LCD_I2C_ADDR,16,2); // set the LCD address, and configure for a 16 chars and 2 line display
 
 #elif defined(OLED1306)
 
@@ -651,7 +651,7 @@ void printtextF(const char* text, int l) {  //Print text to screen.
       lcd.print(ch);
       x++;
     }
-    for(x; x<16; x++) {
+    for(; x<16; x++) {
       lcd.print(' ');
     }
   #endif
@@ -672,7 +672,7 @@ void printtextF(const char* text, int l) {  //Print text to screen.
         sendChar(ch);
         x++;
       }
-      for(x; x<16; x++) {
+      for(; x<16; x++) {
         sendChar(' ');
       }
      #endif
@@ -707,7 +707,6 @@ void printtext(char* text, int l) {  //Print text to screen.
         ch=text[i];
       else
         ch=' ';
-      }
       lcd.print(ch); 
     }
   #endif

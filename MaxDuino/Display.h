@@ -6,6 +6,7 @@
 #ifdef LCDSCREEN16x2
   #define SCREENSIZE 16  
   #include "LiquidCrystal_I2C_Soft.h"
+  extern LiquidCrystal_I2C lcd;
 
 #elif defined(OLED1306)
   #define SCREENSIZE 16
