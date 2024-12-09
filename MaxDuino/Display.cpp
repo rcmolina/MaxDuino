@@ -737,10 +737,8 @@ void printtext(char* text, int l) {  //Print text to screen.
             end=true;
         if(!end)
           ch=text[i];
-        }
-        else {
+        else
           ch=' ';
-        }
         sendChar(ch);
       }       
     #endif
