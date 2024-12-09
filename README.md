@@ -1,9 +1,38 @@
-﻿
-# maxduino
+﻿# maxduino
 
-https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
+## DOCS
+
+(Link coming soon)
+
+## NEWS
 
 * V3.00 Maxduino OTLA as reference name for this version. Check https://github.com/rcmolina/otla_tzx for some testing.
+
+## BUILD INSTRUCTIONS
+
+You can use PlatformIO along with the included environments in platformio.ini or create your own.
+
+Or you can use Arduino IDE (via the MaxDuino/MaxDuino.ino file)
+
+## INSTALLING PREBUILT RELEASES
+
+You can now download prebuilt releases from the github Releases page and upload them to your device
+using the appropriate tools for your device (usually that's avrdude).  For example, on Arduino Nano you can
+follow these instructions https://forum.arduino.cc/t/using-avrdude-to-push-sketch-to-arduino/525745
+The master branch will always have a release called "latest" which is automatically rebuilt on every commit.
+There will also be specific release packages whenever there is a major or minor version bump.
+
+### MODELS / CONFIGS INCLUDED IN GITHUB RELEASES
+*  Nano 328p + userconfig7
+*  Thinary Nano Every / MaxDuino Ultimate
+*  Seeed Xiao M0 (SAMD21) with ADC buttons, no motor
+*  ESP8266
+*  ESP32C3
+*  STM32
+
+## PREVIOUS VERSIONS
+
+Please note: see https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
 * V2.03 OTLA working with tzx id15
   My own otla of HoH at 12600 bauds (29s) vs old turbo at 5800 bauds with z802tzx using compression zx7b (62s). About half of time as expected:
@@ -84,6 +113,6 @@ First support of 1,3" oled SH1106 but using 128x32 and not 128x64. Backported op
 * V1.29 3-digits counter can be configured to display m:ss with #define CNTRBASE
 * V1.28 Better speeed loading tzx files, more than 5000 baud using PORT instructions
 
-### In memoriam
+## In memoriam
 
 To my father R.I.P. who bought my first ZX spectrum and forced me to learn with his casio programming calc.
