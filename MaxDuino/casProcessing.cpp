@@ -304,18 +304,16 @@ void process()
 void processDragon()
 {
   lastByte=filebuffer[0];
-//  byte r=0;
-//  if((r=readfile(1,bytesRead))==1) {
-  if((readfile(1,bytesRead))==1) {
-
-  #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
+  if((readfile(1,bytesRead))==1)
+  {
+    #if defined(Use_Dragon_sLeader) && not defined(Expand_All)
     if(currentTask==TASK::GETFILEHEADER) {
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
        bytesRead+=1;
        count_r--;
       } else {
-       //currentTask=TASK::CAS_wHeader;
+        //currentTask=TASK::CAS_wHeader;
         if(count_r>=0) {
           writeByte(0x55);
           count_r--;
@@ -327,35 +325,21 @@ void processDragon()
           }
         }       
       }
-/*
-    } else if(currentTask==TASK::CAS_wHeader) {
-        if(count_r>=0) {
-          writeByte(0x55);
-          count_r--;
-        } else {    
-          if (fileStage > 0) currentTask=TASK::CAS_wData;
-          else {
-            count_r =19;
-            currentTask=TASK::CAS_wNameFileBlk;
-          }
-        }
-*/
     } else if(currentTask==TASK::CAS_wNameFileBlk) {
-//        if(!count_r==0) {
-        if(count_r) {
-            writeByte(filebuffer[0]);
-            bytesRead+=1;
-            count_r--;            
-        } else {            
-            fileStage=1;
-            currentTask=TASK::GETFILEHEADER;
-            count_r=255;
-        }
-    } else {        
+      if(count_r) {
+        writeByte(filebuffer[0]);
+        bytesRead+=1;
+        count_r--;            
+      } else {            
+        fileStage=1;
+        currentTask=TASK::GETFILEHEADER;
+        count_r=255;
+      }
+    }
+    else
   #endif
     
   #if defined(Use_Dragon_sLeader) && defined(Expand_All)
-
     if(currentTask==TASK::GETFILEHEADER) {
       if(filebuffer[0] == 0x55) {
        writeByte(0x55); 
@@ -372,17 +356,6 @@ void processDragon()
           currentTask=TASK::CAS_wSync;
         }       
       }
-/*
-    } else if(currentTask==TASK::CAS_wHeader) {
-      if(count_r>=0) {
-        writeByte(0x55);
-        count_r--;
-      } else {
-        //count_r= 119;
-        count_r = 2;      
-        currentTask=TASK::CAS_wSync;
-      }
-*/
     } else if(currentTask==TASK::CAS_wSync) { 
       if(count_r) {
         writeByte(filebuffer[0]);
@@ -394,7 +367,6 @@ void processDragon()
         currentTask=TASK::CAS_wNameFileBlk;
         count_r=filebuffer[0]++;                   
       }
- 
     } else if(currentTask==TASK::CAS_wNameFileBlk) { 
       if(count_r) {
         writeByte(filebuffer[0]);
@@ -406,7 +378,6 @@ void processDragon()
         currentTask=TASK::CAS_lookLeader;
         count_r=255;                 
       }
-          
     } else if(currentTask==TASK::CAS_lookLeader) { 
       if(filebuffer[0] == 0x55) {
         writeByte(0x55); 
@@ -420,31 +391,22 @@ void processDragon()
         } else {   
           currentTask=TASK::CAS_wData;
         }
-        
       }
-/*
-    } else if(currentTask==TASK::CAS_wNewLeader) {
-      if(count_r>=0) {
-        writeByte(0x55);
-        count_r--;
-      } else {   
-        currentTask=TASK::CAS_wData;
-      }
-*/                  
-    } else {              // data block
+    }
+    else
 
   #endif
+
+    {              // data block
       //currentTask=TASK::CAS_wData;
       writeByte(filebuffer[0]);
       bytesRead+=1;             // increase pointer to read next byte (not the same)
-  //#if defined(Use_DRAGON) && defined(Use_Dragon_sLeader)                       
     }
-  //#endif
   
-    } else {          // readfile !=1 , ending
-      if(currentTask==TASK::CAS_wData) {
-       if(lastByte != 0x55) {
-          writeByte(0x55);
+  } else {          // readfile !=1 , ending
+    if(currentTask==TASK::CAS_wData) {
+      if(lastByte != 0x55) {
+        writeByte(0x55);
       }      
       count_r = 54;
       currentTask=TASK::CAS_wSilence;
@@ -459,7 +421,7 @@ void processDragon()
     }
   }
 }
-#endif
+#endif // defined(Use_DRAGON)
 
 void casduinoLoop()
 {
