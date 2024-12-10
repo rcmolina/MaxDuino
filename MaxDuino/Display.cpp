@@ -372,6 +372,10 @@
     // sendcommand(0xA6); // SSD1306_NORMALDISPLAY
     // sendcommand(0x2E); // SSD1306_DEACTIVATE_SCROLL
 
+    #if defined(LOAD_EEPROM_LOGO)
+      byte t;
+    #endif
+
     #if defined(OLED1306_128_64) || defined(video64text32)
       for(int j=0;j<8;j++) {
     #else
@@ -421,52 +425,46 @@
         #endif   
 
         #if defined(LOAD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
-        {
-          byte t;
           EEPROM_get(j*128+i, t);
           SendByte(t);
-        }
         #endif
 
         #if defined(LOAD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
           if (i%2 == 0){
+            t=0;
             #ifdef OLED1306_128_64
               if (j%2 == 0) {
-                byte il=0;
                 byte ril=0;
                 byte ib=0;
                 EEPROM_get((j/2)*64+i/2, ril);
 
                 for(ib=0;ib<4;ib++) {
                   if (bitRead (ril,ib)) {
-                    il |= (1 << ib*2);
+                    t |= (1 << ib*2);
                     #ifdef COMPRESS_REPEAT_ROW
-                      il |= (1 << (ib*2)+1);
+                      t |= (1 << (ib*2)+1);
                     #endif
                   }
                 }
-                outByte = il;
               } else {
-                byte ih=0;
                 byte rih=0;
                 byte ic=0;
                 EEPROM_get((j/2)*64+i/2, rih);
 
                 for(ic=4;ic<8;ic++) {
                   if (bitRead (rih,ic)) {
-                    ih |= (1 << (ic-4)*2);
+                    t |= (1 << (ic-4)*2);
                     #ifdef COMPRESS_REPEAT_ROW
-                      ih |= (1 << ((ic-4)*2)+1);
+                      t |= (1 << ((ic-4)*2)+1);
                     #endif
                   }
                 }
-                outByte = ih;                           
               }
             #else
-              EEPROM_get(j*64+i/2, outByte);
+              EEPROM_get(j*64+i/2, t);
             #endif
           }
-          SendByte(outByte);
+          SendByte(t);
         #endif   
     
       }  
