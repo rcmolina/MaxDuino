@@ -208,7 +208,7 @@
 
   #if defined(XY2) && defined(DoubleFont)
     int Xh=X, Xl=X;
-    char *stringL=string, *stringH=string;
+    const char *stringL=string, *stringH=string;
   
     setXY(Xl,Y);
     while(*stringL) {
