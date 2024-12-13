@@ -4,6 +4,9 @@
 #include "utils.h"
 #include "file_utils.h"
 
+//extern char* utoa( unsigned int value, char *string, int radix ) ;
+#include "compat.h"
+
 byte currpct = 100;
 unsigned int lcdsegs = 0;
 
