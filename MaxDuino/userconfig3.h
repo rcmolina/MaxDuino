@@ -1,5 +1,8 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*          3:OPTIBOOT BOOTLOADER 32256, LCDSCREEN16x2, LCD_I2C_ADDR 0x27, SoftI2CMaster, I2CFAST, XY, AYPLAY            */
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
@@ -116,121 +119,16 @@
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
 #define LOAD_EEPROM_LOGO 
 
-#if defined(OLED1306_128_64) || defined(video64text32)
-  //#define EmptyLogo               // to erase
-  //#define Maxduino2Alf            // new Maxduino2 logo 128x64 by Alfredo Retrocant
-  //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
-  //#define Batman
-  //#define Superman
-  //#define Spider
-  //#define Arduino
-  //#define Audi
-  //#define Apple
-  //#define Nike
-  //#define WWF
-  //#define GNU
-  //#define LinuxGnu
-  //#define Bentley
-  //#define dragon
-  //#define heckbert
-  //#define cassette
-  //#define Audiocable
-  //#define Digital
-  //#define dragon32Max
-  //#define Maxduino7
-  //#define Maxduino14
-  //#define Maxduino15
-  //#define Maxduino19
-  //#define Maxduino37
-  //#define Maxduino42
-  //#define Horse
-  //#define Cat
-  //#define chimpeyes
-  //#define buda
-  //#define AbuSimbel
-  //#define Penetrat
-  //#define Goody1
-  //#define Goody2
-  //#define Goody3
-  //#define GameOver
-  //#define Dizzy2017
-  //#define Sega
-  //#define ParisToDakar
-  //#define BatmanTheMovie
-  //#define Phantomas
-  //#define Castle
-  //#define Marilyn
-  //#define LadyGaga
-  //#define lionface
-  //#define MichaelJackson
-  //#define CheGuevara
-  //#define yinyang
-  //#define OLEDmeter
-  //#define fuelstation
-  //#define tanque2
-  //#define tanque3
-  //#define tanque4
-  //#define tanque1
-  //#define dostanques
-  #define cablemax
-  //#define sony
-  //#define miniduino
-  //#define cat    
-#else
-//#define LOGOARDUITAPE            // original arduitape logo
-#define LOGOMAXDUINO             // new logo created by Spirax
-//#define LOGOMAXDUINO2              // new logo2 created by rcmolina
-//#define LOGOMAXDUINO3            // new logo3 created by rcmolina
-//#define LOGOMAXDUINO4            // new logo4 created by rcmolina
-//#define SUGARLESS_1              // new logo cretaed bt YoxxxoY
-//#define SUGARLESS_2              // new logo created by YoxxxoY
-//#define LOGOMINIDUINO            // new logo for A.Villena's Miniduino by rcmolina
-#endif
+// for list of logos, see filenames in "logos" folder, and remove the logo_ prefix from the filename
+// either use the below defines, or use -DLOGO
+#define LOGO_128_64 cablemax
+#define LOGO_128_32 LOGOMAXDUINO
+#define LOGO_84_48 LOGOMAXDUINO
+
 /////////////////////
 //      FONTS      //
 /////////////////////
 //#define DoubleFont
 
-#ifdef DoubleFont
-//#define Retro8x16
-//#define Led8x16
-//#define rconsole8x16
-//#define symon8x16
-//#define uniscr8x16
-//#define atariST8x16
-#define cartoon8x16
-
-#else
-//#define BasicFont
-//#define BoldFont
-//#define c64Font
-//#define zxFont
-//#define borderFont
-#define cartoonFont
-//#define CGAFont
-//#define ComputerFont
-//#define MilitaryFont
-//#define MSXFont
-//#define RoundFont
-//#define minimalFont
-//#define DigitalFont
-//#define TinyFont
-//#define BroadwayFont
-//#define VeniceFont
-//#define MagneticFont
-//#define CinemaFont
-//#define BubblegumFont
-//#define StarsFont
-//#define PreludeFont
-//#define EgyptianFont
-//#define LapseFont
-//#define TentacleFont
-//#define ChicagoFont
-//#define GenevaMonoFont
-//#define PAW17Font
-//#define AmstradCPCFont
-//#define SpectrumFont
-//#define SinclairOutlineFont
-//#define LittleShadowFont
-//#define ClairsysFont
-#endif
+#define FONT8x8 cartoonFont
+#define FONT8x16 cartoon8x16
