@@ -15,7 +15,7 @@
 // files that are already using option 3)
 
 #define __FONT_header(x) #x
-#define _FONT_header(p,x) __FONT_header(p ## x.txt)
+#define _FONT_header(p,x) __FONT_header(p ## x.h)
 #define FONT_header(p,x) _FONT_header(p,x)
 
 #ifndef FONT8x16_DEFAULT

@@ -15,7 +15,7 @@
 // files that are already using option 3)
 
 #define __LOGO_header(x) #x
-#define _LOGO_header(p,x) __LOGO_header(p ## x.txt)
+#define _LOGO_header(p,x) __LOGO_header(p ## x.h)
 #define LOGO_header(p,x) _LOGO_header(p,x)
 
 #ifndef LOGO_128_64_DEFAULT
