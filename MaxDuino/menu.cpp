@@ -19,13 +19,11 @@
 
 #include "configs.h"
 #include "Arduino.h"
+#include "compat.h"
 #include "buttons.h"
 #include "Display.h"
 #include "product_strings.h"
 #include "current_settings.h"
-
-//extern char* utoa( unsigned int value, char *string, int radix ) ;
-#include "compat.h"
 
 #if defined(lineaxy)
 #define M_LINE2 lineaxy
