@@ -137,13 +137,7 @@ bool getNextDataByte() {
     if(bytesToRead == 0) {                  //Check for end of data block
       pass = 0;
       bytesRead -= 1;                      //rewind a byte if we've reached the end
-      
-      if(pauseLength==0) {                  //Search for next ID if there is no pause
-        currentTask = TASK::GETID;
-      } else {
-        currentBlockTask = BLOCKTASK::PAUSE;           //Otherwise start the pause
-      }
-      
+      currentBlockTask = BLOCKTASK::PAUSE; // this also handles jumping to GetID if there is no pause (pauseLength==0)
       return false;  // exit
     }
   } else {                         // If we reached the EOF
@@ -160,12 +154,7 @@ bool getNextDataByte() {
   #endif
     {
       EndOfFile=true;  
-  
-      if(pauseLength==0) {
-        currentTask = TASK::GETID;
-      } else {
-        currentBlockTask = BLOCKTASK::PAUSE;
-      }
+      currentBlockTask = BLOCKTASK::PAUSE; // this also handles EOF case when pauseLength==0
       return false;                           // return here if normal TAP or TZX  
     }
   }
