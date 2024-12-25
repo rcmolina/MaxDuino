@@ -1,14 +1,14 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*   0:OLD BOOTLOADER 30720, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO MenuBLK2A, OLEDBLKMATCH, BLKBIGSIZE   */
+/*   0:OLD BOOTLOADER 30720, OLED1306_128_32, 0,96", SoftI2CMaster, I2CFAST, XY, OLEDBLKMATCH, BLKBIGSIZE   */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
-//#define AYPLAY
-//#define MenuBLK2A
-//#define ID11CDTspeedup
+#define AYPLAY
+#define MenuBLK2A
+#define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define tapORIC
@@ -63,7 +63,7 @@
 #define OLED1306                      // Set if you are using OLED 1306 display
     //#define OLED1306_128_64         // 128x64 resolution with 8 rows
     //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
-    #define video64text32
+    //#define video64text32
 //#define P8544                       // Set if you are Display Nokia 5110 display
 
 //#define btnRoot_AS_PIVOT
