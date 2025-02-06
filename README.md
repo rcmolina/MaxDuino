@@ -6,7 +6,7 @@
 
 ## NEWS
 
-* V3.00 Maxduino OTLA as reference name for this version. Check https://github.com/rcmolina/otla_tzx for some testing.
+* V3.01 Native Jupiter tap (JTAP) implementation.
 
 ## BUILD INSTRUCTIONS
 
@@ -34,6 +34,7 @@ There will also be specific release packages whenever there is a major or minor 
 
 Please note: see https://github.com/rcmolina/MaxDuino_BETA/tree/master/Troubleshooting
 
+* V3.00 Maxduino OTLA as reference name for this version. Check https://github.com/rcmolina/otla_tzx for some testing.
 * V2.03 OTLA working with tzx id15
   My own otla of HoH at 12600 bauds (29s) vs old turbo at 5800 bauds with z802tzx using compression zx7b (62s). About half of time as expected:
   https://github.com/rcmolina/otla_tzx/blob/main/hoh8_zx.zip
