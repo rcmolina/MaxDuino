@@ -79,7 +79,7 @@ void writeUEFData() {
   pass+=1;      //Data is played as 2 x pulses for a zero, and 4 pulses for a one when speed is 1200
 
   if (currentPeriod == zeroPulse) {
-    if(pass==passforZero) {
+    if(pass==uefpassforZero) {
       if ((currentBit>1) && (currentBit<11)) {
         currentByte >>= 1;                        //Shift along to the next bit
       }
@@ -91,7 +91,7 @@ void writeUEFData() {
     }
   } else {
     // must be a one pulse
-    if(pass==passforOne) {
+    if(pass==2*uefpassforZero) {
       if ((currentBit>1) && (currentBit<11)) {
         bitChecksum ^= 1;
         currentByte >>= 1;                        //Shift along to the next bit
@@ -295,12 +295,12 @@ void tzx_process_taskid_uef_processchunkid() {
       case ID0117:
         if(ReadWord()) {
           if (outWord == 300) {
-            passforZero = 8;
-            passforOne = 16;
+            uefpassforZero = 8;
+            //passforOne = 16;
             currentTask = TASK::GETCHUNKID;
           } else {
-            passforZero = 2;
-            passforOne =  4;              
+            uefpassforZero = 2;
+            //passforOne =  4;              
             currentTask = TASK::GETCHUNKID;
           }     
         }           

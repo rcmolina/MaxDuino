@@ -17,6 +17,10 @@ void checkForEXT(const char * const filenameExt) {
   if (!strcasecmp_P(filenameExt, PSTR("tap"))) {
     currentTask=TASK::PROCESSID;
     currentID=BLOCKID::TAP;
+    readfile(1,bytesRead);
+    if (filebuffer[0] == 0x1A) {
+      currentID=BLOCKID::JTAP;    
+    }   
     #ifdef tapORIC
       readfile(1,bytesRead);
       if (filebuffer[0] == 0x16) {

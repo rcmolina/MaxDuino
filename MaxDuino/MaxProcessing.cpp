@@ -53,8 +53,10 @@ word sync1Length=0;
 word sync2Length=0;
 word zeroPulse=0;
 word onePulse=0;
-byte passforZero=2;
-byte passforOne=4;
+byte uefpassforZero=2;
+//byte passforOne=4;
+byte jtapflag=255;
+byte jpass=0;
 
 word TickToUs(word ticks) {
   // returns (ticks/3.5)+0.5 
@@ -93,8 +95,9 @@ void UniPlay(){
   currentBlockTask = BLOCKTASK::READPARAM;    //First block task is to read in parameters
   count_r = 255;                                //End of file buffer flush 
   EndOfFile=false;
-  passforZero=2;
-  passforOne=4;
+  uefpassforZero=2;
+  //passforOne=4;
+  jtapflag=255;
 
   reset_output_state();
   Timer.initialize(100000); //100ms pause prevents anything bad happening before we're ready
@@ -129,6 +132,14 @@ bool getNextDataByte() {
     } else {
     #endif
       bytesToRead += -1;
+
+    if (currentID==BLOCKID::JTAP && jpass == 0) {
+      currentByte = jtapflag;
+      jpass = 1;
+      bytesRead += -1;
+      bytesToRead += 1;     
+    } 
+    
     #ifdef AYPLAY
     }
     bitChecksum ^= currentByte;    // keep calculating checksum
@@ -232,7 +243,7 @@ void StandardBlock() {
     
     case BLOCKTASK::PAUSE:
       //Close block with a pause
-      if((currentID!=BLOCKID::TAP)&&(currentID!=BLOCKID::AYO)) {                  // Check if we have !=AYO too
+      if((currentID!=BLOCKID::TAP)&&(currentID!=BLOCKID::JTAP)&&(currentID!=BLOCKID::AYO)) {                  // Check if we have !=AYO too
         temppause = pauseLength;
         currentID = BLOCKID::IDPAUSE;
       } else {
@@ -833,6 +844,42 @@ void TZXProcess() {
           bytesRead += 9;
           currentTask = TASK::GETID;
           break;
+
+        case BLOCKID::JTAP:
+          //Jupiter Tap file block
+          switch(currentBlockTask) {                 
+            case BLOCKTASK::READPARAM:
+              #if defined(BLOCKTAP_IN)
+                block_mem_oled();
+              #endif
+              
+              pauseLength = 1000;
+              if(ReadWord()) {
+                bytesToRead = outWord+1;
+              }
+
+              jpass = 0; 
+              jtapflag ^= 0xFF;
+              if(jtapflag == 0) {
+                pilotPulses = 8063 + 1; //SP:8063 //JP:4096
+              } else {
+                pilotPulses = 3223 + 1; //SP:3223 //JP:512
+              }
+
+              pilotLength = 619; //SP:2168T=2168/3.5=619u //JP:2011T=575u
+              sync1Length = 191; //SP:667T=191u //JP:601T=172u
+              sync2Length = 210; //SP:735T=210u //JP:791T=226u
+              zeroPulse = 244;  //SP:855T=244u //JP:800T=229u
+              onePulse = 489;   //SP:1710T=489u //JP:1600T=457u
+              currentBlockTask = BLOCKTASK::PILOT;
+              usedBitsInLastByte=8;
+              break;
+
+            default:
+              StandardBlock();
+              break;
+          }
+          break; // Case JTAP
         
         case BLOCKID::TAP:
           //Pure Tap file block
