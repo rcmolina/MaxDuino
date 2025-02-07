@@ -336,7 +336,11 @@ void processDragon()
         count_r=255;
       }
     }
-    else
+    else {              // data block
+      //currentTask=TASK::CAS_wData;
+      writeByte(filebuffer[0]);
+      bytesRead+=1;             // increase pointer to read next byte (not the same)
+    }    
   #endif
     
   #if defined(Use_Dragon_sLeader) && defined(Expand_All)
@@ -393,16 +397,20 @@ void processDragon()
         }
       }
     }
-    else
-
-  #endif
-
-    {              // data block
+    else {              // data block
       //currentTask=TASK::CAS_wData;
       writeByte(filebuffer[0]);
       bytesRead+=1;             // increase pointer to read next byte (not the same)
-    }
+    }    
+  #endif
   
+  #if not defined(Use_Dragon_sLeader)
+      // data block
+      //currentTask=TASK::CAS_wData;
+      writeByte(filebuffer[0]);
+      bytesRead+=1;             // increase pointer to read next byte (not the same)
+  #endif  
+
   } else {          // readfile !=1 , ending
     if(currentTask==TASK::CAS_wData) {
       if(lastByte != 0x55) {

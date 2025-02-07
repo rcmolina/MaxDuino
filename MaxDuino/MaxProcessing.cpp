@@ -861,16 +861,16 @@ void TZXProcess() {
               jpass = 0; 
               jtapflag ^= 0xFF;
               if(jtapflag == 0) {
-                pilotPulses = 8063 + 1; //SP:8063 //JP:4096
+                pilotPulses = 4096 + 1; //SP:8063 //JP:4096
               } else {
-                pilotPulses = 3223 + 1; //SP:3223 //JP:512
+                pilotPulses = 512 + 1; //SP:3223 //JP:512
               }
 
-              pilotLength = 619; //SP:2168T=2168/3.5=619u //JP:2011T=575u
-              sync1Length = 191; //SP:667T=191u //JP:601T=172u
-              sync2Length = 210; //SP:735T=210u //JP:791T=226u
-              zeroPulse = 244;  //SP:855T=244u //JP:800T=229u
-              onePulse = 489;   //SP:1710T=489u //JP:1600T=457u
+              pilotLength = 575; //SP:2168T=2168/3.5=619u //JP:2011T=575u
+              sync1Length = 172; //SP:667T=191u //JP:601T=172u
+              sync2Length = 226; //SP:735T=210u //JP:791T=226u
+              zeroPulse = 229;  //SP:855T=244u //JP:800T=229u
+              onePulse = 457;   //SP:1710T=489u //JP:1600T=457u
               currentBlockTask = BLOCKTASK::PILOT;
               usedBitsInLastByte=8;
               break;
