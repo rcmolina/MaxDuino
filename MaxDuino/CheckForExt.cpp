@@ -22,7 +22,7 @@ void checkForEXT(const char * const filenameExt) {
       currentID=BLOCKID::JTAP;    
     }   
     #ifdef tapORIC
-      readfile(1,bytesRead);
+      //readfile(1,bytesRead);
       if (filebuffer[0] == 0x16) {
         currentID=BLOCKID::ORIC;
       }

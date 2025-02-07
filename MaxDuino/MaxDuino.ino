@@ -1171,7 +1171,7 @@ void GetAndPlayBlock()
   #ifdef BLOCKID_NOMEM_SEARCH 
     unsigned long oldbytesRead=0;
     bytesRead=0;
-    if (currentID!=BLOCKID::TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
+    if ((currentID!=BLOCKID::TAP)&&(currentID!=BLOCKID::JTAP)) bytesRead=10;   //TZX with blocks skip TZXHeader
 
     #ifdef BLKBIGSIZE
       unsigned int i = 0;
@@ -1182,8 +1182,9 @@ void GetAndPlayBlock()
     while (i<= block) {
       if(ReadByte()) {
         oldbytesRead=bytesRead-1;
-        if (currentID!=BLOCKID::TAP) currentID = outByte;  //TZX with blocks GETID
-        if (currentID==BLOCKID::TAP) bytesRead--;
+        if ((currentID!=BLOCKID::TAP)&&(currentID!=BLOCKID::JTAP)) currentID = outByte;  //TZX with blocks GETID
+        //if (currentID==BLOCKID::TAP) bytesRead--;
+        else  bytesRead--;       // TAP or JTAP block 
       }
       else {
         block = i-1;
@@ -1298,8 +1299,9 @@ void GetAndPlayBlock()
                     #endif          
                     break;
 
+        case BLOCKID::JTAP:                  
         case BLOCKID::TAP:
-                     if(ReadWord()) bytesRead += outWord;
+                    if(ReadWord()) bytesRead += outWord;
                     #if defined(OLEDBLKMATCH) && defined(BLOCKTAP_IN)
                       i++;
                     #endif           
@@ -1313,7 +1315,7 @@ void GetAndPlayBlock()
     bytesRead=oldbytesRead;
   #endif   
 
-  if (currentID==BLOCKID::TAP) {
+  if ((currentID==BLOCKID::TAP)||(currentID==BLOCKID::JTAP)) {
     currentTask=TASK::PROCESSID;
   }else {
     currentTask=TASK::GETID;    //Get new TZX Block
