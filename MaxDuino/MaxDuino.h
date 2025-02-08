@@ -129,6 +129,8 @@ extern byte oldMinBlock;
   extern byte oldMaxBlock;
 #endif
 
+extern byte jtapflag;
+
 #define DEBUG 0
 
 void block_mem_oled();

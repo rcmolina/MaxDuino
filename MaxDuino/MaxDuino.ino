@@ -1149,6 +1149,9 @@ void SetPlayBlock()
   lcdsegs=0;       
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
 
+  if ((block%2) == 0) jtapflag = 255;
+  else jtapflag = 0;
+
 #ifdef Use_CAS
   if (casduino==CASDUINO_FILETYPE::NONE) // not a CAS / DRAGON file
 #endif
