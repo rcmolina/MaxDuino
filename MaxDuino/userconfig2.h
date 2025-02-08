@@ -1,6 +1,6 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*             2:OPTIBOOT BOOTLOADER 32256, OLED1106_1_3, 1,3", SoftI2CMaster, I2CFAST, XY2, XY2force, AYPLAY            */
+/*             2:OLD BOOTLOADER 30720, OLED1106_1_3, 1,3", SoftI2CMaster, I2CFAST, XY2, XY2force, BLOCKID21_IN                  */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
@@ -16,7 +16,7 @@
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
         #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-            //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
+            #define Expand_All            // Expand short Leaders in ALL file header blocks. 
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers

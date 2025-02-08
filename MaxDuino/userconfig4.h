@@ -1,29 +1,29 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*      4:PRO MICRO 28672, OLED1306, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO UEF, NO Use_Dragon_sLeader     */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*   4:OLD BOOTLOADER 30720, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, OLEDBLKMATCH, BLKBIGSIZE, BLOCKID21_IN   */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
-//#define AYPLAY
-//#define MenuBLK2A
-//#define ID11CDTspeedup
+#define AYPLAY
+#define MenuBLK2A
+#define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define tapORIC
-    //#define ORICSPEEDUP
+    #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
-        //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-            //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
-//#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
+        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
+            #define Expand_All            // Expand short Leaders in ALL file header blocks. 
+#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
         #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef
-        //#define Use_c117                // data encoding format change for 300 bauds
+        #define Use_c117                // data encoding format change for 300 bauds
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
@@ -61,9 +61,9 @@
 #define OLED_ROTATE180
 #define OLED_address   0x3C           //0x3C or 0x3D
 #define OLED1306                      // Set if you are using OLED 1306 display
-    //#define OLED1306_128_64         // 128x64 resolution with 8 rows
+    #define OLED1306_128_64         // 128x64 resolution with 8 rows
     //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
-    #define video64text32
+    //#define video64text32
 //#define P8544                       // Set if you are Display Nokia 5110 display
 
 //#define btnRoot_AS_PIVOT
@@ -73,8 +73,8 @@
       
   #define SHOW_BLOCKPOS_LCD
   
-#define XY                         // use original settings for Oled line 0,1 and status for menu
-//#define XY2                      // use double size font wihtout status line for menu
+//#define XY                         // use original settings for Oled line 0,1 and status for menu
+#define XY2                      // use double size font wihtout status line for menu
 //#define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
 
 #define SHOW_CNTR
@@ -86,8 +86,8 @@
 #define BLOCKMODE                   // REW or FF a block when in pause and Play to select it
 #define BLKSJUMPwithROOT            // use menu button in pause mode to switch blocks to jump
 #define BM_BLKSJUMP 20               // when menu pressed in pause mode, how may blocks to jump with REW OR FF
-//#define BLKBIGSIZE                   // max number of block > 255
-//#define OLEDBLKMATCH               // Match block numbers with REW/FF
+#define BLKBIGSIZE                   // max number of block > 255
+#define OLEDBLKMATCH               // Match block numbers with REW/FF
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
@@ -97,7 +97,7 @@
 #define maxblock 19                   // maxblock if not using EEPROM
 //#define BLOCKID15_IN
 //#define BLOCKID19_IN                // trace id19 block for zx81 .tzx to be rewinded
-//#define BLOCKID21_IN
+#define BLOCKID21_IN
 #define BLOCKTAP_IN
 #define OLEDPRINTBLOCK 
 #define BLOCK_EEPROM_START 512

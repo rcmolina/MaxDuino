@@ -1,14 +1,14 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                  5:OLD BOOTLOADER 30720, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, OLEDBLKMATCH               */
+/*         5:OLD BOOTLOADER 30720, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, OLEDBLKMATCH, NO BLOCKID21_IN       */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
-//#define AYPLAY
+#define AYPLAY
 #define MenuBLK2A
-//#define ID11CDTspeedup
+#define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define tapORIC
@@ -16,7 +16,7 @@
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
         #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-            //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
+            #define Expand_All            // Expand short Leaders in ALL file header blocks. 
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers

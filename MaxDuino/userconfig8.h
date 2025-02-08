@@ -1,14 +1,14 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*   8:LEONARDO-LUFA MSD 26624, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, NO Use_MENU, NO Use_CAS, NO Use_hqUEF  */
+/*   8:LEONARDO-LUFA MSD 26624, OLED1306_128_64, 0,96", SoftI2CMaster, I2CFAST, XY2, XY2force, NO AYPLAY, NO Expand_All, NO Use_DRAGON, no hqUEF  */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
-//#define Use_MENU                          // removing menu saves space
+#define Use_MENU                          // removing menu saves space
 //#define AYPLAY
 #define MenuBLK2A
-#define ID11CDTspeedup
+//#define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define tapORIC
@@ -19,7 +19,7 @@
             //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
-    #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
+    //#define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
         #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
         //#define Use_c114                // security cycles replaced with carrier tone
         //#define Use_c116                // floating point gap chunk for .hq.uef

@@ -1,11 +1,11 @@
 ////////////////                CONFIG FOR CLASSIC ARDUINO NANO OR PRO MINI                  //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*   9:LEONARDO-LUFA MSD 26624, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO Use_MENU, NO tapOric, NO Use_hqUEF  */
+/*   9:LEONARDO-LUFA MSD 26624, video64text32, 0,96", SoftI2CMaster, I2CFAST, XY, NO tapOric, NO Expand_All, NO Use_hqUEF  */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
-//#define Use_MENU                          // removing menu saves space
+#define Use_MENU                          // removing menu saves space
 //#define AYPLAY
 //#define MenuBLK2A
 //#define ID11CDTspeedup
