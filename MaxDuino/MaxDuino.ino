@@ -1149,7 +1149,7 @@ void SetPlayBlock()
   lcdsegs=0;       
   currentBit=0;                               // fallo reproducción de .tap tras .tzx
 
-  if ((block%2) == 0) jtapflag = 255;
+  if (block%2 == 0) jtapflag = 255;
   else jtapflag = 0;
 
 #ifdef Use_CAS
@@ -1173,9 +1173,15 @@ void GetAndPlayBlock()
   #endif
   #ifdef BLOCKID_NOMEM_SEARCH 
     unsigned long oldbytesRead=0;
-    bytesRead=0;
-    if ((currentID!=BLOCKID::TAP)&&(currentID!=BLOCKID::JTAP)) bytesRead=10;   //TZX with blocks skip TZXHeader
-
+    switch(currentID) {
+      case BLOCKID::TAP:
+      case BLOCKID::JTAP:
+        bytesRead=0;      
+        break;
+      default:
+        bytesRead=10;   //TZX with blocks skip TZXHeader
+        break;
+    }       
     #ifdef BLKBIGSIZE
       unsigned int i = 0;
     #else
@@ -1183,11 +1189,17 @@ void GetAndPlayBlock()
     #endif      
 
     while (i<= block) {
-      if(ReadByte()) {
-        oldbytesRead=bytesRead-1;
-        if ((currentID!=BLOCKID::TAP)&&(currentID!=BLOCKID::JTAP)) currentID = outByte;  //TZX with blocks GETID
-        //if (currentID==BLOCKID::TAP) bytesRead--;
-        else  bytesRead--;       // TAP or JTAP block 
+      if(ReadByte()) {      
+        oldbytesRead=bytesRead-1;      
+        switch(currentID) {
+          case BLOCKID::TAP:
+          case BLOCKID::JTAP:
+            bytesRead--;
+            break;
+          default:
+            currentID = outByte;  //TZX with blocks GETID
+            break;
+        }                    
       }
       else {
         block = i-1;
@@ -1202,7 +1214,6 @@ void GetAndPlayBlock()
                       i++;
                     #endif
                     break;
-
         case BLOCKID::ID11:
                     bytesRead+=15; //lPilot,lSynch1,lSynch2,lZ,lO,lP,LB,Pause
                     if(ReadLong()) bytesRead += outLong;
@@ -1210,15 +1221,12 @@ void GetAndPlayBlock()
                       i++;
                     #endif                      
                     break;
-
         case BLOCKID::ID12:
                     bytesRead+=4;
                     break;
-
         case BLOCKID::ID13:
                     if(ReadByte()) bytesRead += (long(outByte) * 2);
                     break;
-
         case BLOCKID::ID14:
                     bytesRead+=7;
                     if(ReadLong()) bytesRead += outLong;
@@ -1228,7 +1236,6 @@ void GetAndPlayBlock()
                       #endif 
                     */                   
                     break;
-
         case BLOCKID::ID15:
                     bytesRead+=5;
                     if(ReadLong()) bytesRead += outLong;
@@ -1236,72 +1243,57 @@ void GetAndPlayBlock()
                       i++;
                     #endif                     
                     break;
-
         case BLOCKID::ID19:
                     if(ReadDword()) bytesRead += outLong;
                     #if defined(OLEDBLKMATCH) //&& defined(BLOCKID19_IN)
                       i++;
                     #endif          
                     break;
-
         case BLOCKID::ID20:
                     bytesRead+=2;
                     break;
-
         case BLOCKID::ID21:
                     if(ReadByte()) bytesRead += outByte;
                     #if defined(OLEDBLKMATCH) && defined(BLOCKID21_IN)
                       i++;
                     #endif          
                     break;
-
         case BLOCKID::ID22:
                     break;
-
         case BLOCKID::ID24:
                     bytesRead+=2;
                     break;
-
         case BLOCKID::ID25:
                     break;
-
         case BLOCKID::ID2A:
                     bytesRead+=4;
                     break;
-
         case BLOCKID::ID2B:
                     bytesRead+=5;
                     break;
-
         case BLOCKID::ID30:
                     if (ReadByte()) bytesRead += outByte;                                            
                     break;
-
         case BLOCKID::ID31:
                     bytesRead+=1;         
                     if(ReadByte()) bytesRead += outByte; 
                     break;
-
         case BLOCKID::ID32:
                     if(ReadWord()) bytesRead += outWord;
                     break;
-
         case BLOCKID::ID33:
                     if(ReadByte()) bytesRead += (long(outByte) * 3);
                     break;
-
         case BLOCKID::ID35:
                     bytesRead += 0x10;
                     if(ReadDword()) bytesRead += outLong;
                     break;
-
         case BLOCKID::ID4B:
                     if(ReadDword()) bytesRead += outLong;
                     #if defined(OLEDBLKMATCH)
                       i++;
                     #endif          
                     break;
-
         case BLOCKID::JTAP:                  
         case BLOCKID::TAP:
                     if(ReadWord()) bytesRead += outWord;
@@ -1318,17 +1310,20 @@ void GetAndPlayBlock()
     bytesRead=oldbytesRead;
   #endif   
 
-  if ((currentID==BLOCKID::TAP)||(currentID==BLOCKID::JTAP)) {
-    currentTask=TASK::PROCESSID;
-  }else {
-    currentTask=TASK::GETID;    //Get new TZX Block
-    if(ReadByte()) {
-      //TZX with blocks GETID
-      currentID = outByte;
+  switch(currentID) {
+    case BLOCKID::TAP:
+    case BLOCKID::JTAP:    
       currentTask=TASK::PROCESSID;
-    }
+      break;
+    default:
+      currentTask=TASK::GETID;    //Get new TZX Block
+      if(ReadByte()) {            //TZX with blocks GETID
+        currentID = outByte;
+        currentTask=TASK::PROCESSID;
+      }      
+      break;
   }
-   
+          
   SetPlayBlock(); 
 }
 

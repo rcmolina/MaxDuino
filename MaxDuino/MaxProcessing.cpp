@@ -846,7 +846,7 @@ void TZXProcess() {
           break;
 
         case BLOCKID::JTAP:
-          //Jupiter Tap file block
+      /*    //Jupiter Tap file block
           switch(currentBlockTask) {                 
             case BLOCKTASK::READPARAM:
               #if defined(BLOCKTAP_IN)
@@ -880,11 +880,12 @@ void TZXProcess() {
               break;
           }
           break; // Case JTAP
-        
+     */   
         case BLOCKID::TAP:
           //Pure Tap file block
           switch(currentBlockTask) {
             case BLOCKTASK::READPARAM:
+
               #if defined(BLOCKTAP_IN)
                 block_mem_oled();
               #endif
@@ -893,28 +894,54 @@ void TZXProcess() {
               if(ReadWord()) {
                 bytesToRead = outWord+1;
               }
-              if(ReadByte()) {
-                if(outByte == 0) {
-                  pilotPulses = PILOTNUMBERL + 1;
-                } else {
-                  pilotPulses = PILOTNUMBERH + 1;
-                }
-                bytesRead += -1;
-              }
-              pilotLength = PILOTLENGTH;
-              sync1Length = SYNCFIRST;
-              sync2Length = SYNCSECOND;
-              zeroPulse = ZEROPULSE;
-              onePulse = ONEPULSE;
-              currentBlockTask = BLOCKTASK::PILOT;
-              usedBitsInLastByte=8;
-              break;
+
+              switch(currentID) {
+
+                case BLOCKID::JTAP:
+                  jpass = 0; 
+                  jtapflag ^= 0xFF;
+                  if(jtapflag == 0) {
+                    pilotPulses = 4096 + 1; //SP:8063 //JP:4096
+                  } else {
+                    pilotPulses = 512 + 1; //SP:3223 //JP:512
+                  }
+    
+                  pilotLength = 575; //SP:2168T=2168/3.5=619u //JP:2011T=575u
+                  sync1Length = 172; //SP:667T=191u //JP:601T=172u
+                  sync2Length = 226; //SP:735T=210u //JP:791T=226u
+                  zeroPulse = 229;  //SP:855T=244u //JP:800T=229u
+                  onePulse = 457;   //SP:1710T=489u //JP:1600T=457u
+                  currentBlockTask = BLOCKTASK::PILOT;
+                  usedBitsInLastByte=8;             
+                  break;
+
+                case BLOCKID::TAP:
+                default:
+                
+                  if(ReadByte()) {
+                    if(outByte == 0) {
+                      pilotPulses = PILOTNUMBERL + 1;
+                    } else {
+                      pilotPulses = PILOTNUMBERH + 1;
+                    }
+                    bytesRead += -1;
+                  }
+                  pilotLength = PILOTLENGTH;
+                  sync1Length = SYNCFIRST;
+                  sync2Length = SYNCSECOND;
+                  zeroPulse = ZEROPULSE;
+                  onePulse = ONEPULSE;
+                  currentBlockTask = BLOCKTASK::PILOT;
+                  usedBitsInLastByte=8;               
+                  break;                                 
+              }              
+              break; // for BLOCKTASK::READPARAM
 
             default:
               StandardBlock();
               break;
           }
-          break; // Case TAP
+          break; // Case for combined BLOCKID TAP & JTAP
 
         case BLOCKID::ZXP:
           tzx_process_blockid_zx8081_zxp();
