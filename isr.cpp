@@ -46,16 +46,12 @@ void wave2() {
       newTime = workingPeriod;
       //pinState = LOW;
       //WRITE_LOW;
+      pinState = !pinState;
       if (pinState == LOW)
-      {
-        pinState = HIGH;
+        WRITE_LOW; 
+      else   
         WRITE_HIGH;
-      }    
-      else
-      {
-        pinState = LOW;      
-        WRITE_LOW;
-      }      
+     
       goto _next;
     }   
  
