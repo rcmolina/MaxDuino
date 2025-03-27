@@ -44,8 +44,14 @@ void wave2() {
     if (bitRead(workingPeriod, 13)) {
       bitClear(workingPeriod,13);
       newTime = workingPeriod;
-      pinState = LOW;
-      WRITE_LOW;
+      //pinState = LOW;
+      //WRITE_LOW;
+      pinState = !pinState;
+      if (pinState == LOW)
+        WRITE_LOW; 
+      else   
+        WRITE_HIGH;
+     
       goto _next;
     }   
  
