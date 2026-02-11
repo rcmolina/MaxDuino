@@ -24,6 +24,8 @@
 #include "uef.h"
 #include "oric.h"
 #include "kansas_4b.h"
+#include "mzf.h"
+#include "caq.h"
 
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
@@ -848,6 +850,14 @@ void TZXProcess() {
           // Glue block; nothing to do (skip it)
           bytesRead += 9;
           currentTask = TASK::GETID;
+          break;
+
+        case BLOCKID::CAQ:
+          caq_process();
+          break;
+
+        case BLOCKID::MZF:
+          mzf_process();
           break;
 
         case BLOCKID::JTAP:

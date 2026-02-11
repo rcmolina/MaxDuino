@@ -44,6 +44,8 @@ enum BLOCKID
   ID4B = 0x4B,    //Kansas City block (MSX/BBC/Acorn/...)
   ID5A = 0x5A,    //Glue block (90 dec, ASCII Letter 'Z')
   IDPAUSE = 0x80, //Custom Pause processing
+  CAQ = 0xF6,     //Mattel Aquarius CAQ cassette image
+  MZF = 0xF7,     //Sharp MZ series MZF image (tape PWM)
   JTAP = 0xF8,    //JUPITER ACE Tap File  
   UEF = 0xF9,     //UEF file
   ORIC = 0xFA,    //Oric Tap File
