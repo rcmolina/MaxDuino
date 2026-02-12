@@ -24,8 +24,12 @@
 #include "uef.h"
 #include "oric.h"
 #include "kansas_4b.h"
-#include "mzf.h"
-#include "caq.h"
+#ifdef Use_MZF
+  #include "mzf.h"
+#endif
+#ifdef Use_CAQ
+  #include "caq.h"
+#endif
 
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
@@ -853,11 +857,15 @@ void TZXProcess() {
           break;
 
         case BLOCKID::CAQ:
+          #ifdef Use_CAQ
           caq_process();
+          #endif
           break;
 
         case BLOCKID::MZF:
+          #ifdef Use_MZF
           mzf_process();
+          #endif
           break;
 
         case BLOCKID::JTAP:

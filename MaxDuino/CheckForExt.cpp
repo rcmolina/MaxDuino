@@ -6,8 +6,12 @@
 #include "ayplay.h"
 #include "casProcessing.h"
 #include "MaxProcessing.h"
-#include "mzf.h"
-#include "caq.h"
+#ifdef Use_MZF
+  #include "mzf.h"
+#endif
+#ifdef Use_CAQ
+  #include "caq.h"
+#endif
 
 void checkForEXT(const char * const filenameExt) {
   //Check for .xxx file extension as these have no header
@@ -39,9 +43,12 @@ void checkForEXT(const char * const filenameExt) {
     currentID=BLOCKID::ZXO;
   }
 
+
+#ifdef Use_CAQ
 else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
   caq_init();
 }
+#endif
 #ifdef AYPLAY  
   else if (!strcasecmp_P(filenameExt, PSTR("ay"))) {
     currentTask=TASK::GETAYHEADER;
@@ -54,6 +61,9 @@ else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
     currentTask=TASK::GETUEFHEADER;
     currentID=BLOCKID::UEF;
   }
+
+#endif
+#ifdef Use_MZF
   else if (!strcasecmp_P(filenameExt, PSTR("mzf"))) {
     // Sharp MZ series tape image (MZF).
     // Uses PWM encoding: long pulse = 1, short pulse = 0.
