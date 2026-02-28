@@ -67,7 +67,9 @@ word TickToUs(word ticks) {
 void UniPlay(){
   // initialise scale and period based on current BAUDRATE
   // (although these could be overridden later e.g. during checkForEXT, depending on file type)
-  setBaud();
+  #ifdef Use_CAS
+  setCASBaud();
+  #endif
 
   // on entry, currentFile is already pointing to the file entry you want to play
   // and fileName is already set
@@ -89,8 +91,11 @@ void UniPlay(){
   clearBuffer();
 
   // for CAS/DRAGON:
+#ifdef Use_CAS
   cas_currentType=CAS_TYPE::Nothing;
   fileStage=0;
+#endif
+
   // for TZX/UEF/etc:
   currentBlockTask = BLOCKTASK::READPARAM;    //First block task is to read in parameters
   count_r = 255;                                //End of file buffer flush 

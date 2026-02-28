@@ -1,4 +1,7 @@
 #include "configs.h"
+
+#ifdef Use_CAS
+
 #include "Arduino.h"
 #include "compat.h"
 #include "CounterPercent.h"
@@ -11,16 +14,14 @@
 #include "current_settings.h"
 #include "TimerCounter.h"
 
-#ifdef Use_CAS
-
 word bitword;
 byte fileStage=0;
 CASDUINO_FILETYPE casduino = CASDUINO_FILETYPE::NONE;
 bool invert=false;
 CAS_TYPE cas_currentType = CAS_TYPE::Nothing;
 
-byte scale; // gets set when you call setBaud
-byte period; // gets set when you call setBaud
+byte cas_scale; // gets set when you call setBaud
+byte cas_period; // gets set when you call setBaud
 
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
 
@@ -215,7 +216,7 @@ void process()
         } else
         {
           currentTask = TASK::CAS_wSilence;
-          count_r=SHORT_SILENCE*scale;
+          count_r=SHORT_SILENCE*cas_scale;
         }
         if(cas_currentType==CAS_TYPE::Nothing) fileStage=1;
         bytesRead+=8;
@@ -224,7 +225,7 @@ void process()
     {
       cas_currentType=CAS_TYPE::typeEOF;
       currentTask=TASK::CAS_wClose;
-      count_r=LONG_SILENCE*scale;
+      count_r=LONG_SILENCE*cas_scale;
     }
      
   }
@@ -232,7 +233,7 @@ void process()
   if(currentTask==TASK::CAS_lookType)
   {
     currentTask = TASK::CAS_wSilence;
-    count_r = LONG_SILENCE*scale;
+    count_r = LONG_SILENCE*cas_scale;
     fileStage=1;       
     cas_currentType = CAS_TYPE::Unknown;
 //    if((r=readfile(10,bytesRead))==10)
@@ -262,12 +263,12 @@ void process()
       currentTask=TASK::CAS_wHeader;
       if(fileStage==1) 
       {
-        //count_r=LONG_HEADER*scale;
+        //count_r=LONG_HEADER*cas_scale;
         count_r=LONG_HEADER; 
         fileStage+=1;
       } else 
       {
-        count_r=SHORT_HEADER*scale;
+        count_r=SHORT_HEADER*cas_scale;
         //count_r=SHORT_HEADER;
         if(cas_currentType==CAS_TYPE::Ascii) {
           fileStage+=1;
@@ -440,7 +441,7 @@ void casduinoLoop()
     {
       currentTask=TASK::GETFILEHEADER;
 
-      const word _currentPeriod = period | 0x6000;
+      const word _currentPeriod = cas_period | 0x6000;
       const byte _b1 = _currentPeriod /256;
       const byte _b2 = _currentPeriod %256;
       volatile byte * _wb = writeBuffer+writepos;
@@ -481,41 +482,34 @@ void casduinoLoop()
   } 
 }
 
-void setBaud()
+void setCASBaud()
 {
   switch(BAUDRATE) {
     case 1200:
-      scale=1;
-      period=208;
+      cas_scale=1;
+      cas_period=208;
       break;
     case 2400:
-      scale=1;
-      period=104;
+      cas_scale=1;
+      cas_period=104;
       break;
     case 3150:
-      scale=1;
-      period=80;
+      cas_scale=1;
+      cas_period=80;
       break;
     case 3600:
-      //scale=2713/1200;
-      scale=2;
-      //period=93; //2700 baudios
-      //period = TickToUs(243);
-      period=70; //3571 bauds=1000000/4/70 con period 70us, 3675 baudios con period=68 
+      //cas_scale=2713/1200;
+      cas_scale=2;
+      //cas_period=93; //2700 baudios
+      //cas_period = TickToUs(243);
+      cas_period=70; //3571 bauds=1000000/4/70 con period 70us, 3675 baudios con period=68 
       break;      
     case 3850:
-      scale=2;
-      period = 65; //3850 baudios con period=65
+      cas_scale=2;
+      cas_period = 65; //3850 baudios con period=65
       break;
   }
   Timer.stop();
 }
 
-#else
-
-void setBaud()
-{
-  // a no-op, since only CasProcessing uses this
-}
-
-#endif
+#endif // Use_CAS
