@@ -1,9 +1,9 @@
 #ifndef CAS_PROCESSING_H_INCLUDED
 #define CAS_PROCESSING_H_INCLUDED
 
-#include "constants.h"
-
 #ifdef Use_CAS
+
+#include "constants.h"
 
 /* Header Definitions */
 extern PROGMEM const byte HEADER[8];
@@ -19,9 +19,9 @@ extern bool invert;
 
 void casduinoLoop();
 
-void setBaud();
-extern byte scale; // gets set when you call setBaud
-extern byte period; // gets set when you call setBaud
+void setCASBaud();
+extern byte cas_scale; // gets set when you call setCAsBaud
+extern byte cas_period; // gets set when you call setCASBaud
 
 #endif // Use_CAS
 

@@ -58,7 +58,7 @@ void checkForEXT(const char * const filenameExt) {
       if (filebuffer[0] == 0x55) {
         invert=true;
         casduino = CASDUINO_FILETYPE::DRAGONMODE;
-        period=249;
+        cas_period=249;
         count_r=255;
       }
     #endif         

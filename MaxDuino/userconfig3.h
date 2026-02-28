@@ -13,10 +13,10 @@
 #define ZX81SPEEDUP
 #define tapORIC
     #define ORICSPEEDUP
-#define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
-    #define Use_DRAGON
-        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-            #define Expand_All            // Expand short Leaders in ALL file header blocks. 
+//#define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
+    //#define Use_DRAGON
+        //#define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
+            //#define Expand_All            // Expand short Leaders in ALL file header blocks. 
 #define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers

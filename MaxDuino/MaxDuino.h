@@ -71,6 +71,7 @@ enum class TASK : byte
   PROCESSCHUNKID,
 
   // CAS tasks
+#ifdef Use_CAS
   CAS_lookType,       //looking for file type
   CAS_wHeader,        //Write Header
   CAS_wSilence,       //Write Silence
@@ -80,6 +81,7 @@ enum class TASK : byte
   CAS_wNameFileBlk,   //
   CAS_lookLeader,
   CAS_wNewLeader,
+#endif
 };
 
 enum class BLOCKTASK : byte
