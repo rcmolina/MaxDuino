@@ -33,6 +33,9 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
+      - name: Work around missing intelhex package in some versions of tool-esptool
+        run: pip install intelhex
+
       - name: Build PlatformIO Project
         run: pio run -v
 
