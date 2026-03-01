@@ -23,15 +23,19 @@ For more information about this file type, please see:
 
 ## ZX80
 
+### .O
+
+.O (O80 format) is supported. 
+
 ### .P
 
-### .O
+.P (P81 format) is supported for ZX80 (using 8K ROM conversions).
 
 ## ZX81
 
 ### .P
 
-### .O
+.P (P81 format) is supported for ZX81 files.
 
 ## ORIC-1
 
@@ -71,6 +75,8 @@ We handle .CAQ encoded at 600 baud (playback is fixed to this baud rate, meaning
 
 ### .CAS
 
+We support .CAS files for MSX computers.  CAS support is enabled via configuration flag: `Use_CAS`.  Due to several recent optimisations, it should be possible to enable `Use_CAS` for all devices now without running out of firmware space, so all devices should be able to include CAS support by default now.
+
 ### .TSX
 
 .TSX format is a variant of .TZX format with a specific additional block type.  We support .TSX files.
@@ -83,9 +89,16 @@ For more information about .TSX format, take a look at https://github.com/natali
 
 Because of how MaxDuino operates, MSX files are supported regardless of extension (we don't check that the extension is specifically .TSX and can handle MSX file saved as .TZX too)
 
-## DRAGON 32
+## DRAGON 32/64
 
 ### .CAS
+
+We support .CAS files for DRAGON computers.  Support is enabled via configuration flag: `Use_DRAGON` **in addition to** `Use_CAS`.  Due to several recent optimisations, it should be possible to enable `Use_CAS` and `Use_DRAGON` for all devices now without running out of firmware space, so all devices should be able to include CAS support by default now.
+
+There are several additional customizations for .CAS support for DRAGON computers:
+
+* `Use_Dragon_sLeader` - a short Leader of 0x55 allowed for loading TOSEC files
+* `Expand_All` - expand short Leaders in ALL file header blocks. 
 
 ## TANDY COLOR COMPUTER (COCO)
 
