@@ -10,12 +10,29 @@ Our configuration-based build process enables you to customise a configuration t
 Many TZXDuino and MaxDuino have been produced by a variety of individual suppliers and businesses.  The MaxDuino firmware project is not directly affiliated with any of the manufacturers of these products.
 MaxDuino firmware is itself an open-source project and remains free for everybody.
 
-* TZXDuino
-  * typically, Arduino Nano 328p, with either 128x64 GRAPHICAL OLED or 16x2 TEXT LCD
+* TZXDuino, ArduiTape, CASDuino, TSXDuino
+  * typically, Arduino Nano 328p, with either 128x64 GRAPHICAL OLED or 16x2 TEXT LCD, from a variety of suppliers and self-build kits.
+  * Sometimes these devices include PCD8544 LCD controller instead. This is no longer supported by MaxDuino but support can be added back if there is sufficient demand!!
 * MaxDuino Ultimate
-  * Thinary Nano Every + 128x64 OLED
-* MaxDuino Next
+  * Thinary Nano Every + 128x64 OLED + tape motor control
+* MaxDuino Mega
   * ???
+* TSXDuino Mega
+  * ???
+  * ref: https://github.com/capsule5000/TSXduino-MEGA - MaxDuino support needs to be confirmed!!!
+* ZXUITape (aka ZXuiTape Baby), and related devices
+  * Arduino Nano 328p + OLED + tape motor control
+  * Options include standard OLED screen (0.96"), XL OLED screen (1.3"), or 2X XL OLED screen (2.42")
+  * "ZX Spectrum 48K+" style and "ZX Spectrum 128K+" and "Nextduino" devices are hardware-identical
+* Other devices from You Make Robots:
+  * These are all essentially the same as ZXUITape Baby with different styling
+  * MSXuiTape
+  * BeebuiTape (BBC Micro Version)
+  * BeebuiTape (Acorn Version)
+  * CPCuiTape
+  * Dragonuitape
+  * Oricuitape
+  * CocouiTape
 
 
 ## Microcontroller type
@@ -32,6 +49,9 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
 ## LCD type
 
 *  128x64 GRAPHICAL OLED (SPI 1306-compatible)
+  * 0.96"
+  * 1.3"
+  * 2.42"
 *  16x2 TEXT LCD (12C PCF8574T-compatible)
 *  LCD (Nokia P8544-compatible)  (see [Note 1][#notes])
 
