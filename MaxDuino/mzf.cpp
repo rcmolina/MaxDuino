@@ -35,8 +35,6 @@ enum class MZF_STAGE : uint8_t {
   STM_ENDLONG,
   FILE1,
   CHKF1,
-  FILE2,
-  CHKF2,
   DONE
 };
 
@@ -70,19 +68,19 @@ static uint8_t mzf_chk_byte_idx = 0; // 0..1, big-endian
 // half-wave state for emitting asymmetric pulses
 static uint8_t mzf_half = 0; // 0=UP, 1=DOWN
 
-static inline uint8_t popcount8(byte v) {
+static uint8_t popcount8(byte v) {
   v = v - ((v >> 1) & 0x55);
   v = (v & 0x33) + ((v >> 2) & 0x33);
   return (uint8_t)((((v + (v >> 4)) & 0x0F) * 0x01) & 0x1F);
 }
 
-static inline uint16_t mzf_cksum_add(uint16_t acc, byte v) {
+static uint16_t mzf_cksum_add(uint16_t acc, byte v) {
   return (uint16_t)(acc + popcount8(v));
 }
 
 // Emit one half-period of a "pulse".
 // Returns true when the full pulse (UP+DOWN) has been emitted.
-static inline bool mzf_emit_pulse(bool isLong) {
+static bool mzf_emit_pulse(bool isLong) {
   if (mzf_half == 0) {
     currentPeriod = isLong ? MZF_LONG_UP_US : MZF_SHORT_UP_US;
     mzf_half = 1;
@@ -94,7 +92,7 @@ static inline bool mzf_emit_pulse(bool isLong) {
   }
 }
 
-static inline void mzf_next_stage(MZF_STAGE s) {
+static void mzf_next_stage(MZF_STAGE s) {
   mzf_stage = s;
   mzf_half = 0;
   mzf_have_byte = false;
@@ -140,7 +138,7 @@ void mzf_init() {
   mzf_next_stage(MZF_STAGE::LGAP1);
 }
 
-static inline bool mzf_load_next_byte() {
+static bool mzf_load_next_byte() {
   if (mzf_src == BYTE_SRC::HDR) {
     if (mzf_hdr_idx >= 128) return false;
     mzf_cur_byte = mzf_hdr[mzf_hdr_idx++];
@@ -166,7 +164,7 @@ static inline bool mzf_load_next_byte() {
   }
 }
 
-static inline void mzf_reset_byte_writer_for_src(BYTE_SRC src) {
+static void mzf_reset_byte_writer_for_src(BYTE_SRC src) {
   mzf_src = src;
   mzf_have_byte = false;
   mzf_leader_done = false;
@@ -332,21 +330,6 @@ void mzf_process() {
         // MaxDuino's progress indicator is based on file length, so emitting the
         // conventional second copy makes playback appear to "start again".
         // For better UX, stop after the first FILE+CHK block and return to menu.
-        mzf_next_stage(MZF_STAGE::DONE);
-      }
-      return;
-
-    case MZF_STAGE::FILE2:
-      mzf_process_bytes(0);
-      if (currentPeriod == 0) {
-        mzf_reset_byte_writer_for_src(BYTE_SRC::CHK);
-        mzf_next_stage(MZF_STAGE::CHKF2);
-      }
-      return;
-
-    case MZF_STAGE::CHKF2:
-      mzf_process_bytes(2);
-      if (currentPeriod == 0) {
         mzf_next_stage(MZF_STAGE::DONE);
       }
       return;

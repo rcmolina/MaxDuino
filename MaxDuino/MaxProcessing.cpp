@@ -856,17 +856,17 @@ void TZXProcess() {
           currentTask = TASK::GETID;
           break;
 
+      #ifdef Use_CAQ
         case BLOCKID::CAQ:
-          #ifdef Use_CAQ
           caq_process();
-          #endif
           break;
+      #endif
 
+      #ifdef Use_MZF
         case BLOCKID::MZF:
-          #ifdef Use_MZF
           mzf_process();
-          #endif
           break;
+      #endif
 
         case BLOCKID::JTAP:
       /*    //Jupiter Tap file block

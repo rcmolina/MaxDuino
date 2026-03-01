@@ -103,6 +103,15 @@ enum class BLOCKTASK : byte
   GAP,
   SYNCLAST,
   NAME00,
+
+#ifdef Use_CAQ
+  // tasks for CAQ processing
+  CAQ_START_BIT,
+  CAQ_DATA_BITS,
+  CAQ_STOP_BIT1,
+  CAQ_STOP_BIT2,
+  CAQ_DONE
+#endif
 };
 
 //Spectrum Standards
