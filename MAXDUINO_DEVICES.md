@@ -52,7 +52,7 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
   * 0.96" - typically SSD1306
   * 1.3" - typically SH1106
   * 2.42" - typically SSD1309 (configured using same settings as 0.96" SSD1306)
-*  16x2 TEXT LCD (12C PCF8574T-compatible)
+*  16x2 TEXT LCD (I2C PCF8574T-compatible)
 *  LCD (Nokia P8544-compatible)  (see [Note 1][#notes])
 
 ## Output type
