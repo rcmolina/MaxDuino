@@ -2,7 +2,21 @@
 
 Various MaxDuino and TZXDuino devices have been manufactured over the last 15 years or so, and these have been constructed with different combinations of hardware components (microcontroller type, LCD type, etc).  We provide MaxDuino software intended to be compatible with all of them and more.
 
-Our configuration-based build process enables you to customise a configuration that matches your particular hardware.  The below sections outline what components we include support for
+Our configuration-based build process enables you to customise a configuration that matches your particular hardware.  The below sections outline the components for which we include support.
+
+
+## Commercial devices
+
+Many TZXDuino and MaxDuino have been produced by a variety of individual suppliers and businesses.  The MaxDuino firmware project is not directly affiliated with any of the manufacturers of these products.
+MaxDuino firmware is itself an open-source project and remains free for everybody.
+
+* TZXDuino
+  * typically, Arduino Nano 328p, with either 128x64 GRAPHICAL OLED or 16x2 TEXT LCD
+* MaxDuino Ultimate
+  * Thinary Nano Every + 128x64 OLED
+* MaxDuino Next
+  * ???
+
 
 ## Microcontroller type
 
@@ -17,8 +31,8 @@ Our configuration-based build process enables you to customise a configuration t
 
 ## LCD type
 
-*  128x64 OLED (SPI 1306-compatible)
-*  16x2 LCD (12C PCF8574T-compatible)
+*  128x64 GRAPHICAL OLED (SPI 1306-compatible)
+*  16x2 TEXT LCD (12C PCF8574T-compatible)
 *  LCD (Nokia P8544-compatible)  (see [Note 1][#notes])
 
 ## Output type
