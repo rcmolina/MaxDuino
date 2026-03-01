@@ -48,12 +48,12 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
 
 ## LCD type
 
-*  128x64 GRAPHICAL OLED (SPI devices, compatible with SSD1306, SSD1309, or SH1106)
+* 128x64 GRAPHICAL OLED (SPI devices, compatible with SSD1306, SSD1309, or SH1106)
   * 0.96" - typically SSD1306
   * 1.3" - typically SH1106
   * 2.42" - typically SSD1309 (configured using same settings as 0.96" SSD1306)
-*  16x2 TEXT LCD (I2C PCF8574T-compatible)
-*  LCD (Nokia P8544-compatible)  (see [Note 1][#notes])
+* 16x2 TEXT LCD (I2C PCF8574T-compatible)
+* LCD (Nokia P8544-compatible)  (see [Note 1][#notes])
 
 ## Output type
 
@@ -63,8 +63,8 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
 ## Inputs type
 
 *  5 buttons (Up, Down, Left, Play, Pause, Stop)  (See [Note 2][#notes])
-**  Most devices support multi-press combinations
-**  Some devices only support one-button-at-a-time due to lack of indepdent GPIOs e.g. ESP32C3, Xiao M0
+  * Most devices support multi-press combinations
+  * Some devices only support one-button-at-a-time due to lack of indepdent GPIOs e.g. ESP32C3, Xiao M0
 *  Power button, aka "soft-off" (for supported devices only e.g. ESP32C3) (See [Note 3][#notes]])
 
 ## Prebuilt configurations
