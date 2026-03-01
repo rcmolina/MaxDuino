@@ -111,3 +111,9 @@ There are several additional customizations for .CAS support for DRAGON computer
 .CDT images are essentially the same as .TZX images, for Amstrad CPC computers.
 .CDT support is enabled via configuration flag: `ID11CDTspeedup` .  Without this flag enabled, files with a .cdt extension will not be recognised.  This is enabled in most configurations by default, and there should be very little reason to disable it.
 In addition, we have included support for enabling the user to choose their own baud rate, as an alternative to using the timing parameters  from the .CDT file itself.  The custom baud rates we support here are 1000 (same as ROM default), 2000, 3500, and 4000 .  The menu options currently don't match exactly, so you will choose `1200`, `2400`, `3150` (or `3600`), and `3850`, respectively.  To turn on the custom baud rate when playing a .CDT file, toggle the `TSXCzxpUEFSW` option in the menu to 'ON'. (Note that this option has a different meaning for certain other file types).  Turning this option to OFF uses the standard parameters from the .CDT file .
+
+## SHARP MZ (MZ-700, MZ-800)
+
+### .MZF
+
+We support .MZF files for these computers.
