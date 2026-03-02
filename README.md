@@ -15,12 +15,13 @@ For more information about MaxDuino and TZXDuino, check out the [DOCUMENTATION](
 * ZX SPECTRUM: .TZX, .TAP, .AY
 * ZX80: .P, .O
 * ZX81: .P, .O
-* BBC MICRO: .EUF
+* BBC MICRO: .UEF
 * JUPITER ACE: .TAP (JTAP)
 * MATTEL AQUARIUS: .CAQ
-* MSX: .CAS
+* MSX: .TSZ, .CAS
 * DRAGON 32: .CAS
 * AMSTRAD CPC: .CDT
+* SHARP MZ-700: .MZF
 
 More information at [FILE TYPES](./FILE_TYPES.md)
 
