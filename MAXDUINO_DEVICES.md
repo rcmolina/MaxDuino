@@ -15,6 +15,8 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
   * Sometimes these devices include PCD8544 LCD controller instead. This is no longer supported by MaxDuino but support can be added back if there is sufficient demand!!
 * MaxDuino Ultimate
   * Thinary Nano Every + 128x64 OLED + tape motor control
+* MaxDuino Every
+  * Nano Every + 128x64 OLED + tape motor control
 * MaxDuino Mega
   * ???
 * TSXDuino Mega
@@ -76,3 +78,4 @@ You can create your own combinations by editing the configuration files and buil
 1. Support for P8544 has been removed due to lack of devices for testing and development purposes
 2. Devices may have a reset button but this directly resets the device via a hardware reset signal, and is not handled by the firmware
 3. Currently, soft-off is implemented as a long-press on the Stop button, but future hardware iterations might include a separate GPIO power button
+
