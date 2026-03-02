@@ -24,6 +24,12 @@
 #include "uef.h"
 #include "oric.h"
 #include "kansas_4b.h"
+#ifdef Use_MZF
+  #include "mzf.h"
+#endif
+#ifdef Use_CAQ
+  #include "caq.h"
+#endif
 
 //Temporarily store for a pulse period before loading it into the buffer.
 word currentPeriod=1;
@@ -849,6 +855,18 @@ void TZXProcess() {
           bytesRead += 9;
           currentTask = TASK::GETID;
           break;
+
+      #ifdef Use_CAQ
+        case BLOCKID::CAQ:
+          caq_process();
+          break;
+      #endif
+
+      #ifdef Use_MZF
+        case BLOCKID::MZF:
+          mzf_process();
+          break;
+      #endif
 
         case BLOCKID::JTAP:
       /*    //Jupiter Tap file block

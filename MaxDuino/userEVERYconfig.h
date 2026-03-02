@@ -8,6 +8,8 @@
 #define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
+#define Use_MZF
+#define Use_CAQ
 #define tapORIC
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
@@ -115,7 +117,7 @@
 
 // for list of logos, see filenames in "logos" folder, and remove the logo_ prefix from the filename
 // either use the below defines, or use -DLOGO
-#define LOGO_128_64 cablemax
+#define LOGO_128_64 trs80
 #define LOGO_128_32 LOGOMAXDUINO2
 #define LOGO_84_48 LOGOMAXDUINO2
 
