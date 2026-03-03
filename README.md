@@ -6,6 +6,7 @@ For more information about MaxDuino and TZXDuino, check out the [DOCUMENTATION](
 
 ## LATEST NEWS
 
+* V3.02 Adds Sharp MZ-700 .MZF and Mattel Aquarius .CAQ implementation.
 * V3.01 Adds Native Jupiter tap (JTAP) implementation.
 * V3.00 Adds 44.1kHz OTLA support and we now use "Maxduino OTLA" as reference name for this version. Check https://github.com/rcmolina/otla_tzx for some testing.
 
@@ -14,12 +15,13 @@ For more information about MaxDuino and TZXDuino, check out the [DOCUMENTATION](
 * ZX SPECTRUM: .TZX, .TAP, .AY
 * ZX80: .P, .O
 * ZX81: .P, .O
-* BBC MICRO: .EUF
+* BBC MICRO: .UEF
 * JUPITER ACE: .TAP (JTAP)
 * MATTEL AQUARIUS: .CAQ
-* MSX: .CAS
+* MSX: .TSZ, .CAS
 * DRAGON 32: .CAS
 * AMSTRAD CPC: .CDT
+* SHARP MZ-700: .MZF
 
 More information at [FILE TYPES](./FILE_TYPES.md)
 
