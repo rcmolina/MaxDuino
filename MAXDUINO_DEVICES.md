@@ -11,23 +11,39 @@ Many TZXDuino and MaxDuino have been produced by a variety of individual supplie
 MaxDuino firmware is itself an open-source project and remains free for everybody.
 
 * TZXDuino, ArduiTape, CASDuino, TSXDuino
-  * typically, Arduino Nano 328p, with either 128x64 GRAPHICAL OLED or 16x2 TEXT LCD, from a variety of suppliers and self-build kits.
+  * This is the 'classic' original device
+  * Arduino Nano (ATMEGA328P), with either 128x64 GRAPHICAL OLED or 16x2 TEXT LCD, from a variety of suppliers and self-build kits.
   * Sometimes these devices include PCD8544 LCD controller instead. This is no longer supported by MaxDuino but support can be added back if there is sufficient demand!!
-* MaxDuino Ultimate
+* MaxDuino Ultimate (from You Make Robots)
   * Thinary Nano Every + 128x64 OLED + tape motor control
-* MaxDuino Every
+* MaxDuino Every (from You Make Robots)
   * Nano Every + 128x64 OLED + tape motor control
+* MaxDuino (from Antonia Villena)
+  * Either Arduino Nano ATMEGA328P or STM32
+  * (This entry is missing details, can you supply more info?)
+* MaxDuino Easy Upgrade (from Antonia Villena)
+  * ATMEGA32u4
+  * (This entry is missing details, can you supply more info?)
+* Miniduino (from Antonia Villena)
+  * Either Arduino Nano ATMEGA328P or STM32
+  * (This entry is missing details, can you supply more info?)
+* Miniduino Easy Upgrade (from Antonia Villena)
+  * ATMEGA32u4
+  * (This entry is missing details, can you supply more info?)
 * MaxDuino Mega
-  * ???
-* TSXDuino Mega
+  * ATMEGA2560
+  * (This entry is missing details, can you supply more info?)
+* MegaDuino aka TSXDuino Mega
+  * either Mega2560 or dual Mega2560/STM32 (? need details)
   * ???
   * ref: https://github.com/capsule5000/TSXduino-MEGA - MaxDuino support needs to be confirmed!!!
-* ZXUITape (aka ZXuiTape Baby), and related devices
+  * firmware fork: https://github.com/merlinkv/MegaDuino_Firmware - would be great to unfork this and get back to mainline support
+  * (This entry is missing details, can you supply more info?)
+* ZXUITape (aka ZXuiTape Baby), and related devices (from You Make Robots)
   * Arduino Nano 328p + OLED + tape motor control
   * Options include standard OLED screen (0.96"), XL OLED screen (1.3"), or 2X XL OLED screen (2.42")
   * "ZX Spectrum 48K+" style and "ZX Spectrum 128K+" and "Nextduino" devices are hardware-identical
-* Other devices from You Make Robots:
-  * These are all essentially the same as ZXUITape Baby with different styling
+  * Also available with different styling:
   * MSXuiTape
   * BeebuiTape (BBC Micro Version)
   * BeebuiTape (Acorn Version)
@@ -42,6 +58,7 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
 *  Arduino Nano 328p
 *  Arduino Nano Every
 *  Thinary Nano Every
+*  Arduino Mega32u4
 *  Arduino Mega 2560
 *  Seeeduino Seeed Xiao M0 (SAMD21) (experimental)
 *  Espressif ESP8266 (experimental)
