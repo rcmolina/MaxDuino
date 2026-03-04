@@ -550,24 +550,22 @@ void TimerCounter::attachInterrupt(timerCallback isr)
 
 #elif defined(ESP32)
 
-timerCallback ESPTimerCallback;
-
 void ARDUINO_ISR_ATTR onTimer(){
   // just call the callback
-  if (ESPTimerCallback)
-    (*ESPTimerCallback)();
+  if (isrCallback)
+    (*isrCallback)();
 }
 
 hw_timer_t * timer = NULL;
 
 TimerCounter::TimerCounter()
 {
-  ESPTimerCallback = NULL;
+  isrCallback = NULL;
 }
 
 void TimerCounter::initialize(unsigned long microseconds=1000000)
 {
-  ESPTimerCallback = NULL;
+  isrCallback = NULL;
   if (timer==NULL)
   {
     // count microseconds - so divide CPU freq in Hz by 1e6
@@ -596,8 +594,6 @@ void TimerCounter::attachInterrupt(timerCallback isr)
 
 #elif defined(ESP8266)
 
-timerCallback ESPTimerCallback;
-
 void IRAM_ATTR onTimer(){
   // just call the callback
   if (isrCallback)
@@ -606,12 +602,12 @@ void IRAM_ATTR onTimer(){
 
 TimerCounter::TimerCounter()
 {
-  ESPTimerCallback = NULL;
+  isrCallback = NULL;
 }
 
 void TimerCounter::initialize(unsigned long microseconds=1000000)
 {
-  ESPTimerCallback = NULL;
+  isrCallback = NULL;
   // Divide CPU freq in Hz (e.g. 80000000) by 1e6 (=> 80) to determine how many ticks per microsecond
   // DIV16 to reduce this by a factor of 16
   // ESP8266 timer1 is only 23 bits
@@ -636,7 +632,7 @@ void TimerCounter::stop()
 
 void TimerCounter::attachInterrupt(void (*isr)())
 {
-  ESPTimerCallback = isr;
+  isrCallback = isr;
   timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
 }
 
