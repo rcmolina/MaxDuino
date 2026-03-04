@@ -50,7 +50,7 @@ MaxDuino firmware is itself an open-source project and remains free for everybod
 
 ## LCD type
 
-* 128x64 GRAPHICAL OLED (SPI devices, compatible with SSD1306, SSD1309, or SH1106)
+* 128x64 GRAPHICAL OLED (I2C devices, compatible with SSD1306, SSD1309, or SH1106)
   * 0.96" - typically SSD1306
   * 1.3" - typically SH1106
   * 2.42" - typically SSD1309 (configured using same settings as 0.96" SSD1306)
