@@ -8,7 +8,7 @@
 #include "preferences.h"
 #include "current_settings.h"
 
-#if defined(RECORD_EEPROM_LOGO) || defined(LOAD_EEPROM_LOGO)
+#if defined(LOAD_EEPROM_LOGO)
 #include "EEPROM_wrappers.h"
 #endif
 
@@ -154,13 +154,13 @@
               il |= (1 << (ib*2)+1);
             }
           }
-*/
-/*
-          if (bitRead(ril,0)) il|= 1+2;
-          if (bitRead(ril,1)) il|= 4+8;
-          if (bitRead(ril,2)) il|= 16+32;
-          if (bitRead(ril,3)) il|= 64+128;
-*/
+  */
+  /*
+            if (bitRead(ril,0)) il|= 1+2;
+            if (bitRead(ril,1)) il|= 4+8;
+            if (bitRead(ril,2)) il|= 16+32;
+            if (bitRead(ril,3)) il|= 64+128;
+  */
 
           //mx_i2c_start(OLED_address);
           //mx_i2c_write(0x40);
@@ -376,106 +376,34 @@
     // sendcommand(0xA6); // SSD1306_NORMALDISPLAY
     // sendcommand(0x2E); // SSD1306_DEACTIVATE_SCROLL
 
-    #if defined(LOAD_EEPROM_LOGO)
-      byte t;
-    #endif
-
-    #if defined(OLED1306_128_64) || defined(video64text32)
-      for(int j=0;j<8;j++) {
-    #else
-      for(int j=0;j<4;j++) {
-    #endif
+#if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
+    byte t;
+  #if defined(OLED1306_128_64) || defined(video64text32)
+    for(int j=0;j<8;j++)
+  #else
+    for(int j=0;j<4;j++)
+  #endif
+    {
       setXY(0,j);
       for(int i=0;i<128;i++)     // show 128* 32 Logo
       {
-        #ifdef LOAD_MEM_LOGO
-          SendByte(pgm_read_byte(logo+j*128+i));
-        #endif
-
-        #if defined(RECORD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
-          EEPROM_put(j*128+i, pgm_read_byte(logo+j*128+i));
-        #endif
-
-        #if defined(RECORD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
-          if (i%2 == 0){
-            #ifdef OLED1306_128_64
-              if (j%2 == 0){
-                byte nl=0;
-                byte rnl=0;
-                byte nb=0;
-                rnl = pgm_read_byte(logo+j*128+i);
-                for(nb=0;nb<4;nb++) {
-                  if (bitRead (rnl,nb*2)) {
-                    nl |= (1 << nb);
-                  }
-                }
-                byte nh=0;
-                byte rnh=0;
-                byte nc=0;
-                rnh = pgm_read_byte(logo+(j+1)*128+i);
-                for(nc=0;nc<4;nc++) {
-                  if (bitRead (rnh,nc*2)) {
-                    nh |= (1 << nc);
-                  }
-                }
-
-                EEPROM_put((j/2)*64+i/2,nl+nh*16);
-              } 
-
-            #else
-              EEPROM_put(j*64+i/2, pgm_read_byte(logo+j*128+i));
-            #endif
-          }
-        #endif   
-
-        #if defined(LOAD_EEPROM_LOGO) && not defined(EEPROM_LOGO_COMPRESS)
-          EEPROM_get(j*128+i, t);
-          SendByte(t);
-        #endif
-
-        #if defined(LOAD_EEPROM_LOGO) && defined(EEPROM_LOGO_COMPRESS)
-          if (i%2 == 0){
-            t=0;
-            #ifdef OLED1306_128_64
-              if (j%2 == 0) {
-                byte ril=0;
-                byte ib=0;
-                EEPROM_get((j/2)*64+i/2, ril);
-
-                for(ib=0;ib<4;ib++) {
-                  if (bitRead (ril,ib)) {
-                    t |= (1 << ib*2);
-                    #ifdef COMPRESS_REPEAT_ROW
-                      t |= (1 << (ib*2)+1);
-                    #endif
-                  }
-                }
-              } else {
-                byte rih=0;
-                byte ic=0;
-                EEPROM_get((j/2)*64+i/2, rih);
-
-                for(ic=4;ic<8;ic++) {
-                  if (bitRead (rih,ic)) {
-                    t |= (1 << (ic-4)*2);
-                    #ifdef COMPRESS_REPEAT_ROW
-                      t |= (1 << ((ic-4)*2)+1);
-                    #endif
-                  }
-                }
-              }
-            #else
-              EEPROM_get(j*64+i/2, t);
-            #endif
-          }
-          SendByte(t);
-        #endif   
-    
-      }  
-    }
-    #if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
-      sendcommand(0xAF);    //display on
+    #if defined(LOAD_MEM_LOGO)
+        t = pgm_read_byte(logo+j*128+i);
+    #else // defined(LOAD_EEPROM_LOGO)
+      #if not defined(EEPROM_LOGO_COMPRESS)
+        EEPROM_get(j*128+i, t);
+      #else
+        t = EEPROM_get_compressed(i,j);
+      #endif
     #endif
+        SendByte(t);
+      }
+    }
+    sendcommand(0xAF);    //display on
+  #if defined(RECORD_EEPROM_LOGO)
+    write_logo_to_eeprom();
+  #endif
+#endif
   }
 
 //==========================================================//

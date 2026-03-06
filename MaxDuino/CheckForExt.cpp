@@ -13,7 +13,7 @@
   #include "caq.h"
 #endif
 
-void checkForEXT(const char * const filenameExt) {
+void checkForEXT() {
   //Check for .xxx file extension as these have no header
 
 #ifdef Use_CAS

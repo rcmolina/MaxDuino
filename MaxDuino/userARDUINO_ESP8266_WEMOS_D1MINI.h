@@ -116,9 +116,10 @@
 
 //#define COMPRESS_REPEAT_ROW
 //#define EEPROM_LOGO_COMPRESS
-#define LOAD_MEM_LOGO             
+//#define LOAD_MEM_LOGO             
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-//#define LOAD_EEPROM_LOGO 
+#define LOAD_EEPROM_LOGO 
+#define RECORD_EEPROM_LOGO_FROM_SDCARD
 
 // for list of logos, see filenames in "logos" folder, and remove the logo_ prefix from the filename
 // either use the below defines, or use -DLOGO

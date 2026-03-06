@@ -166,8 +166,9 @@
 #include "pinSetup.h"
 #include "USBStorage.h"
 #include "power.h"
+#include "EEPROM_logo.h"
 
-#ifdef BLOCK_EEPROM_PUT
+#if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO)
 #include "EEPROM_wrappers.h"
 #endif
 
@@ -185,6 +186,7 @@ byte _alt_tmp_dir = 1; // which of the _tmpdirs is scratch (we flip this between
 #endif
 
 char fileName[filenameLength + 1];    //Current filename
+char * filenameExt; // points to the file extension of the current filename
 char prevSubDir[SCREENSIZE+1];
 uint16_t DirFilePos[nMaxPrevSubDirs];  //File Positions in Directory to be restored (also, history of subdirectories)
 byte subdir = 0;
@@ -249,6 +251,12 @@ bool firstBlockPause = false;
 #endif
 
 void setup() {
+
+  #if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO)
+  // for some EEPROM libraries, need to initialise, but only once!
+  EEPROM_init();
+  #endif
+
   pinsetup();
   pinMode(chipSelect, OUTPUT);      //Setup SD card chipselect pin
 
@@ -961,17 +969,32 @@ void playFile() {
   }
   else if (!dirEmpty) 
   {
-    printtextF(PSTR("Playing"),0);
-    pauseOn = false;
-    scrollText(fileName, isDir, 0);
-    currpct=100;
-    lcdsegs=0;
-    UniPlay();
-      #ifdef P8544
-        lcd.gotoRc(3,38);
-        lcd.bitmap(Play, 1, 6);
-      #endif      
-    start=1;       
+    if(entry.open(currentDir, currentFile, O_RDONLY)) {
+      filenameExt = strrchr(fileName,'.') + 1;
+  #ifdef RECORD_EEPROM_LOGO_FROM_SDCARD
+      if (handle_load_logo_file())
+      {
+        // done
+        entry.close();
+        seekFile(); 
+        return;
+      }
+      else
+  #endif // RECORD_EEPROM_LOGO_FROM_SDCARD
+      {
+        printtextF(PSTR("Playing"),0);
+        pauseOn = false;
+        scrollText(fileName, isDir, 0);
+        currpct=100;
+        lcdsegs=0;
+        UniPlay();
+          #ifdef P8544
+            lcd.gotoRc(3,38);
+            lcd.bitmap(Play, 1, 6);
+          #endif      
+        start=1;       
+      }
+    }
   }    
 }
 
