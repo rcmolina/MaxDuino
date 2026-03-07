@@ -1105,8 +1105,8 @@ void SetPlayBlock()
         sendStrXY(" ID:", 7,0);
       }
           
-      input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
-      input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+      input[0]=HEX_CHAR(currentID>>4);
+      input[1]=HEX_CHAR(currentID&0x0f);
       input[2]=0;
       if (block < 100) {
         sendStrXY((char *)input,10,0);
@@ -1133,8 +1133,8 @@ void SetPlayBlock()
       sendStr((char *)input);//sendChar(' ');
       sendStr(" ID:");
 
-      input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
-      input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+      input[0]=HEX_CHAR(currentID>>4);
+      input[1]=HEX_CHAR(currentID&0x0f);
       input[2]=0;
       sendStr((char *)input);
     #endif
@@ -1362,7 +1362,7 @@ void block_mem_oled()
   #if defined(OLED1306) && defined(OLEDPRINTBLOCK) 
     #ifdef XY
       setXY(7,2);
-      sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+      sendChar(HEX_CHAR(currentID>>4));sendChar(HEX_CHAR(currentID&0x0f));
       setXY(14,2);
       if ((block%10) == 0) sendChar('0'+(block/10)%10);  
       setXY(15,2);
@@ -1370,15 +1370,15 @@ void block_mem_oled()
     #endif
     #if defined(XY2) && not defined(OLED1306_128_64)
       setXY(9,1);
-      sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+      sendChar(HEX_CHAR(currentID>>4));sendChar(HEX_CHAR(currentID&0x0f));
       setXY(12,1);
       if ((block%10) == 0) sendChar('0'+(block/10)%10);
       setXY(13,1);sendChar('0'+block%10);
     #endif
     #if defined(XY2) && defined(OLED1306_128_64)
       #ifdef XY2force
-        input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
-        input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+        input[0]=HEX_CHAR(currentID>>4);
+        input[1]=HEX_CHAR(currentID&0x0f);
         input[2]=0;
         sendStrXY((char *)input,7,4);
         if ((block%10) == 0) {
@@ -1390,7 +1390,7 @@ void block_mem_oled()
         sendStrXY((char *)input,15,4);
       #else                      
         setXY(7,4);
-        sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+        sendChar(HEX_CHAR(currentID>>4));sendChar(HEX_CHAR(currentID&0x0f));
         setXY(14,4);
         if ((block%10) == 0) sendChar('0'+(block/10)%10);
         setXY(15,4);

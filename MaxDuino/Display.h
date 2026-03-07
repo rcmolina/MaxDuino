@@ -64,7 +64,7 @@ void printtext(char* text, int l);
 
 #if defined(OLED1306)
 void OledStatusLine();
-extern PROGMEM const byte HEX_CHAR[];
+byte HEX_CHAR(byte);
 #endif
 
 #endif // DISPLAY_H_INCLUDED

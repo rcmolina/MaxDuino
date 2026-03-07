@@ -18,7 +18,11 @@
 
 #elif defined(OLED1306)
 
-  PROGMEM const byte HEX_CHAR[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  byte HEX_CHAR(byte nibble){
+    // optimised for smallest firmware size
+    if ((nibble + 7) & 16) nibble += 7;
+    return nibble + '0';
+  }
 
   #if defined(LOAD_EEPROM_LOGO)
     #include "EEPROM_wrappers.h"
