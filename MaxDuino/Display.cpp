@@ -768,7 +768,7 @@ void OledStatusLine() {
     sendStr("ID:   BLK:");
     #ifdef OLED1306_128_64
       setXY(0,7);
-      utoa(BAUDRATE,(char *)fline,10);
+      ultoa(BAUDRATE,(char *)fline,10);
       sendStr((char *)fline);
 
       #ifndef NO_MOTOR       
@@ -790,7 +790,7 @@ void OledStatusLine() {
     #else // OLED1306_128_64 not defined
 
       setXY(0,3);
-      utoa(BAUDRATE,(char *)fline,10);sendStr((char *)fline);
+      ultoa(BAUDRATE,(char *)fline,10);sendStr((char *)fline);
       #ifndef NO_MOTOR        
         setXY(5,3);
         if(mselectMask) {
@@ -811,7 +811,7 @@ void OledStatusLine() {
   #ifdef XY2                        // Y with double value
     #ifdef OLED1306_128_64          // 8 rows supported
       sendStrXY("ID:   BLK:",4,4);        
-      utoa(BAUDRATE,(char *)fline,10);
+      ultoa(BAUDRATE,(char *)fline,10);
       sendStrXY((char *)fline,0,6);
       #ifndef NO_MOTOR       
         if(mselectMask) {

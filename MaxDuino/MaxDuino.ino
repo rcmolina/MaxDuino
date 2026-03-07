@@ -462,13 +462,13 @@ void loop(void) {
             char len=0;
             lcd.setCursor(0,0); 
       
-            lcd.print(utoa(oldMinFile,input,10));
+            lcd.print(ultoa(oldMinFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(utoa(currentFile,input,10));
+            lcd.print(ultoa(currentFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(utoa(oldMaxFile,input,10));
+            lcd.print(ultoa(oldMaxFile,input,10));
             len += strlen(input); 
             for(char x=len;x<16;x++) {
               lcd.print(' '); 
@@ -505,13 +505,13 @@ void loop(void) {
           #if !defined(SHOW_DIRNAMES)
             char len=0;
             setXY(0,0);
-            sendStr(utoa(oldMinFile,input,10));
+            sendStr(ultoa(oldMinFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(utoa(currentFile,input,10));
+            sendStr(ultoa(currentFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(utoa(oldMaxFile,input,10));
+            sendStr(ultoa(oldMaxFile,input,10));
             len += strlen(input);
             for(char x=len;x<16;x++) {
               sendChar(' ');
@@ -1082,7 +1082,7 @@ void SetPlayBlock()
 
   #if defined(OLED1306)
     #if defined(XY2)
-      utoa(block, (char *)input, 10);
+      ultoa(block, (char *)input, 10);
       #if defined(OLEDBLKMATCH)              
         if (block<10) {
           input[1]=input[0];
@@ -1116,7 +1116,7 @@ void SetPlayBlock()
           
     #else // defined(XY2)
 
-      utoa(block, (char *)input, 10);
+      ultoa(block, (char *)input, 10);
       #if defined(OLEDBLKMATCH)              
         setXY(14,2);
         if (block <10) {
@@ -1382,7 +1382,7 @@ void block_mem_oled()
         input[2]=0;
         sendStrXY((char *)input,7,4);
         if ((block%10) == 0) {
-          utoa((block/10)%10,(char *)input,10);
+          ultoa((block/10)%10,(char *)input,10);
           sendStrXY((char *)input,14,4);
         }
         input[0]='0'+block%10;
