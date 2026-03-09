@@ -11,24 +11,24 @@ Many TZXDuino and MaxDuino have been produced by a variety of individual supplie
 MaxDuino firmware is itself an open-source project and remains free for everybody.
 
 * TZXDuino, ArduiTape, CASDuino, TSXDuino
-  * This is the 'classic' original device
+  * This is the 'classic' original device with a variety of different supporting hardware
   * Arduino Nano (ATMEGA328P), with either 128x64 GRAPHICAL OLED or 16x2 TEXT LCD, from a variety of suppliers and self-build kits.
+  * Due to variety of configurations, different build configurations are necessary and you may need to simply build your own.
   * Sometimes these devices include PCD8544 LCD controller instead. This is no longer supported by MaxDuino but support can be added back if there is sufficient demand!!
 * MaxDuino Ultimate (from You Make Robots)
   * Thinary Nano Every + 128x64 OLED + tape motor control
+  * Release build available: `ThinaryNanoEvery_MaxduinoUltimate`
 * MaxDuino Every (from You Make Robots)
   * Nano Every + 128x64 OLED + tape motor control
-* MaxDuino (from Antonia Villena)
-  * Either Arduino Nano ATMEGA328P or STM32
+  * Release build available: `NanoEvery_MaxduinoUltimate`
+* MaxDuino and Miniduino - ATMEGA328P based (from Antonio Villena)
   * (This entry is missing details, can you supply more info?)
-* MaxDuino Easy Upgrade (from Antonia Villena)
-  * ATMEGA32u4
-  * (This entry is missing details, can you supply more info?)
-* Miniduino (from Antonia Villena)
-  * Either Arduino Nano ATMEGA328P or STM32
-  * (This entry is missing details, can you supply more info?)
-* Miniduino Easy Upgrade (from Antonia Villena)
-  * ATMEGA32u4
+* MaxDuino and Miniduino - STM32 based (from Antonio Villena)
+  * STM32 + 0.96" 128x64 OLED + tape motor control
+  * Release build available: `STM32_MapleMiniDuino` (confirmed working but not yet optimised for OTLA)
+* MaxDuino Easy Upgrade and Miniduino Easy Upgrade (from Antonio Villena)
+  * ATMEGA32u4 + 0.96" OLED + tape motor control
+  * Release build available: `ATMEGA32U4_Miniduino` (confirmed working for Miniduino, can someone test with MaxDuino Easy Upgrade?)
   * (This entry is missing details, can you supply more info?)
 * MaxDuino Mega
   * ATMEGA2560
