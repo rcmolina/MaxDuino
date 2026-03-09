@@ -1,8 +1,8 @@
 # MaxDuino Installation
 
-If you have downloaded the files from the 'Releases' section of GitHub, go to the [Installing Releases][#Installing Releases] section below.
+If you have downloaded the files from the 'Releases' section of GitHub, go to the [Installing Releases](#installing_a_release) section below.
 
-If you have built your own variant using PlatformIO or Arduino IDE, the instructions for uploading to your device are on the [Building][BUILDING.md] page.
+If you have built your own variant using PlatformIO or Arduino IDE, the instructions for uploading to your device are on the [Building](./BUILDING.md) page.
 
 ## Releases
 
@@ -41,7 +41,7 @@ TBD
 On Windows, I use Platform IO with Visual Studio Code, which includes latest versions of esptool.  (For example, I find these in `%USERPROFILE%/.platformio/packages/tool-esptool` folder)
 `esptool.exe -v -cp COM4 -cd nodemcu -cf .\ESP8266_firmware_ESP8266.bin`
 
-You may need to adjust the com port and/or maybe also the reset method (-cd) ... use esptool -h for more help
+You may need to adjust the com port (`-cp COM4` in the above example) and/or maybe also the reset method (`-cd nodemcu` in the above example) ... use `esptool -h` for more help
 
 You can also use a graphical tool: https://docs.espressif.com/projects/esp-test-tools/en/latest/esp32/production_stage/tools/flash_download_tool.html .  Enter the downloaded .bin file into the first file entry using the ... button, set the address to 0x00000 , and check the checkbox for that row.  Clicking Start should then upload directly to the device.  You may then need to manually reset the device.
 
@@ -53,4 +53,4 @@ TBD
 
 ### STM32
 
-For more details, please see [STM32 INSTALLATION][STM32_INSTALLATION.md]
+For more details, please see [STM32 INSTALLATION](./STM32_INSTALLATION.md)
