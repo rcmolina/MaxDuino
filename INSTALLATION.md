@@ -53,4 +53,4 @@ TBD
 
 ### STM32
 
-TBD
+For more details, please see [STM32 INSTALLATION][STM32_INSTALLATION.md]
