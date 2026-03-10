@@ -462,13 +462,13 @@ void loop(void) {
             char len=0;
             lcd.setCursor(0,0); 
       
-            lcd.print(utoa(oldMinFile,input,10));
+            lcd.print(ultoa(oldMinFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(utoa(currentFile,input,10));
+            lcd.print(ultoa(currentFile,input,10));
             lcd.print('<');
             len += strlen(input) + 1;
-            lcd.print(utoa(oldMaxFile,input,10));
+            lcd.print(ultoa(oldMaxFile,input,10));
             len += strlen(input); 
             for(char x=len;x<16;x++) {
               lcd.print(' '); 
@@ -505,13 +505,13 @@ void loop(void) {
           #if !defined(SHOW_DIRNAMES)
             char len=0;
             setXY(0,0);
-            sendStr(utoa(oldMinFile,input,10));
+            sendStr(ultoa(oldMinFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(utoa(currentFile,input,10));
+            sendStr(ultoa(currentFile,input,10));
             sendChar('<');
             len += strlen(input) + 1;
-            sendStr(utoa(oldMaxFile,input,10));
+            sendStr(ultoa(oldMaxFile,input,10));
             len += strlen(input);
             for(char x=len;x<16;x++) {
               sendChar(' ');
@@ -1082,7 +1082,7 @@ void SetPlayBlock()
 
   #if defined(OLED1306)
     #if defined(XY2)
-      utoa(block, (char *)input, 10);
+      ultoa(block, (char *)input, 10);
       #if defined(OLEDBLKMATCH)              
         if (block<10) {
           input[1]=input[0];
@@ -1105,8 +1105,8 @@ void SetPlayBlock()
         sendStrXY(" ID:", 7,0);
       }
           
-      input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
-      input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+      input[0]=HEX_CHAR(currentID>>4);
+      input[1]=HEX_CHAR(currentID&0x0f);
       input[2]=0;
       if (block < 100) {
         sendStrXY((char *)input,10,0);
@@ -1116,7 +1116,7 @@ void SetPlayBlock()
           
     #else // defined(XY2)
 
-      utoa(block, (char *)input, 10);
+      ultoa(block, (char *)input, 10);
       #if defined(OLEDBLKMATCH)              
         setXY(14,2);
         if (block <10) {
@@ -1133,8 +1133,8 @@ void SetPlayBlock()
       sendStr((char *)input);//sendChar(' ');
       sendStr(" ID:");
 
-      input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
-      input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+      input[0]=HEX_CHAR(currentID>>4);
+      input[1]=HEX_CHAR(currentID&0x0f);
       input[2]=0;
       sendStr((char *)input);
     #endif
@@ -1362,7 +1362,7 @@ void block_mem_oled()
   #if defined(OLED1306) && defined(OLEDPRINTBLOCK) 
     #ifdef XY
       setXY(7,2);
-      sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+      sendChar(HEX_CHAR(currentID>>4));sendChar(HEX_CHAR(currentID&0x0f));
       setXY(14,2);
       if ((block%10) == 0) sendChar('0'+(block/10)%10);  
       setXY(15,2);
@@ -1370,19 +1370,19 @@ void block_mem_oled()
     #endif
     #if defined(XY2) && not defined(OLED1306_128_64)
       setXY(9,1);
-      sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+      sendChar(HEX_CHAR(currentID>>4));sendChar(HEX_CHAR(currentID&0x0f));
       setXY(12,1);
       if ((block%10) == 0) sendChar('0'+(block/10)%10);
       setXY(13,1);sendChar('0'+block%10);
     #endif
     #if defined(XY2) && defined(OLED1306_128_64)
       #ifdef XY2force
-        input[0]=pgm_read_byte(HEX_CHAR+(currentID>>4));
-        input[1]=pgm_read_byte(HEX_CHAR+(currentID&0x0f));
+        input[0]=HEX_CHAR(currentID>>4);
+        input[1]=HEX_CHAR(currentID&0x0f);
         input[2]=0;
         sendStrXY((char *)input,7,4);
         if ((block%10) == 0) {
-          utoa((block/10)%10,(char *)input,10);
+          ultoa((block/10)%10,(char *)input,10);
           sendStrXY((char *)input,14,4);
         }
         input[0]='0'+block%10;
@@ -1390,7 +1390,7 @@ void block_mem_oled()
         sendStrXY((char *)input,15,4);
       #else                      
         setXY(7,4);
-        sendChar(pgm_read_byte(HEX_CHAR+(currentID>>4)));sendChar(pgm_read_byte(HEX_CHAR+(currentID&0x0f)));
+        sendChar(HEX_CHAR(currentID>>4));sendChar(HEX_CHAR(currentID&0x0f));
         setXY(14,4);
         if ((block%10) == 0) sendChar('0'+(block/10)%10);
         setXY(15,4);

@@ -18,7 +18,11 @@
 
 #elif defined(OLED1306)
 
-  PROGMEM const byte HEX_CHAR[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  byte HEX_CHAR(byte nibble){
+    // optimised for smallest firmware size
+    if ((nibble + 7) & 16) nibble += 7;
+    return nibble + '0';
+  }
 
   #if defined(LOAD_EEPROM_LOGO)
     #include "EEPROM_wrappers.h"
@@ -764,7 +768,7 @@ void OledStatusLine() {
     sendStr("ID:   BLK:");
     #ifdef OLED1306_128_64
       setXY(0,7);
-      utoa(BAUDRATE,(char *)fline,10);
+      ultoa(BAUDRATE,(char *)fline,10);
       sendStr((char *)fline);
 
       #ifndef NO_MOTOR       
@@ -786,7 +790,7 @@ void OledStatusLine() {
     #else // OLED1306_128_64 not defined
 
       setXY(0,3);
-      utoa(BAUDRATE,(char *)fline,10);sendStr((char *)fline);
+      ultoa(BAUDRATE,(char *)fline,10);sendStr((char *)fline);
       #ifndef NO_MOTOR        
         setXY(5,3);
         if(mselectMask) {
@@ -807,7 +811,7 @@ void OledStatusLine() {
   #ifdef XY2                        // Y with double value
     #ifdef OLED1306_128_64          // 8 rows supported
       sendStrXY("ID:   BLK:",4,4);        
-      utoa(BAUDRATE,(char *)fline,10);
+      ultoa(BAUDRATE,(char *)fline,10);
       sendStrXY((char *)fline,0,6);
       #ifndef NO_MOTOR       
         if(mselectMask) {
