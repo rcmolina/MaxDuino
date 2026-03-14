@@ -6,18 +6,19 @@
 #define AYPLAY
 #define MenuBLK2A
 #define ID11CDTspeedup
-#define DIRECT_RECORDING
+#define Use_Rec
+#define Use_c64
 #define ZX81SPEEDUP
-#define Use_MTX
-#define Use_MZF
-#define Use_CAQ
-#define tapORIC
+//#define Use_MZF
+//#define Use_MTX
+//#define Use_CAQ
+//#define tapORIC
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
     #define Use_DRAGON
         #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
             #define Expand_All            // Expand short Leaders in ALL file header blocks.        
-#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
+//#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
     #define Use_c112                      // integer gap chunk for .uef
     #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
         #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
@@ -111,14 +112,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //#define COMPRESS_REPEAT_ROW
-#define EEPROM_LOGO_COMPRESS
-#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
+//#define EEPROM_LOGO_COMPRESS
+//#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
 //#define LOAD_EEPROM_LOGO 
 
 // for list of logos, see filenames in "logos" folder, and remove the logo_ prefix from the filename
 // either use the below defines, or use -DLOGO
-#define LOGO_128_64 trs80
+#define LOGO_128_64 MTX
 #define LOGO_128_32 LOGOMAXDUINO2
 #define LOGO_84_48 LOGOMAXDUINO2
 
@@ -127,5 +128,5 @@
 /////////////////////
 //#define DoubleFont
 
-#define FONT8x8 cartoon
+#define FONT8x8 cartoonFont
 #define FONT8x16 cartoon8x16
