@@ -27,9 +27,6 @@
 #ifdef Use_MZF
   #include "mzf.h"
 #endif
-#ifdef Use_MTX
-  #include "mtx.h"
-#endif
 #ifdef Use_CAQ
   #include "caq.h"
 #endif
@@ -868,12 +865,6 @@ void TZXProcess() {
       #ifdef Use_MZF
         case BLOCKID::MZF:
           mzf_process();
-          break;
-      #endif
-
-      #ifdef Use_MTX
-        case BLOCKID::MTX:
-          mtx_process();
           break;
       #endif
 

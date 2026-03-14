@@ -9,9 +9,6 @@
 #ifdef Use_MZF
   #include "mzf.h"
 #endif
-#ifdef Use_MTX
-  #include "mtx.h"
-#endif
 #ifdef Use_CAQ
   #include "caq.h"
 #endif
@@ -75,11 +72,6 @@ else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
     // MZT/M12 reuse the same 128-byte header layout and playback timings as MZF.
     // Initialises internal MZF playback state and then runs through TASK::PROCESSID.
     mzf_init();
-  }
-#endif
-#ifdef Use_MTX
-  else if (!strcasecmp_P(filenameExt, PSTR("mtx"))) {
-    mtx_init();
   }
 #endif
 #ifdef Use_CAS

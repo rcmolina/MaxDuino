@@ -9,7 +9,7 @@
 //#define AYPLAY
 //#define MenuBLK2A
 //#define ID11CDTspeedup
-//#define Use_Rec  for atmega 4808/4809
+#define DIRECT_RECORDING
 #define ZX81SPEEDUP
 //#define Use_MZF
 //#define Use_CAQ
