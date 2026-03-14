@@ -64,9 +64,12 @@ else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
 
 #endif
 #ifdef Use_MZF
-  else if (!strcasecmp_P(filenameExt, PSTR("mzf"))) {
-    // Sharp MZ series tape image (MZF).
+  else if (!strcasecmp_P(filenameExt, PSTR("mzf")) ||
+           !strcasecmp_P(filenameExt, PSTR("mzt")) ||
+           !strcasecmp_P(filenameExt, PSTR("m12"))) {
+    // Sharp MZ series tape image (MZF/MZT/M12).
     // Uses PWM encoding: long pulse = 1, short pulse = 0.
+    // MZT/M12 reuse the same 128-byte header layout and playback timings as MZF.
     // Initialises internal MZF playback state and then runs through TASK::PROCESSID.
     mzf_init();
   }
