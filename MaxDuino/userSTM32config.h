@@ -8,6 +8,7 @@
 #define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
+#define Use_MTX
 #define Use_MZF
 #define Use_CAQ
 #define tapORIC
@@ -119,7 +120,7 @@
 
 // for list of logos, see filenames in "logos" folder, and remove the logo_ prefix from the filename
 // either use the below defines, or use -DLOGO
-#define LOGO_128_64 Maxduino2Alf
+#define LOGO_128_64 cablemax
 #define LOGO_128_32 LOGOMAXDUINO2
 #define LOGO_84_48 LOGOMAXDUINO2
 
@@ -128,5 +129,5 @@
 /////////////////////
 //#define DoubleFont
 
-#define FONT8x8 cartoonFont
+#define FONT8x8 cartoon
 #define FONT8x16 cartoon8x16

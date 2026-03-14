@@ -11,8 +11,9 @@
 #define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
-#define Use_MZF
-#define Use_CAQ
+//#define Use_MTX
+//#define Use_MZF
+//#define Use_CAQ
 #define tapORIC
     #define ORICSPEEDUP
 #define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
@@ -132,5 +133,5 @@
 /////////////////////
 //#define DoubleFont
 
-#define FONT8x8 BasicFont
+#define FONT8x8 cartoon
 #define FONT8x16 cartoon8x16
