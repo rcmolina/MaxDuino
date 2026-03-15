@@ -15,7 +15,7 @@ extern unsigned long bytesRead;
 extern uint16_t currentFile; //File index (per filesystem) of current file, relative to current directory (pointed to by currentDir)
 extern char fileName[];
 
-extern byte filebuffer[]; // used for small reads from files (readfile, ReadByte, etc use this), sized for the largest read of bytes (= TZX or MSX HEADER read)
+extern byte filebuffer[]; // used for small reads from files (readfile, ReadByte, etc use this), sized for the largest header read
 extern byte lastByte;
 
 byte readfile(byte nbytes, unsigned long p);

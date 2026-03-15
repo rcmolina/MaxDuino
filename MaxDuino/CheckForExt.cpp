@@ -15,6 +15,9 @@
 #ifdef Use_CAQ
   #include "caq.h"
 #endif
+#ifdef Use_c64
+  #include "c64tap.h"
+#endif
 
 void checkForEXT(const char * const filenameExt) {
   //Check for .xxx file extension as these have no header
@@ -24,6 +27,12 @@ void checkForEXT(const char * const filenameExt) {
 #endif
 
   if (!strcasecmp_P(filenameExt, PSTR("tap"))) {
+#ifdef Use_c64
+    if (readfile(20, bytesRead) == 20 && c64tap_is_header(filebuffer, filesize)) {
+      c64tap_init();
+      return;
+    }
+#endif
     currentTask=TASK::PROCESSID;
     currentID=BLOCKID::TAP;
     readfile(1,bytesRead);
@@ -77,6 +86,7 @@ else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
     mzf_init();
   }
 #endif
+
 #ifdef Use_MTX
   else if (!strcasecmp_P(filenameExt, PSTR("mtx"))) {
     mtx_init();
@@ -103,3 +113,4 @@ else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
   }
 #endif  
 }
+

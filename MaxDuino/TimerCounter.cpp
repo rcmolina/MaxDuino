@@ -16,46 +16,30 @@ class HwTimerCounter:public HardwareTimer
   public:
     HwTimerCounter(uint8 timerNum) : HardwareTimer(timerNum) {};
     void setSTM32Period(unsigned long microseconds) __attribute__((always_inline)) {
-
-    if (microseconds < 65536/72) {
-      this->setPrescaleFactor(F_CPU/1000000/72);
-      this->setOverflow(microseconds*72);
-    }else  
-    if (microseconds < 65536/36) {
+      
+/*    if (microseconds < 65536/36) {
       this->setPrescaleFactor(F_CPU/1000000/36);
       this->setOverflow(microseconds*36);
-    }else
-    if (microseconds < 65536/24) {
-      this->setPrescaleFactor(F_CPU/1000000/24);
-      this->setOverflow(microseconds*24);
     }else
     if (microseconds < 65536/18) {
       this->setPrescaleFactor(F_CPU/1000000/18);
       this->setOverflow(microseconds*18);
+    }else */
+    if (microseconds < 65536/24) {
+      this->setPrescaleFactor(F_CPU/1000000/24);
+      this->setOverflow(microseconds*24);
     }else    
-    if (microseconds < 65536/12) {
-      this->setPrescaleFactor(F_CPU/1000000/12);
-      this->setOverflow(microseconds*12);
-    }else
-    if (microseconds < 65536/9) {
-      this->setPrescaleFactor(F_CPU/1000000/9);
-      this->setOverflow(microseconds*9);
-    }else
+/*    if (microseconds < 65536/16) {
+      this->setPrescaleFactor(F_CPU/1000000/16);
+      this->setOverflow(microseconds*16);
+    }else */
     if (microseconds < 65536/8) {
       this->setPrescaleFactor(F_CPU/1000000/8);
       this->setOverflow(microseconds*8);
     }else
-    if (microseconds < 65536/6) {
-      this->setPrescaleFactor(F_CPU/1000000/6);
-      this->setOverflow(microseconds*6);
-    }else
     if (microseconds < 65536/4) {
       this->setPrescaleFactor(F_CPU/1000000/4);
       this->setOverflow(microseconds*4);
-    }else
-    if (microseconds < 65536/3) {
-      this->setPrescaleFactor(F_CPU/1000000/3);
-      this->setOverflow(microseconds*3);
     }else
     if (microseconds < 65536/2) {
       this->setPrescaleFactor(F_CPU/1000000/2);
@@ -65,49 +49,47 @@ class HwTimerCounter:public HardwareTimer
       this->setPrescaleFactor(F_CPU/1000000);
       this->setOverflow(microseconds);
     }else
-    if (microseconds/2 < 65536) {
+    if (microseconds < 65536*2) {
       this->setPrescaleFactor(F_CPU/1000000*2);
       this->setOverflow(microseconds/2);
     }else
-    if (microseconds/4 < 65536) {
+    if (microseconds < 65536*4) {
       this->setPrescaleFactor(F_CPU/1000000*4);
       this->setOverflow(microseconds/4);
     }else
-    if (microseconds/8 < 65536) {
+    if (microseconds < 65536*8) {
       this->setPrescaleFactor(F_CPU/1000000*8);
       this->setOverflow(microseconds/8);
     }else
-    if (microseconds/16 < 65536) {
+/*    if (microseconds < 65536*16) {
       this->setPrescaleFactor(F_CPU/1000000*16);
       this->setOverflow(microseconds/16);
     }else
-    if (microseconds/32 < 65536) {
+    if (microseconds < 65536*32) {
       this->setPrescaleFactor(F_CPU/1000000*32);
       this->setOverflow(microseconds/32);
-    }else
-    if (microseconds/64 < 65536) {
+    }else */
+    if (microseconds < 65536*64) {
       this->setPrescaleFactor(F_CPU/1000000*64);
       this->setOverflow(microseconds/64);
     }else
-    if (microseconds/128 < 65536) {
+/*    if (microseconds < 65536*128) {
       this->setPrescaleFactor(F_CPU/1000000*128);
       this->setOverflow(microseconds/128);
     }else
-    if (microseconds/256 < 65536) {
+    if (microseconds < 65536*256) {
       this->setPrescaleFactor(F_CPU/1000000*256);
       this->setOverflow(microseconds/256);
-    }else
-    if (microseconds/512 < 65536) {                                    
+    }else */
+    if (microseconds < 65536*512) {                                    
       this->setPrescaleFactor(F_CPU/1000000*512);
       this->setOverflow(microseconds/512);
-    }else
-    {                           
-      this->setPrescaleFactor(72);
-      this->setOverflow(microseconds);      
+    }else {                           
+      this->setPrescaleFactor(F_CPU/1000000*512);
+      this->setOverflow(65535);      
     }
     this->refresh();
   }
-
 
 };
 
