@@ -8,6 +8,7 @@
 #define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
+#define Use_MTX
 #define Use_MZF
 #define Use_CAQ
 #define tapORIC
