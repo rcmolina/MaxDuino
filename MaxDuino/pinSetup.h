@@ -183,6 +183,12 @@
   #define btnDown       14            //Down button
   #define btnMotor      6             //Motor Sense (connect pin to gnd to play, NC for pause)
   #define btnRoot       7             //Return to SD card root
+
+  // Dedicated record button (requested: D8 on Nano 4808/4809).
+  // Only enabled when Use_Rec is set in userconfig.
+  #if defined(Use_Rec) && (defined(__AVR_ATmega4808__) || defined(__AVR_ATmega4809__))
+    #define btnRec      8
+  #endif
 #endif
 
 void pinsetup();

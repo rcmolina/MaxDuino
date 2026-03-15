@@ -21,6 +21,9 @@
 // submodules
 #include "zx8081.h"
 #include "ayplay.h"
+#ifdef Use_c64
+#include "c64tap.h"
+#endif
 #include "uef.h"
 #include "oric.h"
 #include "kansas_4b.h"
@@ -306,7 +309,6 @@ void PureDataBlock() {
   }
 }
 
-#ifdef DIRECT_RECORDING
 void writeDataDirect() {
   // Push byte from file into the buffer, with minimal processing.
   // One byte (8 bits) from file turns directly into one entry in the buffer
@@ -375,7 +377,7 @@ void writeDataDirect16() {
     writepos+=2;
   }
 }
-#endif
+
 
 void ForcePauseAfter0() {
   pauseOn=true;
@@ -647,7 +649,6 @@ void TZXProcess() {
           }
           break;
 
-    #ifdef DIRECT_RECORDING
       case BLOCKID::ID15:
         //process ID15 - Direct Recording          
         if(currentBlockTask==BLOCKTASK::READPARAM) {
@@ -691,7 +692,7 @@ void TZXProcess() {
             writeDataDirect();
           }
           break;
-      #endif
+
 
         case BLOCKID::ID19:
           //Process ID19 - Generalized data block
@@ -974,6 +975,12 @@ void TZXProcess() {
               break;
           }
           break; // Case for combined BLOCKID TAP & JTAP
+
+#ifdef Use_c64
+        case BLOCKID::C64TAP:
+          tzx_process_blockid_c64tap();
+          break;
+#endif
 
         case BLOCKID::ZXP:
           tzx_process_blockid_zx8081_zxp();

@@ -4,6 +4,9 @@
 #include "processing_state.h"
 #include "file_utils.h"
 #include "ayplay.h"
+#ifdef Use_c64
+#include "c64tap.h"
+#endif
 #include "casProcessing.h"
 #include "MaxProcessing.h"
 #ifdef Use_MZF
@@ -24,18 +27,25 @@ void checkForEXT(const char * const filenameExt) {
 #endif
 
   if (!strcasecmp_P(filenameExt, PSTR("tap"))) {
-    currentTask=TASK::PROCESSID;
-    currentID=BLOCKID::TAP;
-    readfile(1,bytesRead);
-    if (filebuffer[0] == 0x1A) {
-      currentID=BLOCKID::JTAP;    
-    }   
-    #ifdef tapORIC
-      //readfile(1,bytesRead);
-      if (filebuffer[0] == 0x16) {
-        currentID=BLOCKID::ORIC;
-      }
-    #endif
+#ifdef Use_c64
+    if (c64tap_is_valid()) {
+      c64tap_init();
+    } else {
+#endif
+      currentTask=TASK::PROCESSID;
+      currentID=BLOCKID::TAP;
+      readfile(1,bytesRead);
+      if (filebuffer[0] == 0x1A) {
+        currentID=BLOCKID::JTAP;    
+      }   
+      #ifdef tapORIC
+        if (filebuffer[0] == 0x16) {
+          currentID=BLOCKID::ORIC;
+        }
+      #endif
+#ifdef Use_c64
+    }
+#endif
   }
   else if (!strcasecmp_P(filenameExt, PSTR("p"))) {
     currentTask=TASK::PROCESSID;
@@ -77,11 +87,13 @@ else if (!strcasecmp_P(filenameExt, PSTR("caq"))) {
     mzf_init();
   }
 #endif
+
 #ifdef Use_MTX
   else if (!strcasecmp_P(filenameExt, PSTR("mtx"))) {
     mtx_init();
   }
 #endif
+
 #ifdef Use_CAS
   else if (!strcasecmp_P(filenameExt, PSTR("cas"))) {
     casduino = CASDUINO_FILETYPE::CASDUINO;

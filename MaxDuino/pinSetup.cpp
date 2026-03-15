@@ -1,3 +1,4 @@
+#include "configs.h"
 #include "Arduino.h"
 #include "pinSetup.h"
 
@@ -71,6 +72,16 @@ void pinsetup()
   //VPORTD.OUT |= _BV(btnRoot); 
   //PORTD |= _BV(btnRoot);
 
+  #if defined(Use_Rec) && defined(btnRec)
+    pinMode(btnRec, INPUT_PULLUP);
+
+    // Reduce noise on the recording ADC pin.
+    // ATmega4809 Nano Every: A7 = PD5 = AIN5
+    #if defined(PORT_ISC_INPUT_DISABLE_gc)
+      PORTD.PIN5CTRL = PORT_ISC_INPUT_DISABLE_gc;
+    #endif
+  #endif
+
 #elif defined(__AVR_ATmega4808__)
   //pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
   //digitalWrite(btnPlay,HIGH); // 17 PD3
@@ -107,6 +118,22 @@ void pinsetup()
   VPORTA.DIR |= ~PIN5_bm; 
   PORTA.PIN5CTRL |=PORT_PULLUPEN_bm; /* Enable the internal pullup */
   VPORTA.OUT |=  PIN5_bm;
+
+  #if defined(Use_Rec) && defined(btnRec)
+    pinMode(btnRec, INPUT_PULLUP);
+
+    // Reduce noise on the recording ADC pin (ATmega4808 Nano: A7 = PF5 = AIN15)
+    #if defined(PORT_ISC_INPUT_DISABLE_gc)
+      PORTF.PIN5CTRL = PORT_ISC_INPUT_DISABLE_gc;
+    #endif
+  #endif
+
+  // Reduce noise on the recording ADC pin (ATmega4808 Nano: A7 = PF5 = AIN15)
+  // - disable digital input buffer on PF5
+  // - ensure pullups are off
+  #if defined(PORT_ISC_INPUT_DISABLE_gc)
+    PORTF.PIN5CTRL = PORT_ISC_INPUT_DISABLE_gc;
+  #endif
   
 #elif defined(__arm__) && defined(__STM32F1__)
 

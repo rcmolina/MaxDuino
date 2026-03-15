@@ -11,6 +11,11 @@ bool button_down();
 bool button_menu();
 bool button_root();
 
+#ifdef Use_Rec
+// Dedicated record button (e.g. D8 on megaAVR boards)
+bool button_rec();
+#endif
+
 void debounce(bool (*)());
 void debouncemax(bool (*)());
 
