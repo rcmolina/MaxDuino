@@ -167,7 +167,7 @@
 #include "USBStorage.h"
 #include "power.h"
 
-#ifdef BLOCK_EEPROM_PUT
+#if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO)
 #include "EEPROM_wrappers.h"
 #endif
 
@@ -249,6 +249,12 @@ bool firstBlockPause = false;
 #endif
 
 void setup() {
+
+  #if defined(BLOCK_EEPROM_PUT) || defined(LOAD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO) || defined(RECORD_EEPROM_LOGO_FROM_SDCARD)
+  // for some EEPROM libraries, need to initialise, but only once!
+  EEPROM_init();
+  #endif
+
   pinsetup();
   pinMode(chipSelect, OUTPUT);      //Setup SD card chipselect pin
 
