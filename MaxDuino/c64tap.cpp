@@ -130,7 +130,8 @@ void emit_period(const unsigned long periodUs) {
   if (periodUs <= C64TAP_MAX_INLINE_US) {
     currentPeriod = (word)periodUs;
   } else {
-    begin_long_pulse_output(periodUs);
+    //begin_long_pulse_output(periodUs);
+    currentPeriod = 0x8400; //0x8400 for 2s, 0x9000 for 8s
   }
 }
 
