@@ -79,11 +79,13 @@ void queue_whole_wave(uint32_t totalUs) {
 
   c64tapPendingPulseUs = firstHalf;
   c64tapQueuedSecondHalfUs = secondHalf;
+/*
 if (totalUs*c64tapClockHz/1000000 < C64_DEFAULT_OVERFLOW_CYCLES)
   c64tapPendingPulseNeedsEdge = true;
 else
   c64tapPendingPulseNeedsEdge = false;
-
+*/
+  c64tapPendingPulseNeedsEdge = true;
 }
 void queue_half_wave(uint32_t totalUs) {
   c64tapPendingPulseUs = totalUs;
