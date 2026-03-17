@@ -129,7 +129,7 @@ void wave2() {
 
   if (pauseFlipBit || !isPauseBlock)
     pinState = !pinState;
-
+#ifdef Use_c64
   if (currentID == BLOCKID::C64TAP) { // flip signal
     if (pinState == LOW)
       WRITE_HIGH;
@@ -142,6 +142,12 @@ void wave2() {
     else
       WRITE_HIGH;
   }
+#else
+    if (pinState == LOW)
+      WRITE_LOW;    
+    else
+      WRITE_HIGH;
+#endif
 
   if (isPauseBlock)
   {
