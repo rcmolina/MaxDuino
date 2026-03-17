@@ -21,8 +21,14 @@
   void displayOff(void);
   void clear_display(void);
   void init_OLED(void);
-
-  #if defined(XY2) && not defined(DoubleFont)
+#if defined(LOAD_EEPROM_LOGO)
+  void display_eeprom_logo(void);
+#endif
+#if defined(LOAD_MEM_LOGO) || defined(RECORD_EEPROM_LOGO)
+  void display_or_record_mem_logo(void);
+#endif
+  
+#if defined(XY2) && not defined(DoubleFont)
     PROGMEM const byte DFONT[16] = { 0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F, 0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF };
   #endif
 
