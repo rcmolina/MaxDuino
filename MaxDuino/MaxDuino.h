@@ -9,6 +9,10 @@
 #define SHORT_HEADER        200
 #define LONG_HEADER         800
 
+#define HOLD_SIGNAL_FLAG    0x5000
+#define HOLD_SIGNAL_MASK    0xF000
+#define HOLD_SIGNAL_MAX_US  0x0FFF
+
 // processing.cpp can call stopFile and seekFile, which are defined in MaxDuino.ino
 void stopFile();
 void seekFile();
@@ -50,10 +54,13 @@ enum BLOCKID
   JTAP = 0xF8,    //JUPITER ACE Tap File  
   UEF = 0xF9,     //UEF file
   ORIC = 0xFA,    //Oric Tap File
-  AYO = 0xFB,     //AY file
-  ZXO = 0xFC,     //ZX80 O file
-  ZXP = 0xFD,     //ZX81 P File
-  TAP = 0xFE,     //Tap File Mode
+#ifdef Use_c64
+  C64TAP = 0xFB,  //Commodore TAP file
+#endif
+  AYO = 0xFC,     //AY file
+  ZXO = 0xFD,     //ZX80 O file
+  ZXP = 0xFE,     //ZX81 P File
+  TAP = 0xEF,     //Tap File Mode
   IDEOF = 0xFF,   //End of file
 };
 

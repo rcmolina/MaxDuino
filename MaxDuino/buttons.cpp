@@ -62,6 +62,18 @@ bool button_up()
   return(sensorValue>=btnADCUpLow && sensorValue<btnADCDownLow);
 }
 
+#ifdef Use_Rec
+bool button_rec()
+{
+  // Record is a dedicated digital pin even when the rest of the UI uses ADC buttons.
+  #ifdef btnRec
+    return (digitalRead(btnRec) == LOW);
+  #else
+    return false;
+  #endif
+}
+#endif
+
 #else // !defined (BUTTON_ADC)
 
 void setup_buttons(void)
@@ -96,6 +108,16 @@ bool button_down() {
 bool button_up() {
   return(digitalRead(btnUp) == LOW);
 }
+
+#ifdef Use_Rec
+bool button_rec() {
+  #ifdef btnRec
+    return (digitalRead(btnRec) == LOW);
+  #else
+    return false;
+  #endif
+}
+#endif
 
 #endif // defined(BUTTON_ADC)
 

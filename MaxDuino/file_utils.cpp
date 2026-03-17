@@ -9,7 +9,7 @@ unsigned long filesize;
 byte lastByte;
 _readout_type readout;
 
-byte filebuffer[10]; // used for small reads from files (readfile, ReadByte, etc use this), sizes for the largest ready of bytes (= TZX or MSX HEADER read)
+byte filebuffer[20]; // used for small reads from files (readfile, ReadByte, etc use this), sized for the largest header read
 byte readfile(byte nbytes, unsigned long p)
 {
   byte i=0;

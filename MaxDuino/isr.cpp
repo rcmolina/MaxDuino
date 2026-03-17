@@ -3,7 +3,9 @@
 #include "buffer.h"
 #include "pinSetup.h"
 #include "current_settings.h"
+#include "processing_state.h" // checking CURRENT_ID
 #include "TimerCounter.h"
+#include "MaxDuino.h"
 
 
 //ISR Variables accessed/written by main loop
@@ -26,14 +28,21 @@ void wave2() {
   word workingPeriod = word(readBuffer[readpos], readBuffer[readpos+1]);
   byte pauseFlipBit = false;
   unsigned long newTime;
-  #ifdef DIRECT_RECORDING
   static unsigned long directSampleLength;
-  #endif
  
   if(isStopped)
   {
     newTime = 50000;
     goto _set_period;
+  }
+
+  if ((workingPeriod & HOLD_SIGNAL_MASK) == HOLD_SIGNAL_FLAG)
+  {
+
+    newTime = workingPeriod & HOLD_SIGNAL_MAX_US;
+    if (newTime == 0)
+      newTime = 1;
+    goto _next;
   }
 
   if bitRead(workingPeriod, 15)          
@@ -62,7 +71,6 @@ void wave2() {
     if (!wasPauseBlock)
       pauseFlipBit = true;
   }
-  #ifdef DIRECT_RECORDING
   else if (bitRead(workingPeriod, 14))
   {
     if bitRead(workingPeriod, 13)
@@ -113,7 +121,6 @@ void wave2() {
       goto _next;
     }
   }
-  #endif
   else if (workingPeriod==0)
   {
     newTime = 1000; // Just in case we have a 0 in the buffer
@@ -122,11 +129,25 @@ void wave2() {
 
   if (pauseFlipBit || !isPauseBlock)
     pinState = !pinState;
-
-  if (pinState == LOW)
-    WRITE_LOW;    
-  else
-    WRITE_HIGH;
+#ifdef Use_c64
+  if (currentID == BLOCKID::C64TAP) { // flip signal
+    if (pinState == LOW)
+      WRITE_HIGH;
+    else
+      WRITE_LOW;
+  }
+  else {
+    if (pinState == LOW)
+      WRITE_LOW;    
+    else
+      WRITE_HIGH;
+  }
+#else
+    if (pinState == LOW)
+      WRITE_LOW;    
+    else
+      WRITE_HIGH;
+#endif
 
   if (isPauseBlock)
   {

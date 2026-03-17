@@ -18,10 +18,10 @@
 #define AYPLAY
 #define MenuBLK2A
 #define ID11CDTspeedup
-#define DIRECT_RECORDING
+//#define Use_Rec  for atmega 4808/4809
 #define ZX81SPEEDUP
-//#define Use_MTX
 #define Use_MZF
+#define Use_MTX
 #define Use_CAQ
 #define tapORIC
     #define ORICSPEEDUP
