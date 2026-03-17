@@ -3,6 +3,7 @@
 #include "buffer.h"
 #include "pinSetup.h"
 #include "current_settings.h"
+#include "processing_state.h" // checking CURRENT_ID
 #include "TimerCounter.h"
 #include "MaxDuino.h"
 
@@ -37,6 +38,7 @@ void wave2() {
 
   if ((workingPeriod & HOLD_SIGNAL_MASK) == HOLD_SIGNAL_FLAG)
   {
+
     newTime = workingPeriod & HOLD_SIGNAL_MAX_US;
     if (newTime == 0)
       newTime = 1;
@@ -128,10 +130,18 @@ void wave2() {
   if (pauseFlipBit || !isPauseBlock)
     pinState = !pinState;
 
-  if (pinState == LOW)
-    WRITE_LOW;    
-  else
-    WRITE_HIGH;
+  if (currentID == BLOCKID::C64TAP) { // flip signal
+    if (pinState == LOW)
+      WRITE_HIGH;
+    else
+      WRITE_LOW;
+  }
+  else {
+    if (pinState == LOW)
+      WRITE_LOW;    
+    else
+      WRITE_HIGH;
+  }
 
   if (isPauseBlock)
   {
