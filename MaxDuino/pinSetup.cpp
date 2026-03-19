@@ -28,7 +28,7 @@ void pinsetup()
   PORTH |= _BV(3);
 
 #elif defined(__AVR_ATmega4809__)
-  //pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
+//pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
   //digitalWrite(btnPlay,HIGH); // 17 PD0
   //PORTD.PIN0CTRL |=0B00001000;
   PORTD.PIN0CTRL |=PORT_PULLUPEN_bm; /* Enable the internal pullup */
@@ -184,7 +184,7 @@ void pinsetup()
   // BUTTON PIN CONFIGURATION
   // n.a.
   
-#else  //__AVR_ATmega328P__
+#elif defined(__AVR_ATmega328P__)
   //pinMode(btnPlay,INPUT_PULLUP);  // Not needed, default is INPUT (0)
 //  digitalWrite(btnPlay,HIGH); // Wrte for INPUT_PULLUP if input type is only INPUT
   PORTC |= _BV(3);
@@ -208,5 +208,7 @@ void pinsetup()
   //pinMode(btnRoot, INPUT_PULLUP);  // Not needed, default is INPUT (0)
 //  digitalWrite(btnRoot, HIGH); 
   PORTD |= _BV(btnRoot);
+#else
+#error Unknown device type or missing definition in pinSetup.h
 #endif
 }
