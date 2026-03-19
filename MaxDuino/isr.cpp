@@ -3,7 +3,6 @@
 #include "buffer.h"
 #include "pinSetup.h"
 #include "current_settings.h"
-#include "processing_state.h" // checking CURRENT_ID
 #include "TimerCounter.h"
 #include "MaxDuino.h"
 
@@ -129,32 +128,25 @@ void wave2() {
 
   if (pauseFlipBit || !isPauseBlock)
     pinState = !pinState;
-#ifdef Use_c64
-  if (currentID == BLOCKID::C64TAP) { // flip signal
-    if (pinState == LOW)
-      WRITE_HIGH;
-    else
-      WRITE_LOW;
-  }
-  else {
-    if (pinState == LOW)
-      WRITE_LOW;    
-    else
-      WRITE_HIGH;
-  }
-#else
-    if (pinState == LOW)
-      WRITE_LOW;    
-    else
-      WRITE_HIGH;
-#endif
 
+
+  if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = !pinState; // pre flip signal
+
+  if (pinState == LOW)
+    WRITE_LOW;    
+  else
+    WRITE_HIGH;
+
+  if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = !pinState; // post flip signal
+
+_after_invert:
   if (isPauseBlock)
   {
     if(pauseFlipBit)
     {
       newTime = 1500;                     //Set 1.5ms initial pause block
-      pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;   
+      //pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;
+      pinState= !pinState;   
       // reduce pause by 1ms as we've already pause for 1.5ms
       workingPeriod = workingPeriod - 1;
       readBuffer[readpos] = workingPeriod /256;
