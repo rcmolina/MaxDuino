@@ -132,7 +132,9 @@ void emit_period(const unsigned long periodUs) {
   } else {
     //begin_long_pulse_output(periodUs);
     //currentPeriod = 0x8400; //0x8400 for 2s, 0x9000 for 8s
-    currentPeriod = 32768 + (word)(periodUs/1000);  // use millis
+    //currentPeriod = (word)(periodUs/1000) |0x8000;  // use millis
+    currentPeriod = (word)(periodUs/1000);  // use millis
+    bitSet(currentPeriod, 15);
   }
 }
 

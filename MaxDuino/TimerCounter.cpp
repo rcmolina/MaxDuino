@@ -101,9 +101,10 @@ class HwTimerCounter:public HardwareTimer
       this->setPrescaleFactor(F_CPU/1000000*512);
       this->setOverflow(microseconds/512);
     }else
+
     {                           
-      this->setPrescaleFactor(72);
-      this->setOverflow(microseconds);      
+      //this->setPrescaleFactor(2);
+      this->setOverflow(microseconds*36);      
     }
     this->refresh();
   }

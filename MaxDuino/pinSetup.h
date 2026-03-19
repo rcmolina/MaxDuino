@@ -73,8 +73,8 @@
   #define WRITE_LOW               digitalWrite(outputPin,LOW)
   #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
 
-#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega4808__) || defined(__AVR_ATmega4809__)
-  //#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design . You can define this in platformio.ini
+#else  //__AVR_ATmega328P__
+  //#define MINIDUINO_AMPLI     // For A.Villena's Miniduino new design
   #define outputPin           9
   #ifdef MINIDUINO_AMPLI
     #define INIT_OUTPORT         DDRB |= B00000011                              // pin8+ pin9 es el bit0-bit1 del PORTB 
@@ -102,19 +102,14 @@
   #define WRITE_LOW          PORTB |= _BV(1)         // El pin9 es el bit1 del PORTB
   // pin 0-7 PortD0-7, pin 8-13 PortB0-5, pin 14-19 PortC0-5
 #endif
-
 */
 
-#else
-#error Unknown device type or missing definition in pinSetup.h
 #endif 
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////
   //General Pin settings
   //Setup buttons with internal pullup
 
-#if defined(__AVR_ATmega2560__)
+#ifdef __AVR_ATmega2560__
 
   const byte chipSelect = 53;          //Sd card chip select pin
   
@@ -179,7 +174,7 @@
 #define btnADC        A0 
 #define btnMotor      2
 
-#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega4808__) || defined(__AVR_ATmega4809__)
+#else
   const byte chipSelect = 10;          //Sd card chip select pin
   
   #define btnPlay       17            //Play Button
@@ -194,8 +189,6 @@
   #if defined(Use_Rec) && (defined(__AVR_ATmega4808__) || defined(__AVR_ATmega4809__))
     #define btnRec      8
   #endif
-#else
-#error Unknown device type or missing definition in pinSetup.h
 #endif
 
 void pinsetup();

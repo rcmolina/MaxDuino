@@ -11,6 +11,8 @@
 #define MenuBLK2A
 #define ID11CDTspeedup
 #define ZX81SPEEDUP
+#define Use_c64
+//#define Use_Rec  for atmega 4808/4809
 #define Use_MZF
 #define Use_MTX
 #define Use_CAQ
@@ -116,7 +118,7 @@
 
 //#define COMPRESS_REPEAT_ROW
 //#define EEPROM_LOGO_COMPRESS
-//#define LOAD_MEM_LOGO             
+#define LOAD_MEM_LOGO             
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
 //#define LOAD_EEPROM_LOGO 
 
