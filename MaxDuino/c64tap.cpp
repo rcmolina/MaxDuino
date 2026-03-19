@@ -63,10 +63,13 @@ unsigned long cycles_per_second() {
   }
 }
 
-unsigned long cycles_to_us(const unsigned long cycles) {
+unsigned long cycles_to_us(const unsigned long cycles) { //PAL: (((2030*cycles+1000)>>1)/1000)
   const unsigned long cps = cycles_per_second();
-  const unsigned long long numerator = (unsigned long long)cycles * 1000000ULL + (cps / 2);
-  const unsigned long periodUs = (unsigned long)(numerator / cps);
+  //const unsigned long long numerator = (unsigned long long)cycles * 1000000ULL + (cps / 2);
+  //const unsigned long periodUs = (unsigned long)(numerator / cps);
+  //const unsigned long N = (unsigned long)((2000000000ULL + cps)/cps);
+  unsigned long N= ((2000000UL+cps)>>1)/cps*2000UL ;
+  const unsigned long periodUs = (unsigned long)(((N*cycles+1000)>>1)/1000);
   return (periodUs == 0) ? 1UL : periodUs;
 }
 
