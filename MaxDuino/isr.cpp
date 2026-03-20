@@ -130,14 +130,14 @@ void wave2() {
     pinState = !pinState;
 
 
-  if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = !pinState; // pre flip signal
+  //if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = !pinState; // pre flip signal
+  //if (pinState == LOW)
+  //if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = !pinState; // post flip signal
 
-  if (pinState == LOW)
+  if (pinState ^ TSXCONTROLzxpolarityUEFSWITCHPARITY == LOW)
     WRITE_LOW;    
   else
     WRITE_HIGH;
-
-  if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = !pinState; // post flip signal
 
 _after_invert:
   if (isPauseBlock)
