@@ -11,8 +11,7 @@
 #ifdef Use_c64
 namespace {
 
-const uint32_t C64_PAL_CLOCK_HZ = 985248UL;
-//const uint32_t C64_PAL_CLOCK_HZ = 983248UL;  //*0,998
+const uint32_t C64_PAL_CLOCK_HZ = 985248UL; // testing: *0,998=983248UL;
 const uint32_t C64_NTSC_CLOCK_HZ = 1022727UL;
 const uint32_t C64_UNIT_CYCLES = 8UL;
 const uint16_t C64_HEADER_SIZE = 20;
@@ -33,7 +32,8 @@ uint32_t cycles_to_us(uint32_t cycles) {
     return 1;
   }
 
-  uint32_t usec = ((cycles * 1000000UL) + (c64tapClockHz / 2UL)) / c64tapClockHz;
+  //uint32_t usec = ((cycles * 1000000UL) + (c64tapClockHz / 2UL)) / c64tapClockHz;
+  uint32_t usec = ((cycles * 2000000UL +c64tapClockHz)>>1)/c64tapClockHz;
   if (usec == 0) {
     usec = 1;
   }
