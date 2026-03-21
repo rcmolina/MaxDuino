@@ -129,26 +129,36 @@ void wave2() {
 
   if (pauseFlipBit || !isPauseBlock)
     pinState = !pinState;
+
+/*
+#ifdef Use_c64
+  if (currentID == BLOCKID::C64TAP) pinState = !pinState; // pre flip signal
+#endif
+  if (pinState == LOW)
+    WRITE_LOW;    
+  else
+    WRITE_HIGH;
+#ifdef Use_c64
+  if (currentID == BLOCKID::C64TAP) pinState = !pinState; // post flip signal
+#endif
+*/
 #ifdef Use_c64
   if (currentID == BLOCKID::C64TAP) { // flip signal
     if (pinState == LOW)
       WRITE_HIGH;
     else
       WRITE_LOW;
+
+    goto _after_invert;
   }
-  else {
-    if (pinState == LOW)
-      WRITE_LOW;    
-    else
-      WRITE_HIGH;
-  }
-#else
-    if (pinState == LOW)
-      WRITE_LOW;    
-    else
-      WRITE_HIGH;
 #endif
 
+  if (pinState == LOW)
+    WRITE_LOW;    
+  else
+    WRITE_HIGH;
+
+_after_invert:
   if (isPauseBlock)
   {
     if(pauseFlipBit)
