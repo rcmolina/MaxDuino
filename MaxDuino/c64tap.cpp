@@ -68,7 +68,6 @@ unsigned long cycles_to_us(const unsigned long cycles) { //PAL: (((2030*cycles+1
   const unsigned long cps = cycles_per_second();
   //const unsigned long long numerator = (unsigned long long)cycles * 1000000ULL + (cps / 2);
   //const unsigned long periodUs = (unsigned long)(numerator / cps);
-  //const unsigned long N = (unsigned long)((2000000000ULL + cps)/cps);
   const unsigned long N= ((2000000UL+cps)>>1)/cps*2000UL ;
   const unsigned long periodUs = (unsigned long)(((N*cycles+1000)>>1)/1000);
   return (periodUs == 0) ? 1UL : periodUs;
@@ -137,11 +136,12 @@ void emit_period(const unsigned long periodUs) {
     //begin_long_pulse_output(periodUs);
     //currentPeriod = 0x8400; //0x8400 for 2s, 0x9000 for 8s
     //currentPeriod = (word)(periodUs/1000) |0x8000;  // use millis
-    if (skip2A){ 
+
+    //if (skip2A){ 
       currentPeriod = (word)(periodUs/1000);  // use millis
       bitSet(currentPeriod, 15);
-    }
-    else ForcePauseAfter0();
+    //}
+    //else ForcePauseAfter0();
   }
 }
 
@@ -149,7 +149,7 @@ bool emit_pending_long_pulse_word() {
   if (c64tapPendingLongStage == 0) {
     return false;
   }
-
+/*
   if (c64tapPendingLongStage == 2) {
     currentPeriod = (word)(c64tapPendingLongPeriodUs & 0xFFFFUL);
     c64tapPendingLongStage = 1;
@@ -158,7 +158,7 @@ bool emit_pending_long_pulse_word() {
     c64tapPendingLongPeriodUs = 0;
     c64tapPendingLongStage = 0;
   }
-
+*/
   return true;
 }
 
