@@ -63,10 +63,13 @@ unsigned long cycles_per_second() {
   }
 }
 
-unsigned long cycles_to_us(const unsigned long cycles) {
+unsigned long cycles_to_us(const unsigned long cycles) { //PAL: (((2030*cycles+1000)>>1)/1000)
   const unsigned long cps = cycles_per_second();
-  const unsigned long long numerator = (unsigned long long)cycles * 1000000ULL + (cps / 2);
-  const unsigned long periodUs = (unsigned long)(numerator / cps);
+  //const unsigned long long numerator = (unsigned long long)cycles * 1000000ULL + (cps / 2);
+  //const unsigned long periodUs = (unsigned long)(numerator / cps);
+  //const unsigned long N = (unsigned long)((2000000000ULL + cps)/cps);
+  const unsigned long N= ((2000000UL+cps)>>1)/cps*2000UL ;
+  const unsigned long periodUs = (unsigned long)(((N*cycles+1000)>>1)/1000);
   return (periodUs == 0) ? 1UL : periodUs;
 }
 
@@ -132,7 +135,9 @@ void emit_period(const unsigned long periodUs) {
   } else {
     //begin_long_pulse_output(periodUs);
     //currentPeriod = 0x8400; //0x8400 for 2s, 0x9000 for 8s
-    currentPeriod = 32768 + (word)(periodUs/1000);  // use millis
+    //currentPeriod = (word)(periodUs/1000) |0x8000;  // use millis
+    currentPeriod = (word)(periodUs/1000);  // use millis
+    bitSet(currentPeriod, 15);
   }
 }
 
