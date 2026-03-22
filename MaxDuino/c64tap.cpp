@@ -102,6 +102,11 @@ bool read_next_period(unsigned long &periodUs) {
     cycles = outLong;
   }
 
+  if ((!skip2A) && cycles>=2048){
+    ForcePauseAfter0();
+    return true;
+  }
+
   periodUs = cycles_to_us(cycles);
   return true;
 }
@@ -136,12 +141,8 @@ void emit_period(const unsigned long periodUs) {
     //begin_long_pulse_output(periodUs);
     //currentPeriod = 0x8400; //0x8400 for 2s, 0x9000 for 8s
     //currentPeriod = (word)(periodUs/1000) |0x8000;  // use millis
-
-    //if (skip2A){ 
       currentPeriod = (word)(periodUs/1000);  // use millis
       bitSet(currentPeriod, 15);
-    //}
-    //else ForcePauseAfter0();
   }
 }
 
