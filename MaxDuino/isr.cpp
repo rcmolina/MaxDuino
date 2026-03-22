@@ -163,8 +163,15 @@ _after_invert:
   {
     if(pauseFlipBit)
     {
-      newTime = 1500;                     //Set 1.5ms initial pause block
-      pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;   
+      newTime = 1500;                     //Set 1.5ms initial pause block 
+      #ifdef Use_c64
+         if (currentID == BLOCKID::C64TAP) {
+            pinState= !pinState;
+            goto _after_pause_flip;
+         }
+      #endif
+      pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;  
+ _after_pause_flip:
       // reduce pause by 1ms as we've already pause for 1.5ms
       workingPeriod = workingPeriod - 1;
       readBuffer[readpos] = workingPeriod /256;
