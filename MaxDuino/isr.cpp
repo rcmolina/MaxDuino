@@ -55,7 +55,7 @@ void wave2() {
       //pinState = LOW;
       //WRITE_LOW;
       pinState = !pinState;
-      if (pinState == LOW)
+      if (pinState ^ TSXCONTROLzxpolarityUEFSWITCHPARITY == LOW)
         WRITE_LOW; 
       else   
         WRITE_HIGH;
