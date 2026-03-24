@@ -56,7 +56,17 @@ void wave2() {
       //pinState = LOW;
       //WRITE_LOW;
       pinState = !pinState;
-      if (pinState == LOW)
+      #ifdef Use_c64
+        if (currentID == BLOCKID::C64TAP) {
+          if (pinState == LOW)
+            WRITE_HIGH; 
+          else   
+            WRITE_LOW;
+           
+           goto _next;
+        }
+      #endif
+      if (pinState ^TSXCONTROLzxpolarityUEFSWITCHPARITY == LOW)
         WRITE_LOW; 
       else   
         WRITE_HIGH;
@@ -153,7 +163,7 @@ void wave2() {
   }
 #endif
 
-  if (pinState == LOW)
+  if (pinState ^TSXCONTROLzxpolarityUEFSWITCHPARITY == LOW)
     WRITE_LOW;    
   else
     WRITE_HIGH;
@@ -164,14 +174,7 @@ _after_invert:
     if(pauseFlipBit)
     {
       newTime = 1500;                     //Set 1.5ms initial pause block 
-      #ifdef Use_c64
-         if (currentID == BLOCKID::C64TAP) {
-            pinState= !pinState;
-            goto _after_pause_flip;
-         }
-      #endif
-      pinState = TSXCONTROLzxpolarityUEFSWITCHPARITY;  
- _after_pause_flip:
+      pinState = !pinState;  
       // reduce pause by 1ms as we've already pause for 1.5ms
       workingPeriod = workingPeriod - 1;
       readBuffer[readpos] = workingPeriod /256;
